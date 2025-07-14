@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('source_alert_name')->nullable(); // Name of the source alert, if applicable
             $table->string('alert_type'); // Type of alert (e.g., 'Security', 'Safety', etc.)
             $table->string('alert_description'); // Description of the alert
-            $table->string('alert_status'); 
+            $table->string('alert_status');  
             $table->date('alert_date')->nullable(); // Date when the alert was raised
             $table->date('alert_resolved_date')->nullable(); // Date when the alert was resolved, if applicable
             $table->timestamps();

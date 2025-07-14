@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
 class SelectedChecklistQuestion extends Model
 {
@@ -24,8 +26,21 @@ class SelectedChecklistQuestion extends Model
         'follow_up_date',
         'proposed_follow_up_action',
         'date_of_closure',
-        'status'
+        'status',
+        'evidence_file',
     ];
+
+    public function scopeSearch(Builder $query , Request $request){       
+        return $query->where(function($query) use ($request){
+            return $query->when($request->search,function($query) use ($request){ 
+                return $query->where(function ($query) use ($request){
+                    $query->where('question','like','%'.$request->search.'%')
+                    ->orWhere('status','like','%'.$request->search.'%')
+                    ->orWhere('finding_category','like','%'.$request->search.'%');
+                });
+            });
+        });
+    }
 
     public function qualityControl()
     {

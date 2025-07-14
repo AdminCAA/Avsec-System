@@ -5,12 +5,7 @@
                 <li class="nav-item">
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="index3.html" class="nav-link">Home</a>
-                </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="#" class="nav-link">Contact</a>
-                </li>
+                
                 </ul>
 
                 <!-- Right navbar links -->
@@ -99,7 +94,8 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link" data-toggle="dropdown" href="#">
                     <i class="far fa-bell"></i>
-                    <span class="badge badge-warning navbar-badge">15</span>
+                    <Link :href="route('securityconcerns.index')"><span class="badge badge-warning navbar-badge">{{ securityConcernCounter }}</span>
+                    </Link>
                     </a>
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                     <span class="dropdown-header">15 Notifications</span>
@@ -138,15 +134,32 @@
 </template>
 <script setup>
 import { ref } from 'vue';
-import { usePage } from '@inertiajs/vue3';
+import { usePage,Link } from '@inertiajs/vue3';
 import { useRoute } from 'vue-router';
+import axios from 'axios';
+import { onMounted} from 'vue';
+
+
+
 const user2 = '/assets/user2.jpg';
     const user3 = '/assets/user3.jpg';
     const user4 = '/assets/user4.jpg';
     const logoImage = '/assets/caa-logo.png';
     const avatar = '/assets/avatar.png';
 
-
+    const securityConcernCounter = ref(0);
+    onMounted(() => {
+        // You can add any additional logic here if needed
+        axios.get('/securityconcerns/count')
+            .then(response => {
+                // Handle the response if needed            
+                securityConcernCounter.value = response.data.count; 
+            })
+            .catch(error => {
+                console.error('Error fetching user data:', error);
+            });
+    });
+    
 </script>
 <style lang="">
     

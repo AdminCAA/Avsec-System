@@ -9,6 +9,7 @@ use App\Models\QualityControl;
 use App\Models\AuditQuestion;
 use App\Models\SelectedChecklistQuestion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 
 class QualityControlController extends Controller
@@ -184,11 +185,11 @@ class QualityControlController extends Controller
         $validator = Validator::make($request->all(),[
             'question_id' => 'required|integer',
             'quality_control_id' => 'required|integer',
-            'question_response' => 'required|string|in:Yes,No,N/A,N/C',
+            'question_response' => 'required|string|in:Yes,No,Pass,Fail,Not Applicable,Not confirmed',
             'finding_observation' => 'nullable|string',
             'action_taken' => 'nullable|string',
-            'status' => 'required|string|in:Open,Closed,Needs Follow up',
-            'finding_category' => 'required|string|in:Compliant,Non Compliant(Minor),Not Compliant(Serious),Not Applicable,Not Confirmed',
+            'status' => 'required|string|in:Open,Closed',
+            'finding_category' => 'required|string|in:Compliant,Not Compliant(Minor),Not Compliant(Serious),Not Applicable,Not Confirmed,Not Applicable,Not Confirmed',
             'date_quality_control' => 'required|date',
             'problem_cause' => 'required|string',
             'proposed_follow_up_action' => 'nullable|string',
@@ -196,7 +197,8 @@ class QualityControlController extends Controller
             'long_term_action' => 'nullable|string',
             'completion_date' => 'nullable|date',
             'date_of_closure' => 'required|date',
-            'follow_up_date' => 'required|date'
+            'follow_up_date' => 'required|date',
+            'evidence_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', 
         ]);
 
         if($validator->fails()){
@@ -219,6 +221,16 @@ class QualityControlController extends Controller
             'date_of_closure' => $request->date_of_closure,
             'follow_up_date' => $request->follow_up_date,
         ]);
+
+        if ($request->hasFile('evidence_file')) {
+            // Delete old file if exists
+            if ($selectedCheckliskQuestion->evidence_file) {
+                Storage::disk('public')->delete($selectedCheckliskQuestion->evidence_file);
+            }
+            $selectedCheckliskQuestion->evidence_file = $request->file('evidence_file')->store('qc_evidences', 'public');
+        }
+        
+        $selectedCheckliskQuestion->save();
         return redirect()->route('quality-controls.show',$request->quality_control_id)->with('success', 'Checklist updated successfully.');        
     }
 }

@@ -120,17 +120,13 @@ watch(()=>search.value, (newvalue)=>{
   const getStatusClass = (status)=>{
     switch (status) {
       case 'Pending':
-        return 'bg-secondary text-white';
+        return 'bg-primary text-white';
       case 'In Progress':
-        return 'bg-info text-white';
+        return 'bg-warning text-white';
       case 'Completed':
         return 'bg-success text-white';
       case 'Overdue':
-        return 'bg-danger text-white';
-      case 'Follow Up Required':
-        return 'bg-warning text-dark';
-      case 'Closed':
-        return 'bg-dark text-white';
+        return 'bg-danger text-white';            
       default:
         return 'bg-light text-dark';
     }
@@ -212,8 +208,11 @@ watch(()=>search.value, (newvalue)=>{
                     <td>                        
                         {{ item.facility.name }}           
                     </td>
-                    <td :class="getStatusClass(item.status)" class="text-center">                        
-                        {{ item.status }}          
+                    <td class="text-center">      
+                      <span  :class="getStatusClass(item.status)" class="badge p-2">
+                        {{ item.status }}  
+                      </span>                  
+                                
                     </td>
                     <td>                        
                         {{ dayjs(item.scheduled_date).format('DD-MM-YYYY') }}          

@@ -129,8 +129,6 @@ watch(() => form.facility_id, (value) => {
 });
 
 
-console.log(!groupedAuditQuestions);
-console.log(hasChecklistQuestions)
 </script>
 
 <template>

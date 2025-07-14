@@ -29,6 +29,12 @@ class Kernel extends ConsoleKernel
                  ->withoutOverlapping()        // Prevent overlapping if it takes long
                  ->onOneServer()               // For load-balanced apps
                  ->runInBackground();          // Don't block other jobs
+        
+        $schedule->command('app:check-quality-control-status')
+                 ->everyMinute()          // Run every day at 9:00 AM
+                 ->withoutOverlapping()        // Prevent overlapping if it takes long
+                 ->onOneServer()               // For load-balanced apps
+                 ->runInBackground();          // Don't block other jobs
 
     }
 

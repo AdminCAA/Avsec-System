@@ -13,6 +13,7 @@ use App\Http\Controllers\AuditAreaCategoryController;
 use App\Http\Controllers\CertificationsController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\QualificationsController;
+use App\Http\Controllers\SecurityConcernsController;
 use App\Http\Controllers\SecurityEquipmentController;
 use App\Http\Controllers\TrainingController;
 use Inertia\Inertia;
@@ -155,6 +156,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/qualifications/{id}/edit', [QualificationsController::class, 'edit'])->name('qualifications.edit');
     Route::post('/qualifications/{id}', [QualificationsController::class, 'update'])->name('qualifications.update');
     Route::delete('/qualifications/{id}', [QualificationsController::class, 'destroy'])->name('qualifications.destroy');        
+
+
+     //Security Concerns Routes
+    Route::get('/securityconcerns', [SecurityConcernsController::class, 'index'])->name('securityconcerns.index');
+    Route::get('/securityconcerns/{id}/edit', [SecurityConcernsController::class, 'edit'])->name('securityconcerns.edit');
+    Route::post('/securityconcerns/{id}', [SecurityConcernsController::class, 'update'])->name('securityconcerns.update');
+
+    //Sidebar Routes
+    Route::get('/securityconcerns/count', [SecurityConcernsController::class, 'securityConcernsCount'])->name('securityconcerns.api.index');
 });
 
 

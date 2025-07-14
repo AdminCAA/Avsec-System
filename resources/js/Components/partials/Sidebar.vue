@@ -60,67 +60,17 @@
                   </p>
                   </Link>
               </li>
-
-
-              <!-- <li class="nav-item">
-                  <a href="#" class="nav-link">
-                  <i class="nav-icon fas fa-shield-alt"></i>
-                  <p>
-                      Aviation Facilities
-                      <i class="right fas fa-angle-left"></i>
-                  </p>
-                  </a>
-                  <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                      <a href="#" class="nav-link">
-                          <i class="fas fa-chevron-circle-right nav-icon"></i>
-                      <p>Airport Operators</p>
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a href="#" class="nav-link">
-                          <i class="fas fa-chevron-circle-right nav-icon"></i>
-                      <p>Airline Operators</p>
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a href="#" class="nav-link">
-                          <i class="fas fa-chevron-circle-right nav-icon"></i>
-                      <p>Aircraft Operators</p>
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a href="#" class="nav-link">
-                          <i class="fas fa-chevron-circle-right nav-icon"></i>
-                      <p>Regulated Agents</p>
-                      </a>
-                  </li>
-
-                  <li class="nav-item">
-                      <a href="#" class="nav-link">
-                          <i class="fas fa-chevron-circle-right nav-icon"></i>
-                      <p>Catering Operators</p>
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a href="#" class="nav-link">
-                          <i class="fas fa-chevron-circle-right nav-icon"></i>
-                      <p>Training Organisation</p>
-                      </a>
-                  </li>
-                  
-                  </ul>
-              </li> -->
-
               
               <li class="nav-item">
-                  <a href="#" class="nav-link">
-                      <i class="nav-icon fas fa-bolt"></i>
+                  <Link :href="route('securityconcerns.index')" 
+                    class="nav-link"
+                    :class="{ active: currentPath.startsWith('/securityconcerns') }">
+                    <i class="nav-icon fas fa-bolt"></i>
                   <p>
                       AVSEC Concerns                 
-                      <span class="badge badge-warning navbar-badge">15</span>               
+                      <span class="badge badge-danger navbar-badge">{{ securityConcernCounter }}</span>               
                   </p>
-                  </a>
+                </Link>
               </li>
 
               <li class="nav-item">
@@ -261,10 +211,12 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
-import { ref ,computed} from 'vue';
+import { ref ,computed,onMounted} from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { usePage } from '@inertiajs/vue3';
 import { useRoute } from 'vue-router';
+import axios from 'axios';
+
 
 defineProps({
     currentUser: {
@@ -277,6 +229,18 @@ const logoImage = '/assets/caa-logo.png';
 const avatar = '/assets/avatar.png';
 
 const currentPath = computed(() => window.location.pathname);
+const securityConcernCounter = ref(0);
+onMounted(() => {
+    // You can add any additional logic here if needed
+    axios.get('/securityconcerns/count')
+        .then(response => {
+            // Handle the response if needed            
+            securityConcernCounter.value = response.data.count; 
+        })
+        .catch(error => {
+            console.error('Error fetching user data:', error);
+        });
+});
 
 </script>
 <style>

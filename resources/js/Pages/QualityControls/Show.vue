@@ -19,15 +19,17 @@ const {qualityControl, groupedCheckListQuestions} = defineProps({
 });
 
 const responseOptions = [
-  {id : 1, option  : 'Yes'},
+{id : 1, option  : 'Yes'},
   {id : 2, option  : 'No'},
-  {id : 3, option  : 'N/A'},
-  {id : 4, option  : 'N/C'},
+  {id:3, option:'Pass'},
+  {id:4, option:'Fail'},
+  {id : 5, option  : 'Not Applicable'},
+  {id : 6, option  : 'Not Comfirmed'},
 ]
 
 const findingCategoryOptions = [
   {id : 1, option  : 'Compliant'},
-  {id : 2, option  : 'Non Compliant(Minor)'},
+  {id : 2, option  : 'Not Compliant(Minor)'},
   {id : 3, option  : 'Not Compliant(Serious)'},
   {id : 4, option  : 'Not Applicable'},
   {id : 5, option  : 'Not Confirmed'},
@@ -36,13 +38,13 @@ const findingCategoryOptions = [
 
 const statusOptions = [
   {id : 1, option  : 'Open'},
-  {id : 2, option  : 'Closed'},
-  {id : 3, option  : 'Needs Follow up'},  
+  {id : 2, option  : 'Closed'},  
 ]
 
 const forms = ref({});
 const isLoading = ref(false);
 const formErrors = ref({});
+
 function validateQuestionForm(questionId) {
   const form = getForm(questionId);
   const errors = {};
@@ -52,7 +54,15 @@ function validateQuestionForm(questionId) {
   if (!form.problem_cause) errors.problem_cause = 'Problem cause is required';
   if (!form.status) errors.status = 'Status is required';
   if (!form.date_of_closure) errors.date_of_closure = 'Date of closure is required';
+  if (!form.completion_date) errors.completion_date = 'Completion date is required';
   if (!form.follow_up_date) errors.follow_up_date = 'Follow-up date is required';
+  //Check if the evidence file is more the 2Mb
+  if (form.evidence_file && form.evidence_file.size > 2 * 1024 * 1024) {
+    errors.evidence_file = 'File size must be less than 2MB';
+  } 
+  if (form.evidence_file && !['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'].includes(form.evidence_file.type)) {
+    errors.evidence_file = 'Only PDF, JPG, or PNG files are allowed.';
+  } 
 
   formErrors.value[questionId] = errors;
 
@@ -61,14 +71,28 @@ function validateQuestionForm(questionId) {
 
 function submitQuestionForm(questionId) {
   if (validateQuestionForm(questionId)) {
-      isLoading.value = true;  
-      const formData = forms.value[questionId];
-      axios.post(route('quality-controls.saveQuestionResponse',questionId), 
-      {
-        question_id: questionId,
-        quality_control_id: qualityControl.id,
-        ...formData
-      }).then(() => {
+      isLoading.value = true;        
+      let formData = new FormData();
+      formData.append('question_id', questionId);
+      formData.append('quality_control_id',qualityControl.id);
+
+      formData.append('question_response', forms.value[questionId].question_response);
+      formData.append('finding_observation', forms.value[questionId].finding_observation);
+      formData.append('action_taken', forms.value[questionId].action_taken);
+      formData.append('status',forms.value[questionId].status);
+      formData.append('finding_category', forms.value[questionId].finding_category);
+      formData.append('date_quality_control', forms.value[questionId].date_quality_control);
+      formData.append('problem_cause', forms.value[questionId].problem_cause);
+      formData.append('proposed_follow_up_action', forms.value[questionId].proposed_follow_up_action);
+      formData.append('short_term_action',forms.value[questionId].short_term_action);
+      formData.append('long_term_action', forms.value[questionId].long_term_action);
+      formData.append('completion_date',forms.value[questionId].completion_date);
+      formData.append('date_of_closure', forms.value[questionId].date_of_closure);
+      formData.append('follow_up_date', forms.value[questionId].follow_up_date);
+      if (forms.value[questionId].evidence_file) {
+          formData.append('evidence_file', forms.value[questionId].evidence_file);
+      }   
+      axios.post(route('quality-controls.saveQuestionResponse',questionId), formData).then(() => {
           Swal.fire({
             icon: 'success',
             title: 'Checklist has been saved successfully',
@@ -81,7 +105,7 @@ function submitQuestionForm(questionId) {
         .catch(error => {        
           if (error.response?.status === 422) {
             const errors = error.response.data.errors;
-            formErrors.value = errors;
+            formErrors.value[questionId] = errors;
             const message = Object.values(errors).flat().join('\n');
             Swal.fire({
               icon: 'error',
@@ -96,11 +120,11 @@ function submitQuestionForm(questionId) {
         }).finally(() => {
           isLoading.value = false;
         });
-  }else{    
+  }else{        
     Swal.fire({
       icon: 'error',
-      title: 'Validation failed for question - '+ questionId,
-      text: message,
+      title: 'Validation failed',
+      text:formErrors.value[questionId].evidence_file,
       toast: true,
       position: 'top-end',
       timer: 3000,
@@ -127,7 +151,8 @@ function getForm(questionId) {
       long_term_action: '',
       completion_date: '',
       date_of_closure: '',
-      follow_up_date: ''
+      follow_up_date: '',
+      evidence_file: null
     };
   }
   return forms.value[questionId];
@@ -149,11 +174,43 @@ onMounted(() => {
         long_term_action: question.long_term_action || '',
         completion_date: question.completion_date || '',
         date_of_closure: question.date_of_closure || '',
-        follow_up_date: question.follow_up_date || ''
+        follow_up_date: question.follow_up_date || '',
+        evidence_file: question.evidence_file || null
       };      
     }
   }
 });
+
+
+
+
+
+
+const fileName = ref({});
+const handleFileUpload = (questionId, event) => {         
+    const file = event.target.files[0];
+    if (!formErrors.value[questionId]) {
+      formErrors.value[questionId] = {};
+    }
+    if (file) {
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+        getForm(questionId).evidence_file = file;          
+        fileName.value[questionId] = file.name;
+        // Optional: Basic file type validation        
+        if (!allowedTypes.includes(file.type)) {
+          formErrors.value[questionId].evidence_file = 'Only PDF, JPG, or PNG files are allowed.';
+        } else {          
+          formErrors.value[questionId].evidence_file = '';
+        }
+    } else {
+      fileName.value[questionId] = '';      
+      getForm(questionId).evidence_file = null;
+    }
+};
+
+
+
+
 
 </script>
 
@@ -196,13 +253,12 @@ onMounted(() => {
                                   </div>
                               </div>
                               <div v-for="(question,index) in questions" :key="question.id" class="card-body">                                                           
-                                <form @submit.prevent="submitQuestionForm(question.id)">
+                                <form @submit.prevent="submitQuestionForm(question.id)" enctype="multipart/form-data">
                                   <div class="col-md-12">
                                     <h4>{{ question.question }}</h4>
                                       <div class="card card-success collapsed-card">
                                         <div class="card-header">
                                           <h3 class="card-title">Checklist Question # {{ index + 1 }}</h3>
-
                                           <div class="card-tools">
                                             <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
                                             </button>
@@ -222,8 +278,7 @@ onMounted(() => {
                                               :class="{ 
                                                 'is-invalid': formErrors[question.id]?.question_response, 
                                                 'is-valid': forms[question.id]?.question_response && !formErrors[question.id]?.question_response 
-                                            }"
-                                                                              
+                                            }"                                                                              
                                             >
                                                 <option value="">-- Select Question Response -- </option>
                                                 <option v-for="item in responseOptions" :key="item.id" :value="item.option">{{ item.option }}</option>
@@ -327,12 +382,19 @@ onMounted(() => {
                                     <div class="row">
                                       <div class="form-group col-md-6">
                                         <label>Proposed Completion Date</label>
-                                        <input                                                     
+                                        <input required  
+                                            @change="validateQuestionForm(question.id)"                                                     
                                             v-model="getForm(question.id).completion_date"                                         
                                             type="date"
                                             class="form-control"                                                      
                                             placeholder="Proposed Completion Date"
-                                        />                                                  
+                                            :class="{ 
+                                                'is-invalid': formErrors[question.id]?.completion_date, 
+                                                'is-valid': forms[question.id].completion_date && !formErrors[question.id]?.completion_date 
+                                            }" 
+                                        /> 
+                                        
+                                        <small v-if="formErrors[question.id]?.completion_date" class="text-danger">{{ formErrors[question.id].completion_date }}</small>                                                                                                      
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label>Follow-up Date</label>
@@ -353,7 +415,7 @@ onMounted(() => {
                                     </div>
 
                                     <div class="row">
-                                      <div class="form-group col-md-12">
+                                      <div class="form-group col-md-6">
                                         <label>Proposed Follow up Action</label>
                                         <textarea v-model="getForm(question.id).proposed_follow_up_action"
                                             class="form-control"
@@ -362,9 +424,6 @@ onMounted(() => {
                                         </textarea>
                                       </div>
 
-                                    </div>
-
-                                    <div class="row">                                                                                              
                                       <div class="form-group col-md-6">
                                         <label>Date of Closure</label>
                                         <input required                                                      
@@ -379,33 +438,61 @@ onMounted(() => {
                                                                                     
                                             placeholder="Date of Closure"
                                         /> 
-                                        <small v-if="formErrors[question.id]?.date_of_closure" class="text-danger">{{ formErrors[question.id].date_of_closure }}</small>
-                                      
+                                        <small v-if="formErrors[question.id]?.date_of_closure" class="text-danger">{{ formErrors[question.id].date_of_closure }}</small>                                                                                                                                                  
+                                      </div>
                                     </div>
+
+                                      <div class="row">                                                                                              
+                                      
+
+                                    <div class="form-group col-md-6">                                    
+                                        <label v-if="!question.evidence_file">Evidence Attachment</label>  
+                                        <a v-if="question.evidence_file"                                                       
+                                            data-bs-toggle="tooltip"
+                                            title="View Evidence Attachment"
+                                            :href="`/storage/${forms[question.id].evidence_file}`" 
+                                            target="_blank"
+                                        >
+                                            <i class="fas fa-paperclip"></i><span><label>Evidence Attachment</label> </span>
+                                        </a>                                      
+                                        <div class="input-group">
+                                            <div class="custom-file">
+                                                <input 
+                                                    
+                                                    type="file"                                                       
+                                                    accept="image/*,application/pdf"   
+                                                    @change="event=>handleFileUpload(question.id,event)"
+                                                    class="custom-file-input" 
+                                                    id="exampleInputFile"
+                                                    :class="{ 'is-invalid': formErrors[question.id]?.evidence_file, 'is-valid': forms[question.id]?.evidence_file && !formErrors[question.id]?.evidence_file }"
+                                                >
+                                                <label class="custom-file-label" for="exampleInputFile">
+                                                    {{ fileName[question.id] || 'Choose file' }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <small v-if="formErrors[question.id]?.evidence_file" class="text-danger">{{ formErrors[question.id]?.evidence_file }}</small>
+                                    </div> 
 
                                     <div class="form-group col-md-6">                                                    
                                             <label>Status</label>
                                             <select required v-model="getForm(question.id).status" 
                                             class="form-control"  
                                             @change="validateQuestionForm(question.id)"
-
                                             :class="{ 
                                                 'is-invalid': formErrors[question.id]?.status, 
                                                 'is-valid': forms[question.id].status && !formErrors[question.id]?.status 
-                                            }"
-                                            
+                                            }"                                            
                                             >
                                                 <option value="">-- Select Status --</option>
                                                 <option v-for="item in statusOptions" :key="item.id" :value="item.option">{{ item.option }}</option>
                                             </select>    
 
-                                          </div>
-                                          
-
+                                          </div>                                          
                                     </div> 
-
-                                    <div class="card-footer d-flex justify-content-end">
-                                      <button :disabled="isLoading" type="submit" class="btn btn-info mr-2">
+                                  
+                                    <div class="d-flex justify-content-end">
+                                      <button :disabled="isLoading" type="submit" class="btn btn-info mr-1">
                                         <span v-if="isLoading"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
                                         <span v-else><i class="fas fa-save"></i> Save</span>
                                       </button>                                               
@@ -416,12 +503,7 @@ onMounted(() => {
                                         <!-- /.card-body -->
                                       </div>
                                       <!-- /.card -->
-                                    </div>
-
-
-
-
-                                                                            
+                                    </div>                                                                            
                                 </form> 
                               </div> 
                             </div>
