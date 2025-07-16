@@ -208,7 +208,7 @@ watch(() => form.nrc, (value) => {
 
 watch(() => form.facility_id, (value) => {
     if (!value) {
-        formErrors.value.facility_id = 'Facility is required.';        
+        formErrors.value.facility_id = 'Operator is required.';        
     }  else {
         formErrors.value.facility_id = '';
     }
