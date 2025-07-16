@@ -37,7 +37,7 @@ function updateFacility() {
     .then(() => {
       Swal.fire({
         icon: 'success',
-        title: 'Facility updated successfully',
+        title: 'Operator updated successfully',
         toast: true,
         position: 'top-end',
         timer: 1500,
@@ -86,14 +86,14 @@ watch(() => form.email, (value) => {
 </script>
 
 <template>
-  <Head title="Edit Facility" />
+  <Head title="Edit Operator" />
   <AuthenticatedLayout>
     <div class="content-wrapper">    
         <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
             <div class="col-sm-6">
-                <h3 class="m-0">Facility / Edit</h3>
+                <h3 class="m-0">Operator / Edit</h3>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -113,7 +113,7 @@ watch(() => form.email, (value) => {
                     <!-- general form elements -->
                     <div class="card card-info">
                         <div class="card-header">
-                            <h3 class="card-title">Edit Facility</h3>
+                            <h3 class="card-title">Edit Operator</h3>
                         </div>
                         <!-- form start -->
                         
@@ -130,7 +130,7 @@ watch(() => form.email, (value) => {
                                     type="text" 
                                     class="form-control"
                                     :class="{ 'is-invalid': formErrors.name, 'is-valid': form.name && !formErrors.name }"
-                                    placeholder="Enter Facility Name">
+                                    placeholder="Enter Operator Name">
                                   <InputError :message="formErrors.name" class="mt-1" />
                                 </div>
 

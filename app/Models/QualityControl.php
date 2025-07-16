@@ -15,6 +15,7 @@ class QualityControl extends Model
         'control_type',        
         'description',
         'scheduled_date',
+        'end_date', 
         'status',
     ];
 

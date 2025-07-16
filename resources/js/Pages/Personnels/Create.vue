@@ -211,11 +211,13 @@ watch(() => form.nrc, (value) => {
 
 watch(() => form.facility_id, (value) => {
     if (!value) {
-        formErrors.value.facility_id = 'Facility is required.';        
+        formErrors.value.facility_id = 'Operator is required.';        
     }  else {
         formErrors.value.facility_id = '';
     }
 });
+
+
 
 watch(() => form.is_certified, (value) => {
     if (!value.trim()) {
@@ -252,9 +254,7 @@ watch(() => form.phone_number, (value) => {
     formErrors.value.phone_number = '';
   }
 });
-watch(() => form.facility_id, (value) => {
-  formErrors.value.facility_id = value ? '' : 'Facility is required.';
-});
+
 
 watch(()=>form.gender,()=>{
     if (!form.gender) {
@@ -267,24 +267,7 @@ watch(()=>form.gender,()=>{
 })
 
 
-// Check if a training is selected
-// const isSelected = (trainingId) => {
-//     return selectedTrainings.value[trainingId] !== undefined
-// }
 
-
-
-// const toggleTraining = (trainingId) => {
-//     if (selectedTrainings.value[trainingId]) {
-//         // Unselect
-//         delete selectedTrainings.value[trainingId]
-//     } else {
-//         // Select and initialize score
-//         selectedTrainings.value[trainingId] = {
-//             score: ''
-//         }
-//     }
-// }
 // Handle file upload for portrait
 const fileName = ref('');
 const handleFileUpload = (event) => {
@@ -450,13 +433,13 @@ const handleFileUpload = (event) => {
 
                                 <div class="row">                                                                                                            
                                     <div class="form-group col-md-6">                                    
-                                      <label>Facility</label>                                        
+                                      <label>Operator</label>                                        
                                       <v-select
                                           v-model="form.facility_id"
                                           :options="facilities"
                                           :reduce="facility => facility.id"
                                           label="name"
-                                          placeholder="-- Select Institution --"
+                                          placeholder="-- Select Operator --"
                                           :class="{
                                           'is-invalid': formErrors.facility_id,
                                           'is-valid': form.facility_id && !formErrors.facility_id

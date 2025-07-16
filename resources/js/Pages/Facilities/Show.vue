@@ -46,18 +46,17 @@ const goToPage = (url) => {
   router.visit(url, { preserveScroll: true, preserveState: true });
 };
 
-console.log(facility)
 </script>
 
 <template>
-  <Head title="Edit Facility" />
+  <Head title="Edit Operator" />
   <AuthenticatedLayout>
     <div class="content-wrapper">    
         <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
             <div class="col-sm-6">
-                <h3 class="m-0">Institution Details</h3>
+                <h3 class="m-0">Operator Details</h3>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -86,7 +85,6 @@ console.log(facility)
                 <p class="text-muted text-center">Category:  {{facility.category}}</p>
                 <p class="text-muted text-center">Email:  {{facility.email}}</p>
                 <p class="text-muted text-center">Contact:  {{facility.contact_number}}</p>
-                
 
                 <ul class="list-group list-group-unbordered mb-3">
                   <li class="list-group-item">

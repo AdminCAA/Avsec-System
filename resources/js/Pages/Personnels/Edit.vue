@@ -454,13 +454,13 @@ const handleFileUpload = (event) => {
 
                                 <div class="row">                                                                                                            
                                     <div class="form-group col-md-6">                                    
-                                      <label>Facility</label>                                        
+                                      <label>Operator</label>                                        
                                       <v-select
                                           v-model="form.facility_id"
                                           :options="facilities"
                                           :reduce="facility => facility.id"
                                           label="name"
-                                          placeholder="-- Select Institution --"
+                                          placeholder="-- Select Operator --"
                                           :class="{
                                           'is-invalid': formErrors.facility_id,
                                           'is-valid': form.facility_id && !formErrors.facility_id

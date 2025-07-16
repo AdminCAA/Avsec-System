@@ -43,13 +43,20 @@ const {
   },
   
 });
-
+const statusOptions = [
+  { label: 'In Progress', value: 'In Progress' },
+  { label: 'Pending', value: 'Pending' }, 
+  { label: 'Completed', value: 'Completed' },  
+  { label: 'Overdue', value: 'Overdue' },  
+];
 const form = useForm({
   title: qualityControl.title,
   control_type: qualityControl.control_type,  
   description: qualityControl.description,
   facility_id: qualityControl.facility_id,
-  scheduled_date: qualityControl.scheduled_date,    
+  scheduled_date: qualityControl.scheduled_date,  
+  end_date: qualityControl.end_date || '', 
+  status: qualityControl.status || 'Pending' 
 });
 
 const selectedCheckListQuestions = ref([]); // This will hold the selected checklist IDs
@@ -61,12 +68,14 @@ const formErrors = ref({});
 function editQualityControl() {
   isLoading.value = true;  
   axios.post(route('quality-controls.update', qualityControl.id), {
-    title: form.title,
-    control_type: form.control_type,  
-    description: form.description,
-    facility_id: form.facility_id,
-    scheduled_date: form.scheduled_date,  
-    selectedCheckListQuestions: selectedCheckListQuestions.value
+    title: form.title || '', // Ensure title is always a string
+    control_type: form.control_type || '', // Ensure control_type is always a string
+    description: form.description || '', // Ensure description is always a string
+    facility_id: form.facility_id || '', // Ensure facility_id is always a string
+    scheduled_date: form.scheduled_date || '', // Ensure scheduled_date is always a string
+    end_date: form.end_date || '',
+    status: form.status || '', // Ensure status is always a string
+    selectedCheckListQuestions: selectedCheckListQuestions.value 
   })
     .then(() => {
       Swal.fire({
@@ -121,10 +130,31 @@ watch(() => form.scheduled_date, (value) => {
     ? 'Scheduled Date must be at least 3 characters.'
     : '';
 });
-watch(() => form.facility_id, (value) => {
-  formErrors.value.facility_id = !value? 'Institution is required.'
+
+watch(() => form.status, (value) => {
+  formErrors.value.status = !value? 'Status is required.'
     : value.length < 3
-    ? 'Facility must be at least 3 characters.'
+    ? 'Status must be at least 3 characters.'
+    : '';
+});
+
+watch(() => form.end_date, (value) => {
+  //End date is required
+  formErrors.value.end_date = !value?.trim()? 'End Date is required.'
+    : value.length < 3
+    ? 'End Date must be at least 3 characters.'
+    : '';
+  // Check if end date is after scheduled date
+  if (form.scheduled_date && value && new Date(value) < new Date(form.scheduled_date)) {
+    formErrors.value.end_date = 'End Date must be after Start Date.';
+  } else if (formErrors.value.end_date === 'End Date must be after Scheduled Date.') {
+    formErrors.value.end_date = '';
+  }
+});
+watch(() => form.facility_id, (value) => {
+  formErrors.value.facility_id = !value? 'Operator is required.'
+    : value.length < 3
+    ? 'Operator must be at least 3 characters.'
     : '';
 });
 
@@ -200,13 +230,13 @@ watch(() => form.facility_id, (value) => {
 
                                 <div class="row">
                                     <div class="form-group col-md-6">                                    
-                                      <label>Institution</label>                                        
+                                      <label>Operator</label>                                        
                                       <v-select
                                           v-model="form.facility_id"
                                           :options="facilities"
                                           :reduce="facility => facility.id"
                                           label="name"
-                                          placeholder="-- Select Institution --"
+                                          placeholder="-- Select Operator --"
                                           :class="{
                                           'is-invalid': formErrors.facility_id,
                                           'is-valid': form.facility_id && !formErrors.facility_id
@@ -214,22 +244,53 @@ watch(() => form.facility_id, (value) => {
                                       />
                                       <InputError :message="formErrors.facility_id" class="mt-1" />
                                     </div>
+
                                     <div class="form-group col-md-6">
-                                    <label>Date</label>
+                                    <label>Status</label>
+                                    <select required v-model="form.status" class="form-control"
+                                        :class="{ 'is-invalid': formErrors.status, 'is-valid': form.status && !formErrors.status }"
+                                    >
+                                        <option value="">-- Select Status --</option>
+                                        <option v-for="item in statusOptions" :key="item" :value="item.value">{{ item.label }}</option>
+                                    </select>
+                                    <InputError :message="formErrors.status" class="mt-1" />
+                                    </div>                                                                      
+                                  </div>   
+
+                                  <div class="row">
+                                    <div class="form-group col-md-6">
+                                      <label>Date</label>
+                                      <input 
+                                          required 
+                                          v-model="form.scheduled_date"                                         
+                                          type="date"
+                                          class="form-control"
+                                          :class="{ 
+                                          'is-invalid': formErrors.scheduled_date, 
+                                          'is-valid': form.scheduled_date && !formErrors.scheduled_date 
+                                          }"
+                                          placeholder="Start Date"
+                                      />
+                                      <InputError :message="formErrors.scheduled_date" class="mt-1" />
+                                      </div>     
+                                      
+                                      <div class="form-group col-md-6">
+                                    <label>End Date</label>
                                     <input 
                                         required 
-                                        v-model="form.scheduled_date"                                         
+                                        v-model="form.end_date" 
+                                        :min="today"
                                         type="date"
                                         class="form-control"
                                         :class="{ 
-                                        'is-invalid': formErrors.scheduled_date, 
-                                        'is-valid': form.scheduled_date && !formErrors.scheduled_date 
+                                          'is-invalid': formErrors.end_date, 
+                                          'is-valid': form.end_date && !formErrors.end_date 
                                         }"
-                                        placeholder="Scheduled Date"
+                                        placeholder="End Date"
                                     />
-                                    <InputError :message="formErrors.scheduled_date" class="mt-1" />
-                                    </div>                                    
-                                </div>   
+                                    <InputError :message="formErrors.end_date" class="mt-1" />
+                                    </div>  
+                                  </div>
 
                               <!-- Row 2: Description -->
                               <div class="row">

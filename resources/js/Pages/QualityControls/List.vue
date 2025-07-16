@@ -189,10 +189,10 @@ watch(()=>search.value, (newvalue)=>{
                     <th>#</th>
                     <th>Title</th>
                     <th>Type</th>
-                    <th>Institution</th> 
+                    <th>Operator</th> 
                     <th>Status</th>
-                    <th>Date</th>                           
-                    <th>Created</th>   
+                    <th>Start Date</th>                           
+                    <th>End Date</th>   
                     <th>Actions</th>             
                   </tr>
                   </thead>
@@ -218,7 +218,7 @@ watch(()=>search.value, (newvalue)=>{
                         {{ dayjs(item.scheduled_date).format('DD-MM-YYYY') }}          
                     </td>
 
-                    <td>{{dayjs(item.created_at).format('DD-MM-YYYY')}}</td>
+                    <td>{{dayjs(item.end_date).format('DD-MM-YYYY')}}</td>
                     
                     <td>
                       <div class="d-flex justify-content-end">

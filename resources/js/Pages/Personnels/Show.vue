@@ -222,7 +222,7 @@ const deleteCertificate = (id)=>{
                 <p class="text-muted text-center">Status:  {{personnel.is_certified}}</p>
                 <p class="text-muted text-center">Gender:  {{personnel.gender}}</p>
                 <p class="text-muted text-center">NRC:  {{personnel.nrc}}</p>
-                <p class="text-muted text-center">Facility:<Link :href="route('facilities.show',personnel.facility_id)">{{personnel.facility_name}}</Link></p>
+                <p class="text-muted text-center">Operator:<Link :href="route('facilities.show',personnel.facility_id)">{{personnel.facility_name}}</Link></p>
                 <p class="text-muted text-center">Email:  {{personnel.email}}</p>
                 <p class="text-muted text-center">Contact:  {{personnel.phone_number}}</p> <hr>     
                 <div class="d-flex justify-content-center mb-2">
@@ -256,9 +256,7 @@ const deleteCertificate = (id)=>{
                     <th>D/Issue</th>                                                        
                     <th>E/Date</th>
                     <th>Status</th>
-                    <th>Score</th> 
-                    
-                    
+                    <th>Score</th>                                         
                     <th>Actions</th>             
                   </tr>
                   </thead>
@@ -274,8 +272,7 @@ const deleteCertificate = (id)=>{
                     <td>{{certificate.certification_body }}</td>
                     <td>                        
                         {{ certificate.certification_number }}           
-                    </td>
-                    
+                    </td>                    
                     <td>                        
                         {{ certificate.date_issued ? dayjs(certificate.date_issued).format('DD-MM-YYYY') : 'N/A' }}           
                     </td>
@@ -310,8 +307,7 @@ const deleteCertificate = (id)=>{
                         </button>
                       </div>
                     </td>                    
-                  </tr>
- 
+                  </tr> 
                   </tbody>                
                     </table>
                     <div v-else class="text-center mt-4">
@@ -328,7 +324,7 @@ const deleteCertificate = (id)=>{
                             <tr>
                                 <th>#</th>
                                 <th>Name</th>
-                                <th>Institution</th>
+                                <th>Operator</th>
                                 <th>Number</th>
                                 <th>Type</th>                                       
                                 <th>D/Issue</th>                                                                                                                               

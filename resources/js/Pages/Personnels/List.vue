@@ -177,9 +177,9 @@ const {personnels} = defineProps({
                     <th>Phone</th>
                     <th>Status</th>
                     <th>Category</th>                    
-                    <th>Facility</th>  
+                    <th>Operator</th>  
                     <th>Created</th>   
-                    <th>Actions</th>             
+                    <th style="width: 240px;">Actions</th>             
                   </tr>
                   </thead>
                   <tbody>

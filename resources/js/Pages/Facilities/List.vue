@@ -118,7 +118,7 @@ const {facilities} = defineProps({
 </script>
 
 <template>
-    <Head title="Facilities" />
+    <Head title="Operators" />
     <AuthenticatedLayout>
         <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -126,7 +126,7 @@ const {facilities} = defineProps({
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h3 class="m-0">Aviation Institution</h3>
+            <h3 class="m-0">Aviation Operators</h3>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -143,8 +143,7 @@ const {facilities} = defineProps({
       <div class="container-fluid">
         <div class="row">
           <div class="col-12">
-            <div class="card">
-              
+            <div class="card">              
               <!-- /.card-header -->
               <div class="card-body">
 
@@ -170,7 +169,7 @@ const {facilities} = defineProps({
                   <thead>
                   <tr>
                     <th>#</th>
-                    <th>Institution</th>
+                    <th>Operator</th>
                     <th>Category</th>                                   
                     <th>Email</th>       
                     <th>Contact</th>  
@@ -220,8 +219,8 @@ const {facilities} = defineProps({
                   <Pagination :data="facilities" :updatePageNumber="updatePageNumber"/>                               
                 </div>
                 <div v-else class="card mt-3">
-                  <h3 class="text-center">No Facility found</h3>
-                  <p class="text-center">Please create a facility to get started.</p>                         
+                  <h3 class="text-center">No Operator found</h3>
+                  <p class="text-center">Please create a Operator to get started.</p>                         
                 </div>
                 
               </div>

@@ -169,8 +169,8 @@ watch(()=>search.value, (newvalue)=>{
                     <th>#</th>
                     <th>Audit Question</th>
                     <th>Audit Area</th>                                                       
-                    <th>Created</th>   
-                    <th>Actions</th>             
+                    <th style="width: 100px;">Created</th>   
+                    <th style="width: 160px;">Actions</th>             
                   </tr>
                   </thead>
                   <tbody>

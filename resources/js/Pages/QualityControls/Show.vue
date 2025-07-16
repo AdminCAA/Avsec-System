@@ -287,7 +287,7 @@ const handleFileUpload = (questionId, event) => {
                                           </div>
 
                                           <div class="form-group col-md-6">
-                                            <label>Finding /Observation</label>
+                                            <label>Finding / Observation</label>
                                             <textarea 
                                               v-model="getForm(question.id).finding_observation
                                               "

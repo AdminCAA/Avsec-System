@@ -194,7 +194,7 @@ const {securityEquipments} = defineProps({
                     <th>#</th>
                     <th>Name</th>
                     <th>Serial</th>  
-                    <th>Institition</th>                                   
+                    <th>Facility</th>                                   
                     <th>Status</th>       
                     
                     <th>Created</th>   

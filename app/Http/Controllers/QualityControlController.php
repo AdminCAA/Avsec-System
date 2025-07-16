@@ -73,8 +73,10 @@ class QualityControlController extends Controller
             'facility_id' => 'required|exists:facilities,id',
             'control_type' => 'required|string|in:' . implode(',', QualityControl::CONTROL_TYPE),            
             'description' => 'nullable|string|max:1000',
-            'scheduled_date' => 'required|date',     
-            'selectedCheckListQuestions'=>'array'           
+            'scheduled_date' => 'required|date',  
+            'end_date' => 'nullable|date|after_or_equal:scheduled_date', // Ensure end_date is after or equal to scheduled_date
+            'status' =>'required|string|max:60|in:Pending,In Progress,Completed,Overdue',
+
         ]);        
         
         // Check if validation passes
@@ -87,7 +89,9 @@ class QualityControlController extends Controller
                 'facility_id' => $request->facility_id,
                 'control_type' => $request->control_type,
                 'description' => $request->description,
-                'scheduled_date' => $request->scheduled_date,                
+                'scheduled_date' => $request->scheduled_date,  
+                'end_date' => $request->end_date, // Update end_date if provided 
+
             ]);   
 
             if (!empty($request->selectedCheckListQuestions)) {
@@ -160,7 +164,9 @@ class QualityControlController extends Controller
             'facility_id' => 'required|exists:facilities,id',
             'control_type' => 'required|string|in:' . implode(',', QualityControl::CONTROL_TYPE),            
             'description' => 'nullable|string|max:1000',
-            'scheduled_date' => 'required|date|after_or_equal:today',                
+            'scheduled_date' => 'required|date|after_or_equal:today',  
+            'end_date' => 'nullable|date|after_or_equal:scheduled_date',       
+            'status' =>'required|string|max:60|in:Pending,In Progress,Completed,Overdue',
         ]);
         
 
@@ -173,7 +179,8 @@ class QualityControlController extends Controller
                 'facility_id' => $request->facility_id,
                 'control_type' => $request->control_type,
                 'description' => $request->description,
-                'scheduled_date' => $request->scheduled_date,                
+                'scheduled_date' => $request->scheduled_date,    
+                'end_date' => $request->end_date, // Update end_date if provided            
             ]);                       
             return redirect()->route('quality-controls.index')->with('success', 'Quality Control created successfully.');
         }
