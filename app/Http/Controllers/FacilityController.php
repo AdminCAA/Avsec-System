@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Facility;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
@@ -66,7 +67,7 @@ class FacilityController extends Controller
                 'email' => $request->email,
             ]);
             // Redirect to the facilities list with a success message
-            return redirect()->route('facilities.index')->with('success', 'Facility created successfully.');
+            return redirect()->route('facilities.index')->with('success', 'Operator created successfully.');
         }else{
             return response()->json(['errors' => $validator->errors()], 422);
         }
@@ -147,7 +148,7 @@ class FacilityController extends Controller
             ]);
             
             // Redirect to the facilities list with a success message
-            return redirect()->route('facilities.index')->with('success', 'Facility updated successfully.');
+            return redirect()->route('facilities.index')->with('success', 'Operator updated successfully.');
         }else{
             return response()->json(['errors' => $validator->errors()], 422);
         }
@@ -161,18 +162,29 @@ class FacilityController extends Controller
         //
         $facility = Facility::find($id);
         if (!$facility || $facility->id != $id) {
-            return response()->json(['error' => 'Facility not found'], 404);
+            return response()->json(['error' => 'Operator not found'], 404);
         }
         // Delete the facility
         $facility->delete();
         // Redirect to the facilities list with a success message
         return response()->json(
-            ['success' => 'Facility deleted successfully.',
+            ['success' => 'Operator deleted successfully.',
             'status' => true
             ], 
             200
         );
     }
+
+    public function downloadOperatorsPDF(){
+        
+        $operators = Facility::all();        
+        $pdf = Pdf::loadView('pdfTemplates.operators', [
+            'operators' => $operators,
+        ]);
+        return $pdf->download('operators.pdf');        
+    }
+
+
 
 
 }

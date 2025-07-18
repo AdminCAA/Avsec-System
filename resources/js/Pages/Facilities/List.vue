@@ -115,6 +115,36 @@ const {facilities} = defineProps({
       }
     })
   }
+
+  const downLoadOperator = async () => {   
+    try{
+      const response = await axios.get('/api/facilities/downloadFacilities',{
+        responseType:'blob'
+      });      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link =  document.createElement('a');
+      link.href = url;
+      link.setAttribute('download','operators.pdf');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+    }catch(error){
+      console.log(error);
+      Swal.fire({
+              icon: "error",
+              title: "PDF Generation Failed",
+              text: 'Something went wrong while generating the PDF file.',
+              toast: true,  
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 1000,
+              timerProgressBar: true,
+          });
+    }    
+  }
+
+
 </script>
 
 <template>
@@ -150,21 +180,29 @@ const {facilities} = defineProps({
                 <div class="row mb-3">
                   <div class="col-md-3">
                     <div class="form-group">
-                            <div class="input-group input-group-sm">
-                                <input 
-                                    type="search" 
-                                    class="form-control form-control-lg" 
-                                    placeholder="Search for facility here.." 
-                                    v-model="search">
-                                <div class="input-group-append">
-                                    <button type="submit" class="btn btn-lg btn-default">
-                                        <i class="fa fa-search"></i>
-                                    </button>
-                                </div>
+                        <div class="input-group input-group-sm">
+                            <input 
+                                type="search" 
+                                class="form-control form-control-lg" 
+                                placeholder="Search for operator here.." 
+                                v-model="search">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-lg btn-default">
+                                    <i class="fa fa-search"></i>
+                                </button>
                             </div>
                         </div>
+                    </div>
+                  </div>
+                  <div class="col-md-9">
+                    <div class="d-flex justify-content-end">
+                      <button @click="downLoadOperator" class="btn btn-sm btn-primary">
+                        <i class="fas fa-file-pdf"></i> Export to PDF                        
+                      </button>
+                    </div>
                   </div>
                  </div>
+               
                 <table v-if="facilities.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
                   <thead>
                   <tr>

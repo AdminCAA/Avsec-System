@@ -45,7 +45,7 @@
                     :class="{ active: currentPath.startsWith('/facilities') }">
                     <i class="nav-icon fas fa-shield-alt"></i>
                   <p>
-                    AVSEC Facilities                      
+                    AVSEC Operators                    
                   </p>
                   </Link>
               </li>
@@ -67,7 +67,7 @@
                     :class="{ active: currentPath.startsWith('/securityconcerns') }">
                     <i class="nav-icon fas fa-bolt"></i>
                   <p>
-                      AVSEC Concerns                 
+                      Security Concerns                 
                       <span class="badge badge-danger navbar-badge">{{ securityConcernCounter }}</span>               
                   </p>
                 </Link>
@@ -88,11 +88,10 @@
               <li class="nav-item">
                   <Link :href="route('audit-categories.index')" class="nav-link"
                   :class="{ active: currentPath.startsWith('/audit-categories') }"
-                  >
-                  
+                  >                  
                     <i class="nav-icon fas fa-boxes"></i>
                   <p>
-                      Areas of Audit                                                       
+                      Quality Control Areas
                   </p>
                 </Link>
               </li>
@@ -105,7 +104,7 @@
                   >
                   <i class="nav-icon fas fa-microscope"></i>
                   <p>
-                      AVSEC Equipment
+                      AVSEC Equipments
                       
                   </p>
                   </Link>

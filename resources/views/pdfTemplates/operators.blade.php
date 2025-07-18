@@ -1,63 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Application Submission</title>
+    <title>Operators List</title>
     <style>
-        body { font-family: sans-serif; font-size: 12px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        /* body { font-family: sans-serif; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; } */
         th, td { border: 1px solid #ccc; padding: 6px; }
-        h2, h3 { margin-top: 30px; }
+        h2, h3 { margin-top: 15px; }
         th { background-color: #f2f2f2; }
         .header, .footer { text-align: center; }
-        .header { font-size: 24px; margin-bottom: 20px; }
+        /* .header { font-size: 24px; margin-bottom: 20px; } */
     </style>
+    <script setup>
+        const logoImage = '/assets/caa-logo.png';
+    </script>
 </head>
 <body>
     <div class="header">
         <div>
-            <img src="../public/assets/caa-logo.png" alt="Logo" style="height: 100px" >
+
+            {{-- <img src="../public/assets/caa-logo.png" alt="Logo" style="height: 100px" > --}}
             <h4>CIVIL AVIATION AUTHORITY</h4>
         </div>
       <hr>
-    <h4> APPLICATION SUBMISSION</h4>
-    <h6 style="margin-top: 2px;"><strong>{{ $application->application_code ?? 'N/A' }}</strong> </h6>
+    <h4> AVSEC OPERATORS LIST</h4>
+    {{-- <h6 style="margin-top: 2px;"><strong>{{ $application->application_code ?? 'N/A' }}</strong> </h6>
     </div>
     <p><strong>Full Name:</strong> {{ $application->user->name ?? 'N/A' }}</p>
     <p><strong>Email ID:</strong> {{ $application->user->email ?? 'N/A' }}</p>
     <p><strong>Application Type:</strong> {{ $application->application_type->name ?? 'N/A' }}</p>
-    <p><strong>Action Type:</strong> {{ $application->actionType }}</p>
+    <p><strong>Action Type:</strong> {{ $application->actionType }}</p> --}}
 
-    <h3>License Particulars</h3>
+    <h3>Aviation Operator</h3>
     <table>
         <thead>
             <tr>
-                <th>License Number</th>
-                <th>Place of Issue</th>
-                <th>Date of Issue</th>
-                <th>Type</th>
-                <th>Expiry Date</th>
+                {{-- <th>#</th> --}}
+                <th>Operator</th>
+                <th>Category</th>
+                <th>Email</th>
+                <th>Contact</th>
             </tr>
         </thead>
         <tbody>
-            @if ($application->licenseParticulars->isNotEmpty())
-                @foreach ($application->licenseParticulars as $license)
+            @if ($operators->isNotEmpty())
+                @foreach ($operators as $operator)
                     <tr>
-                        <td>{{ $license->licenseNumber }}</td>
-                        <td>{{ $license->placeOfIssue }}</td>
-                        <td>{{ $license->dateOfIssue }}</td>
-                        <td>{{ $license->typeOfLicense }}</td>
-                        <td>{{ $license->expiryDate }}</td>
+                        {{-- <td>{{ $index + 1  }}</td> --}}
+                        <td>{{ $operator->name }}</td>
+                        <td>{{ $operator->category }}</td>
+                        <td>{{ $operator->email }}</td>
+                        <td>{{ $operator->contact_number }}</td>                        
                     </tr>
                 @endforeach
             @else
                 <tr>
-                    <td colspan="5">No license particulars available.</td>
+                    <td colspan="5">No Operator is available.</td>
                 </tr>
             @endif
         </tbody>
     </table>
 
-    <h3>License Categories</h3>
+    {{-- <h3>License Categories</h3>
     <table>
         <thead>
             <tr>
@@ -81,9 +85,9 @@
                 </tr>
             @endif
         </tbody>
-    </table>
+    </table> --}}
 
-    <h3>Single Engine Aircrafts</h3>
+    {{-- <h3>Single Engine Aircrafts</h3>
     <table>
         <thead>
             <tr>
@@ -109,9 +113,9 @@
                 </tr>
             @endforelse
         </tbody>
-    </table>
+    </table> --}}
 
-    <h3>Multi Engine Aircrafts</h3>
+    {{-- <h3>Multi Engine Aircrafts</h3>
     <table>
         <thead>
             <tr>
@@ -137,8 +141,8 @@
                 </tr>
             @endforelse
         </tbody>
-    </table>
-
+    </table> --}}
+{{-- 
     <h3>Type Ratings</h3>
     @if ($application->typeRatings && $application->typeRatings->isEmpty())
         <p>No type ratings submitted.</p>
@@ -163,7 +167,7 @@
                 @endforelse
             </tbody>
         </table>
-    @endif
+    @endif --}}
 
 </body>
 </html>

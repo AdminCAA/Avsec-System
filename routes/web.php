@@ -78,6 +78,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/facilities/{id}', [FacilityController::class, 'update'])->name('facilities.update');
     Route::delete('/facilities/{id}', [FacilityController::class, 'destroy'])->name('facilities.destroy');
     Route::get('/facilities/{id}/show', [FacilityController::class, 'show'])->name('facilities.show');
+    Route::get('/api/facilities/downloadFacilities', [FacilityController::class, 'downloadOperatorsPDF'])->name('facilities.downloadOperatorsPDF');
 
     //Quality Control Routes
     Route::get('/quality-controls', [QualityControlController::class, 'index'])->name('quality-controls.index');
