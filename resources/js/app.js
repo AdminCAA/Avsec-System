@@ -6,6 +6,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import VueSweetalert2 from 'vue-sweetalert2';
+import HighchartsVue from 'highcharts-vue';
 //import router from './router/index.js';
 
 
@@ -23,6 +24,7 @@ createInertiaApp({
             //.use(router)
             .use(VueSweetalert2)
             .use(plugin)
+            //.use(HighchartsVue)
             .use(ZiggyVue)
             .mount(el);
     },

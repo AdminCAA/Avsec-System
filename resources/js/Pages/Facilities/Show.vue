@@ -7,7 +7,7 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 import InputError from '@/Components/InputError.vue';
 import dayjs from 'dayjs';
 
-const {facility , qualityControlCounts,audits,inspections,securityTests } = defineProps({
+const {facility , qualityControlCounts,audits,inspections,securityTests,usersCount } = defineProps({
   facility: {
     type: Object,
     required: true
@@ -16,10 +16,10 @@ const {facility , qualityControlCounts,audits,inspections,securityTests } = defi
     type:Object,
     required: true
   },
-  audits: Object,
-  inspections: Object,
-  securityTests: Object,
-
+  audits: {type: Object, required:true},
+  inspections:{type: Object, required:true},
+  securityTests: {type: Object, required:true},
+  usersCount:{type: Number, required:true},
 });
 
 
@@ -46,6 +46,7 @@ const goToPage = (url) => {
   router.visit(url, { preserveScroll: true, preserveState: true });
 };
 
+console.log(facility);
 </script>
 
 <template>
@@ -96,6 +97,9 @@ const goToPage = (url) => {
                   <li class="list-group-item">
                     <b>Tests</b> <a class="float-right">{{qualityControlCounts.securityTests}}</a>
                   </li>
+                  <li class="list-group-item">
+                    <b>Certified Personnels</b> <a class="float-right">{{usersCount}}</a>
+                  </li>
                 </ul>               
               </div>
               <!-- /.card-body -->
@@ -123,11 +127,21 @@ const goToPage = (url) => {
                     <div v-if="paginatedControls.data.length">
                       <div v-for="qc in paginatedControls.data" :key="qc.id" class="card mb-3">
                         <div class="card-body">
-                          <h5 class="card-title">Title: {{ qc.title }}</h5>
-                          <p class="card-text">Description: {{ qc.description }}</p>
-                          <p class="card-text">Date: {{ dayjs(qc.scheduled_date).format('DD-MM-YYYY') }}</p>
-                          <p class="card-text"><small class="text-muted">Type: {{ qc.control_type }}</small></p>
-                          <p class="card-text"><small class="text-muted">Inspectors: [Inspectors that inspected]</small></p>
+                          <h5 class="card-title mb-2"><i class="fas fa-align-justify"></i> Title : {{ qc.title }}</h5>
+                          <p class="card-text"><i class="fas fa-file-alt"></i> Description : {{ qc.description }}</p>
+                          <p class="card-text"><i class="fas fa-calendar-alt"></i> Start Date : {{ dayjs(qc.scheduled_date).format('DD-MM-YYYY') }} -  End Date: {{ dayjs(qc.end_date).format('DD-MM-YYYY') }}</p>
+                          <p class="card-text"><i class="fas fa-shield-alt"></i> Quality Control Type : {{ qc.control_type }}</p>
+                          <p class="card-text">                            
+                            <i class="fas fa-users"></i> Conducted By :
+                            <span class="badge px-1 mr-2" style="border-radius:10px; background-color:whitesmoke ;" v-for="(user, index) in qc.users" :key="index">
+                              <img class="profile-user-img img-fluid img-circle"
+                                :src="user.portrait ? `/storage/${user.portrait}`: '/storage/portraits/avatar.png'"
+                                alt="User profile picture">
+                              {{ user.name }}                              
+                            </span>
+
+                         
+                          </p>
                         </div>
                         <div class="col-sm-12">
                           <ol class="float-sm-right">
@@ -198,7 +212,24 @@ const goToPage = (url) => {
 </template>
 <style>
   .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
-   color: #fff !important;
+    color: #fff !important;
     background-color: #17a2b8 !important;
+    
+  }
+  .img-circle {
+    border-radius: 50%;
+  }
+
+
+.profile-user-img {
+    border: 1px solid #adb5bd;
+    margin: 0 auto;
+    padding: 3px;
+    width: 30px;
 }
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}
+
 </style>

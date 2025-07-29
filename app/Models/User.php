@@ -31,7 +31,8 @@ class User extends Authenticatable
         'is_certified',
         'phone_number',
         'portrait',
-        'signature',      
+        'signature',  
+        'quality_control_id',
     ];
 
 
@@ -76,10 +77,17 @@ class User extends Authenticatable
             return $query->when($request->search,function($query) use ($request){ 
                 return $query->where(function ($query) use ($request){
                     $query->where('name','like','%'.$request->search.'%')
-                    ->orWhere('email','like','%'.$request->search.'%');                    
+                    ->orWhere('email','like','%'.$request->search.'%')
+                    ->orWhere('user_type','like','%'.$request->search.'%');
                 });
             });
         });
+    }
+
+    public function qualityControls()
+    {
+        return $this->belongsToMany(QualityControl::class)->withTimestamps();
+                    
     }
 
     public function facility()

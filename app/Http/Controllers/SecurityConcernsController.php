@@ -18,7 +18,7 @@ class SecurityConcernsController extends Controller
     {
         // Fetch all security concerns from the database
         $searchQuery = SelectedChecklistQuestion::with('qualityControl')->search($request);
-        $questionsWithConcerns = $searchQuery->orderBy('modified_at','DESC')->whereIn('status',['Open','Overdue'])->paginate(5);
+        $questionsWithConcerns = $searchQuery->orderBy('updated_at','DESC')->whereIn('status',['Open','Overdue'])->paginate(50);
 
         return Inertia::render('SecurityConcerns/List', [
             'questionsWithConcerns' => $questionsWithConcerns,   
@@ -57,7 +57,7 @@ class SecurityConcernsController extends Controller
     public function edit(string $id)
     {
         //
-        $question = SelectedChecklistQuestion::findOrFail($id);
+        $question = SelectedChecklistQuestion::findOrFail($id);        
         $qualityControl = $question->qualityControl;
         $facility = $qualityControl->facility ?? null;
         return Inertia::render('SecurityConcerns/Edit', [
@@ -78,12 +78,17 @@ class SecurityConcernsController extends Controller
             'question_response' => 'required|string|in:Yes,No,Pass,Fail,Not Applicable,Not confirmed',
             'finding_observation' => 'nullable|string',
             'action_taken' => 'nullable|string',
-            'status' => 'required|string|in:Open,Closed',
+            'immediate_corrective_action' => 'nullable|string',
+            'recommendations' => 'nullable|string',
+            'reference' => 'nullable|string',
+            'status' => 'required|string|in:Open,Closed,Overdue',
             'finding_category' => 'required|string|in:Compliant,Not Compliant(Minor),Not Compliant(Serious),Not Applicable,Not Confirmed,Not Applicable,Not Confirmed',
             'date_quality_control' => 'required|date',
             'problem_cause' => 'required|string',
-            'proposed_follow_up_action' => 'nullable|string',
+            'proposed_follow_up_action' => 'nullable|string|in:Onsite,Administrative,Onsite and Administrative',
             'short_term_action' => 'nullable|string',
+            'short_term_date' => 'nullable|date',
+            'long_term_action' => 'nullable|string',
             'long_term_action' => 'nullable|string',
             'completion_date' => 'nullable|date',
             'date_of_closure' => 'required|date',
@@ -110,6 +115,12 @@ class SecurityConcernsController extends Controller
             'completion_date' => $request->completion_date,
             'date_of_closure' => $request->date_of_closure,
             'follow_up_date' => $request->follow_up_date,
+
+            'immediate_corrective_action' => $request->immediate_corrective_action,
+            'recommendations' => $request->recommendations,
+            'reference' => $request->reference,
+            'short_term_date' => $request->short_term_date,
+            'long_term_date' => $request->long_term_date,
         ]);
 
         if ($request->hasFile('evidence_file')) {

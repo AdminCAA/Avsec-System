@@ -12,12 +12,14 @@ class AuditAreaCategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         // Fetch all audit area categories from the database
-        $auditAreaCategories = AuditAreaCategory::orderBy('name', 'asc')->paginate(50);
+        $searchQuery = AuditAreaCategory::search($request);
+        $auditAreaCategories = $searchQuery->orderBy('name', 'asc')->paginate(50);
         return inertia('AuditCategories/List', [
             'auditAreaCategories' => $auditAreaCategories,
+            'search' => $request->search ?? '',
         ]);
     }
 
@@ -48,7 +50,7 @@ class AuditAreaCategoryController extends Controller
         if ($validator->passes()) {
             // Create a new audit area category
             AuditAreaCategory::create([
-                'name' => $request->name,
+                'name' => $request->name .' - '.$request->category_name,
                 'category_name' => $request->category_name,
             ]);
             return redirect()->route('audit-categories.index')->with('success', 'Audit Category created successfully.');
@@ -72,8 +74,10 @@ class AuditAreaCategoryController extends Controller
     {
         //
         $auditCategory = AuditAreaCategory::findOrFail($id);
+        $categories = AuditAreaCategory::CATEGORIES;
         return inertia('AuditCategories/Edit',[
-            'auditCategory' => $auditCategory
+            'auditCategory' => $auditCategory,
+            'categories' => $categories
         ]);
     }
 
@@ -84,14 +88,14 @@ class AuditAreaCategoryController extends Controller
     {        //
         $auditCategory = AuditAreaCategory::findOrFail($id);
         $validator = Validator::make($request->all(),[
-            'name' => 'required|string|max:255|unique:audit_area_categories,name,'.$id.',id',
+            'name' => 'required|string|max:255',
             'category_name' => 'required|string|max:255|',
         ]);
         // Check if validation passes
         if ($validator->passes()) {                        
             // Update the audit area category
             $auditCategory->update([
-                'name' => $request->name,
+                'name' => $request->name .' - '.$request->category_name,
                 'category_name' => $request->category_name,
             ]);
             return redirect()->route('audit-categories.index')->with('success', 'Audit Category updated successfully.');

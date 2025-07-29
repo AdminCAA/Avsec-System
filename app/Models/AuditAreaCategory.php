@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
 class AuditAreaCategory extends Model
 {
@@ -14,8 +16,10 @@ class AuditAreaCategory extends Model
         'Catering Agent',        
         'Ground Handling Agent',
         'Fuel Supplier',
-        'Security Agent',
-        'Maintenance Provider',        
+        'Outsourced Security Service Provider',
+        //'Security Agent',
+        //'Maintenance Provider',        
+        'Air Navigation Service Provider' ,
         'Training Organization',        
     ];
 
@@ -23,6 +27,17 @@ class AuditAreaCategory extends Model
         'name',
         'category_name',
     ];
+
+    public function scopeSearch(Builder $query , Request $request){       
+        return $query->where(function($query) use ($request){
+            return $query->when($request->search,function($query) use ($request){ 
+                return $query->where(function ($query) use ($request){
+                    $query->where('name','like','%'.$request->search.'%')
+                    ->orWhere('category_name','like','%'.$request->search.'%');                    
+                });
+            });
+        });
+    }
 
     public function auditQuestions()
     {

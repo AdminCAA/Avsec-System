@@ -3,9 +3,10 @@
 //import Swal from 'sweetalert2';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Pagination from '@/Components/Pagination.vue';``
-import { Head,Link, router } from '@inertiajs/vue3';
+import { Head,Link,usePage, router } from '@inertiajs/vue3';
+
 import dayjs from 'dayjs';
-import { ref } from 'vue';
+import { ref ,computed, watch} from 'vue';
 
 defineProps({
     auditAreaCategories: {
@@ -20,7 +21,20 @@ defineProps({
   };
 
   let pageNumber = ref(1);  
+  
+  let search = ref(usePage().props.search);
 
+  let qcAreaUrl = computed(()=>{
+        let url = new URL(route('audit-categories.index'));
+        url.searchParams.append('page', pageNumber.value);
+        if(search.value){
+            url.searchParams.append('search', search.value);
+        }
+        // if(class_id.value){
+        //     url.searchParams.append('class_id', class_id.value);
+        // }
+        return url;
+  });
 
   const updatePageNumber = (link)=>{
         pageNumber.value = link.url.split('=')[1];            
@@ -28,6 +42,21 @@ defineProps({
             preserveScroll:true,
         });    
   }
+
+  watch(()=>qcAreaUrl.value, (newUrl)=>{
+    router.visit(newUrl,{
+        preserveScroll: true,
+        preserveState: true,
+        replace: true
+    });
+})
+
+    watch(()=>search.value, (newvalue)=>{
+        if(newvalue){
+        pageNumber.value = 1;
+        } 
+    })
+
 
   const deleteAuditCategory = (id)=>{
     Swal.fire({
@@ -87,7 +116,7 @@ defineProps({
 </script>
 
 <template>
-    <Head title="Areas of Audit" />
+    <Head title="Areas of Quality Control" />
     <AuthenticatedLayout>
         <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -117,39 +146,60 @@ defineProps({
               
               <!-- /.card-header -->
               <div class="card-body">
-                <table v-if="auditAreaCategories.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
-                  <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Target Area</th>
-                    <th>Created</th>
-                    <th>Actions</th>                    
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr  v-for="(item, index) in auditAreaCategories.data" :key="item.id"
-                    :class="{'table table-selected': selectedRowId === item.id }" 
-                    @click="selectRow(item.id)"                 
-                  >
-                    <td>{{ (auditAreaCategories.current_page - 1) * auditAreaCategories.per_page + index + 1 }}</td>
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.category_name }}</td>
-                    <td>{{dayjs(item.created_at).format('DD-MM-YYYY')}}</td>
-                    
-                    <td>
-                      <div class="d-flex justify-content-end">
-                        <Link class="btn btn-info btn-sm mr-2" :href="route('audit-categories.edit', item.id)">
-                          <i class="fas fa-edit"></i> <span>Edit</span>
-                        </Link>
-                        <button class="btn btn-danger btn-sm" @click="deleteAuditCategory(item.id)">
-                          <i class="fas fa-trash"></i> <span>Delete</span>
-                        </button>
-                      </div>
-                    </td>                    
-                  </tr> 
-                  </tbody>                
-                </table>
+                <div class="row mb-3">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                        <div class="input-group input-group-sm">
+                            <input 
+                                type="search" 
+                                class="form-control form-control-lg" 
+                                placeholder="Search for Quality Control Area" 
+                                v-model="search">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-lg btn-default">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                  
+                 </div>
+                 <div class="table-responsive">
+                  <table v-if="auditAreaCategories.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
+                    <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Name</th>
+                      <th>Target Area</th>
+                      <th>Created</th>
+                      <th>Actions</th>                    
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr  v-for="(item, index) in auditAreaCategories.data" :key="item.id"
+                      :class="{'table table-selected': selectedRowId === item.id }" 
+                      @click="selectRow(item.id)"                 
+                    >
+                      <td>{{ (auditAreaCategories.current_page - 1) * auditAreaCategories.per_page + index + 1 }}</td>
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.category_name }}</td>
+                      <td>{{dayjs(item.created_at).format('DD-MM-YYYY')}}</td>
+                      
+                      <td>
+                        <div class="d-flex justify-content-end">
+                          <Link class="btn btn-info btn-sm mr-2" :href="route('audit-categories.edit', item.id)">
+                            <i class="fas fa-edit"></i> <span>Edit</span>
+                          </Link>
+                          <button class="btn btn-danger btn-sm" @click="deleteAuditCategory(item.id)">
+                            <i class="fas fa-trash"></i> <span>Delete</span>
+                          </button>
+                        </div>
+                      </td>                    
+                    </tr> 
+                    </tbody>                
+                  </table>
+                </div>
 
                 <div v-if="auditAreaCategories.data.length > 0" class="card mt-3">
                   <Pagination :data="auditAreaCategories" :updatePageNumber="updatePageNumber"/>                               

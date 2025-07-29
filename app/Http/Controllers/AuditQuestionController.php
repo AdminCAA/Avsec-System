@@ -49,9 +49,9 @@ class AuditQuestionController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        $auditCategory = AuditAreaCategory::find($request->audit_area_category_id);
+        $auditAreaCategory = AuditAreaCategory::find($request->audit_area_category_id);
 
-        if (!$auditCategory) {
+        if (!$auditAreaCategory) {
             return response()->json(['message' => 'Audit area category not found'], 404);
         }
 
@@ -59,7 +59,7 @@ class AuditQuestionController extends Controller
         AuditQuestion::create([
             'audit_area_category_id' => $request->audit_area_category_id,
             'question' => $request->question,
-            'audit_area_name'=> $auditCategory->name .'  -  '. $auditCategory->category_name,
+            'audit_area_name'=> $auditAreaCategory->name,
         ]);
         return redirect()->route('audit-questions.index')->with('success', 'Audit question created successfully.');
       
@@ -102,12 +102,12 @@ class AuditQuestionController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $auditCategory = AuditAreaCategory::find($request->audit_area_category_id);
+        $auditAreaCategory = AuditAreaCategory::find($request->audit_area_category_id);
         // Update the audit question
         $auditQuestion->update([
             'audit_area_category_id' => $request->audit_area_category_id,
             'question' => $request->question,
-            'audit_area_name'=> $auditCategory->name .'  -  '. $auditCategory->category_name,
+            'audit_area_name'=> $auditAreaCategory->name,
         ]);
         return redirect()->route('audit-questions.index')->with('success', 'Audit question updated successfully.');
     }

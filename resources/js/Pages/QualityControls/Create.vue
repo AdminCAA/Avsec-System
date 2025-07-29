@@ -187,7 +187,7 @@ watch(() => form.facility_id, (value) => {
 
                                 <div class="row">
                                     <div class="form-group col-md-6">                                    
-                                      <label>Operator</label>                                        
+                                      <label>Target Operator</label>                                        
                                       <v-select
                                           v-model="form.facility_id"
                                           :options="props.facilities"

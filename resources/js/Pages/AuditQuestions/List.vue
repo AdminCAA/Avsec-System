@@ -163,41 +163,45 @@ watch(()=>search.value, (newvalue)=>{
                         </div>
                   </div>
                  </div>
-                <table v-if="auditQuestions.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
-                  <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Audit Question</th>
-                    <th>Audit Area</th>                                                       
-                    <th style="width: 100px;">Created</th>   
-                    <th style="width: 160px;">Actions</th>             
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr  v-for="(question, index) in auditQuestions.data" :key="question.id"
-                    :class="{'table table-selected': selectedRowId === question.id }" 
-                    @click="selectRow(question.id)"                 
-                  >
-                    <td>{{ (auditQuestions.current_page - 1) * auditQuestions.per_page + index + 1 }}</td>
-                    
-                    <td>{{ question.question }}</td>
-                    <td>{{ question.audit_area_category.name }}</td>                                                                                                  
-                    <td>{{dayjs(question.created_at).format('DD-MM-YYYY')}}</td>
-                    
-                    <td>
-                      <div class="d-flex justify-content-end">                        
-                        <Link class="btn btn-info btn-sm mr-2" :href="route('audit-questions.edit', question.id)">
-                          <i class="fas fa-edit"></i> <span>Edit</span>
-                        </Link>
-                        <button class="btn btn-danger btn-sm" @click="deleteAuditQuestions(question.id)">
-                          <i class="fas fa-trash"></i> <span>Delete</span>
-                        </button>
-                      </div>
-                    </td>                    
-                  </tr>
- 
-                  </tbody>                
-                </table>
+                 <div class="table-responsive">
+
+                    <table v-if="auditQuestions.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
+                    <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Audit Question</th>
+                      <th>Audit Area</th>                                                       
+                      <th style="width: 100px;">Created</th>   
+                      <th style="width: 160px;">Actions</th>             
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr  v-for="(question, index) in auditQuestions.data" :key="question.id"
+                      :class="{'table table-selected': selectedRowId === question.id }" 
+                      @click="selectRow(question.id)"                 
+                    >
+                      <td>{{ (auditQuestions.current_page - 1) * auditQuestions.per_page + index + 1 }}</td>
+                      
+                      <td>{{ question.question }}</td>
+                      <td>{{ question.audit_area_category.name }}</td>                                                                                                  
+                      <td>{{dayjs(question.created_at).format('DD-MM-YYYY')}}</td>
+                      
+                      <td>
+                        <div class="d-flex justify-content-end">                        
+                          <Link class="btn btn-info btn-sm mr-2" :href="route('audit-questions.edit', question.id)">
+                            <i class="fas fa-edit"></i> <span>Edit</span>
+                          </Link>
+                          <button class="btn btn-danger btn-sm" @click="deleteAuditQuestions(question.id)">
+                            <i class="fas fa-trash"></i> <span>Delete</span>
+                          </button>
+                        </div>
+                      </td>                    
+                    </tr>
+  
+                    </tbody>                
+                  </table>
+                 </div>
+                
 
                 <div v-if="auditQuestions.data.length > 0" class="card mt-3">
                   <Pagination :data="auditQuestions" :updatePageNumber="updatePageNumber"/>                               

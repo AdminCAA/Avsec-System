@@ -78,11 +78,11 @@ class FacilityController extends Controller
      */
     public function show(string $id)
     {
-        $facility = Facility::with('qualityControls')->findOrFail($id);    
-        
-        $audits = $facility->qualityControls()->where('control_type', 'Audit')->paginate(2, ['*'], 'audits_page');
-        $inspections = $facility->qualityControls()->where('control_type', 'Inspection')->paginate(2, ['*'], 'inspections_page');
-        $securityTests = $facility->qualityControls()->where('control_type', 'Security Test')->paginate(2, ['*'], 'security_tests_page');
+        $facility = Facility::with(['qualityControls','users'])->findOrFail($id);    
+        $usersCount = $facility->users()->count();
+        $audits = $facility->qualityControls()->with('users')->where('control_type', 'Audit')->paginate(2, ['*'], 'audits_page');
+        $inspections = $facility->qualityControls()->with('users')->where('control_type', 'Inspection')->paginate(2, ['*'], 'inspections_page');
+        $securityTests = $facility->qualityControls()->with('users')->where('control_type', 'Security Test')->paginate(2, ['*'], 'security_tests_page');
 
         $qualityControlCounts = [
             'audits' => $facility->qualityControls->where('control_type', 'Audit')->count(),
@@ -95,7 +95,9 @@ class FacilityController extends Controller
             'qualityControlCounts' => $qualityControlCounts,
             'audits' => $audits,
             'inspections' => $inspections,
-            'securityTests' => $securityTests,            
+            'securityTests' => $securityTests,    
+            'usersCount'  => $usersCount
+
         ]);
     }
 

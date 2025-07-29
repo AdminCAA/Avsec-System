@@ -63,7 +63,7 @@ class CheckQualityControlStatus extends Command
                             $qualityControl->status = 'Overdue';
                             $qualityControl->save();  
                             //Update the status of the selected question
-                            $selectedQuestion->status = 'Open';
+                            $selectedQuestion->status = 'Overdue';
                             $selectedQuestion->modified_at = now();
                             $selectedQuestion->save();
                             $this->info("QUALITY CONTROL ID: {$qualityControl->id}. UPDATED");

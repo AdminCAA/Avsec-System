@@ -117,38 +117,42 @@ defineProps({
               
               <!-- /.card-header -->
               <div class="card-body">
-                <table v-if="permissions.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
-                  <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Created</th>
-                    <th>Actions</th>                    
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr  v-for="(permission, index) in permissions.data" :key="permission.id"
-                    :class="{'table table-selected': selectedRowId === permission.id }" 
-                    @click="selectRow(permission.id)"                 
-                  >
-                    <td>{{ (permissions.current_page - 1) * permissions.per_page + index + 1 }}</td>
-                    <td>{{ permission.name }}</td>
-                    <td>{{dayjs(permission.created_at).format('DD-MM-YYYY')}}</td>
-                    
-                    <td>
-                      <div class="d-flex justify-content-end">
-                        <Link class="btn btn-info btn-sm mr-2" :href="route('permissions.edit', permission.id)">
-                          <i class="fas fa-edit"></i> <span>Edit</span>
-                        </Link>
-                        <button class="btn btn-danger btn-sm" @click="deletePermission(permission.id)">
-                          <i class="fas fa-trash"></i> <span>Delete</span>
-                        </button>
-                      </div>
-                    </td>                    
-                  </tr>
- 
-                  </tbody>                
-                </table>
+                <div class="table-responsive">
+  <table v-if="permissions.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
+                    <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Name</th>
+                      <th>Created</th>
+                      <th>Actions</th>                    
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr  v-for="(permission, index) in permissions.data" :key="permission.id"
+                      :class="{'table table-selected': selectedRowId === permission.id }" 
+                      @click="selectRow(permission.id)"                 
+                    >
+                      <td>{{ (permissions.current_page - 1) * permissions.per_page + index + 1 }}</td>
+                      <td>{{ permission.name }}</td>
+                      <td>{{dayjs(permission.created_at).format('DD-MM-YYYY')}}</td>
+                      
+                      <td>
+                        <div class="d-flex justify-content-end">
+                          <Link class="btn btn-info btn-sm mr-2" :href="route('permissions.edit', permission.id)">
+                            <i class="fas fa-edit"></i> <span>Edit</span>
+                          </Link>
+                          <button class="btn btn-danger btn-sm" @click="deletePermission(permission.id)">
+                            <i class="fas fa-trash"></i> <span>Delete</span>
+                          </button>
+                        </div>
+                      </td>                    
+                    </tr>
+  
+                    </tbody>                
+                  </table>
+
+                </div>
+                
 
                 <div v-if="permissions.data.length > 0" class="card mt-3">
                   <Pagination :data="permissions" :updatePageNumber="updatePageNumber"/>                               
@@ -176,7 +180,7 @@ defineProps({
 </template>
 <style>
   .table .table-selected {
-    background-color: #3A59D1 !important; /* or any other color */
+    background-color: #bebebe !important; /* or any other color */
     color: white !important; /* or any other color */
   }
   .table th {

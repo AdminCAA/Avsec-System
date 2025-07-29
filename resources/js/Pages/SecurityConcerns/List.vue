@@ -130,9 +130,9 @@ const { questionsWithConcerns} = defineProps({
       case 'Not Confirmed':
         return 'Not Confirmed';            
       default:
-        return 'bg-light text-dark';
+        return category;
     }
-  }
+  }  
 </script>
 
 <template>
@@ -184,10 +184,11 @@ const { questionsWithConcerns} = defineProps({
                   <tr>
                     <th>#</th>
                     <!-- <th>Facility</th> -->
+                    <th>Question</th> 
                     <th>Quality Control</th>
                     <th>Type</th>   
-                    <th>Area</th>   
-                    <th>Question</th>                             
+                    <th>Target Area</th>   
+                                               
                     <th>Status</th>       
                     <th>Category</th>       
                     <th style="width: 100px;">Modified</th>                  
@@ -202,6 +203,12 @@ const { questionsWithConcerns} = defineProps({
                     <!-- <td>{{ index + 1 }}</td> -->
                     <td>{{ (questionsWithConcerns.current_page - 1) * questionsWithConcerns.per_page + index + 1 }}</td>
                     <!-- <td>{{ securityConcern.quality_control.facility.name }}</td> -->
+                    
+                    <td>          
+                        <Link :href="route('securityconcerns.edit', securityConcern.id)">
+                            {{ securityConcern.question}}           
+                        </Link>              
+                    </td>
                     <td>
                         <Link :href="route('quality-controls.edit', securityConcern.quality_control_id)">{{ securityConcern.quality_control.title }}</Link>
                     </td>
@@ -210,18 +217,14 @@ const { questionsWithConcerns} = defineProps({
 
                     <td>{{ securityConcern.audit_area_name }}</td>
                                        
-                    <td>          
-                        <Link :href="route('securityconcerns.edit', securityConcern.id)">
-                            {{ securityConcern.question}}           
-                        </Link>              
-                    </td>
+                    
                     <td>                        
                         <span :class="securityConcern.status==='Open','bg-danger text-white'" class="badge p-2">{{ securityConcern.status }}</span>          
                     </td>
                     <td>                        
                         {{getFindingCategory(securityConcern.finding_category) }}
                     </td>
-                    <td>{{dayjs(securityConcern.modified_at).format('DD-MM-YYYY')}}</td>
+                    <td>{{dayjs(securityConcern.updated_at).format('DD-MM-YYYY')}}</td>
                    
                     
                     <td>
@@ -261,7 +264,7 @@ const { questionsWithConcerns} = defineProps({
 </template>
 <style>
   .table .table-selected {
-    background-color: #4962df !important; /* or any other color */
+    background-color: #bebebe !important; /* or any other color */
     color: white !important; /* or any other color */
   }
   

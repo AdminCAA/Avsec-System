@@ -41,6 +41,12 @@ const statusOptions = [
   {id : 2, option  : 'Closed'},  
 ]
 
+const followupActionOptions = [
+  {id : 1, option  : 'Onsite'},
+  {id : 2, option  : 'Administrative'},  
+  {id : 3, option  : 'Onsite and Administrative'},  
+]
+
 const forms = ref({});
 const isLoading = ref(false);
 const formErrors = ref({});
@@ -57,13 +63,18 @@ function validateQuestionForm(questionId) {
   if (!form.completion_date) errors.completion_date = 'Completion date is required';
   if (!form.follow_up_date) errors.follow_up_date = 'Follow-up date is required';
   //Check if the evidence file is more the 2Mb
-  if (form.evidence_file && form.evidence_file.size > 2 * 1024 * 1024) {
-    errors.evidence_file = 'File size must be less than 2MB';
-  } 
-  if (form.evidence_file && !['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'].includes(form.evidence_file.type)) {
-    errors.evidence_file = 'Only PDF, JPG, or PNG files are allowed.';
-  } 
 
+  
+  if (form.evidence_file instanceof File) {
+    // Size check
+    if (form.evidence_file.size > 2 * 1024 * 1024) {
+      errors.evidence_file = 'File size must be less than 2MB';
+    }
+    // Type check
+    else if (!['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'].includes(form.evidence_file.type)) {
+      errors.evidence_file = 'Only PDF, JPG, or PNG files are allowed.';
+    }
+  } 
   formErrors.value[questionId] = errors;
 
   return Object.keys(errors).length === 0;
@@ -75,7 +86,6 @@ function submitQuestionForm(questionId) {
       let formData = new FormData();
       formData.append('question_id', questionId);
       formData.append('quality_control_id',qualityControl.id);
-
       formData.append('question_response', forms.value[questionId].question_response);
       formData.append('finding_observation', forms.value[questionId].finding_observation);
       formData.append('action_taken', forms.value[questionId].action_taken);
@@ -83,15 +93,23 @@ function submitQuestionForm(questionId) {
       formData.append('finding_category', forms.value[questionId].finding_category);
       formData.append('date_quality_control', forms.value[questionId].date_quality_control);
       formData.append('problem_cause', forms.value[questionId].problem_cause);
-      formData.append('proposed_follow_up_action', forms.value[questionId].proposed_follow_up_action);
-      formData.append('short_term_action',forms.value[questionId].short_term_action);
+      formData.append('recommendations', forms.value[questionId].recommendations);
+      formData.append('reference', forms.value[questionId].reference);
+      formData.append('immediate_corrective_action', forms.value[questionId].immediate_corrective_action);
+      formData.append('short_term_action', forms.value[questionId].short_term_action);
+      formData.append('short_term_date', forms.value[questionId].short_term_date);
       formData.append('long_term_action', forms.value[questionId].long_term_action);
+      formData.append('long_term_date', forms.value[questionId].long_term_date);
+      
+      formData.append('proposed_follow_up_action', forms.value[questionId].proposed_follow_up_action);     
       formData.append('completion_date',forms.value[questionId].completion_date);
       formData.append('date_of_closure', forms.value[questionId].date_of_closure);
       formData.append('follow_up_date', forms.value[questionId].follow_up_date);
-      if (forms.value[questionId].evidence_file) {
+
+      if (forms.value[questionId].evidence_file instanceof File) {          
           formData.append('evidence_file', forms.value[questionId].evidence_file);
-      }   
+      }
+      
       axios.post(route('quality-controls.saveQuestionResponse',questionId), formData).then(() => {
           Swal.fire({
             icon: 'success',
@@ -134,8 +152,6 @@ function submitQuestionForm(questionId) {
 }
 
 // Realtime validation examples
-
-
 function getForm(questionId) {
   if (!forms.value[questionId]) {
     forms.value[questionId] = {
@@ -145,6 +161,14 @@ function getForm(questionId) {
       status: '',
       finding_category: '',
       date_quality_control: '',
+      recommendations: '',
+      reference: '',
+      immediate_corrective_action: '',
+      short_term_action: '',
+      short_term_date: '',
+      long_term_action: '',
+      long_term_date: '',
+      date_quality_control: '',      
       problem_cause: '',
       proposed_follow_up_action: '',
       short_term_action: '',
@@ -167,6 +191,13 @@ onMounted(() => {
         action_taken: question.action_taken || '',
         status: question.status || '',
         finding_category: question.finding_category || '',
+        recommendations: question.recommendations || '',
+        reference: question.reference || '',
+        immediate_corrective_action: question.immediate_corrective_action || '',
+        short_term_action: question.short_term_action || '',
+        short_term_date: question.short_term_date || '',
+        long_term_action: question.long_term_action || '',
+        long_term_date: question.long_term_date || '',
         date_quality_control: question.date_quality_control || '',
         problem_cause: question.problem_cause || '',
         proposed_follow_up_action: question.proposed_follow_up_action || '',
@@ -175,7 +206,7 @@ onMounted(() => {
         completion_date: question.completion_date || '',
         date_of_closure: question.date_of_closure || '',
         follow_up_date: question.follow_up_date || '',
-        evidence_file: question.evidence_file || null
+        evidence_file: question.evidence_file || null 
       };      
     }
   }
@@ -189,6 +220,7 @@ onMounted(() => {
 const fileName = ref({});
 const handleFileUpload = (questionId, event) => {         
     const file = event.target.files[0];
+     
     if (!formErrors.value[questionId]) {
       formErrors.value[questionId] = {};
     }
@@ -207,8 +239,6 @@ const handleFileUpload = (questionId, event) => {
       getForm(questionId).evidence_file = null;
     }
 };
-
-
 
 
 
@@ -338,7 +368,56 @@ const handleFileUpload = (questionId, event) => {
                                           
                                       </div>
                                     </div>
+                                    <div class="row">
+                                      <div class="form-group col-md-6">
+                                        <label>Recommendations</label>
+                                        <textarea required v-model="getForm(question.id).recommendations"
+                                          class="form-control" rows="2" placeholder="Recommendations"
+                                          
+                                          @change="validateQuestionForm(question.id)"
+                                          :class="{ 
+                                                    'is-invalid': formErrors[question.id]?.recommendations, 
+                                                    'is-valid': forms[question.id].recommendations && !formErrors[question.id]?.recommendations 
+                                            }" 
+                                          >
+                                        </textarea>
+                                        <small v-if="formErrors[question.id]?.recommendations" class="text-danger">{{ formErrors[question.id].recommendations }}</small>                                                     
+                                      </div>
 
+                                      <div class="form-group col-md-6">
+                                          <label>Reference</label>
+                                          <input 
+                                              required 
+                                              v-model="getForm(question.id).reference"                                         
+                                              type="text"
+                                              class="form-control"  
+                                              @change="validateQuestionForm(question.id)"  
+                                              :class="{ 
+                                                    'is-invalid': formErrors[question.id]?.reference, 
+                                                    'is-valid': forms[question.id].reference && !formErrors[question.id]?.reference 
+                                                }"                                                     
+                                              placeholder="Reference"
+                                          />
+                                          <small v-if="formErrors[question.id]?.reference" class="text-danger">{{ formErrors[question.id].reference }}</small>                                                     
+                                          
+                                      </div>
+                                    </div>
+
+                                    <div class="row">
+                                      <div class="form-group col-md-12">
+                                        <label>Immediate Corrective Actions</label>
+                                        <textarea v-model="getForm(question.id).immediate_corrective_action
+                                          "class="form-control" rows="2" placeholder="Immediate Corrective Action"
+                                          
+                                          @change="validateQuestionForm(question.id)"
+                                          :class="{ 
+                                                    'is-invalid': formErrors[question.id]?.immediate_corrective_action, 
+                                                    'is-valid': forms[question.id].immediate_corrective_action && !formErrors[question.id]?.immediate_corrective_action 
+                                            }" 
+                                          >
+                                        </textarea>                                                                                  
+                                      </div>
+                                    </div>
                                     <div class="row">
                                       <div class="form-group col-md-6">
                                         <label>Action Taken By Operator</label>
@@ -363,6 +442,7 @@ const handleFileUpload = (questionId, event) => {
                                         <small v-if="formErrors[question.id]?.problem_cause" class="text-danger">{{ formErrors[question.id].problem_cause }}</small>                                                     
                                       </div>
                                     </div> 
+                                    
 
                                     <div class="row">
                                       <div class="form-group col-md-6">
@@ -373,11 +453,45 @@ const handleFileUpload = (questionId, event) => {
                                       </div>
 
                                       <div class="form-group col-md-6">
+                                        <label>Short term  Date</label>
+                                        <input                                                     
+                                            v-model="getForm(question.id).short_term_date"                                         
+                                            type="date"
+                                            class="form-control"   
+                                            @change="validateQuestionForm(question.id)"        
+                                            :class="{ 
+                                                'is-invalid': formErrors[question.id]?.short_term_date, 
+                                                'is-valid': forms[question.id].short_term_date && !formErrors[question.id]?.short_term_date 
+                                            }"                                                  
+                                            placeholder="Short Term Date"
+                                        />  
+                                        <small v-if="formErrors[question.id]?.short_term_date" class="text-danger">{{ formErrors[question.id].short_term_date }}</small>                                      
+                                      </div>                                     
+                                    </div> 
+
+                                    <div class="row">
+                                      <div class="form-group col-md-6">
                                         <label>Long term CAP</label>
                                         <textarea v-model="getForm(question.id).long_term_action" class="form-control" rows="2" placeholder="Long term CAP">
                                         </textarea>
                                       </div>
-                                    </div> 
+
+                                      <div class="form-group col-md-6">
+                                        <label>Long Term  Date</label>
+                                        <input                                                     
+                                            v-model="getForm(question.id).long_term_date"                                         
+                                            type="date"
+                                            class="form-control"   
+                                            @change="validateQuestionForm(question.id)"        
+                                            :class="{ 
+                                                'is-invalid': formErrors[question.id]?.long_term_date, 
+                                                'is-valid': forms[question.id].long_term_date && !formErrors[question.id]?.long_term_date 
+                                            }"                                                  
+                                            placeholder="Follow-up Date"
+                                        />  
+                                        <small v-if="formErrors[question.id]?.long_term_date" class="text-danger">{{ formErrors[question.id].long_term_date }}</small>                                      
+                                      </div>
+                                    </div>
 
                                     <div class="row">
                                       <div class="form-group col-md-6">
@@ -415,14 +529,20 @@ const handleFileUpload = (questionId, event) => {
                                     </div>
 
                                     <div class="row">
-                                      <div class="form-group col-md-6">
-                                        <label>Proposed Follow up Action</label>
-                                        <textarea v-model="getForm(question.id).proposed_follow_up_action"
-                                            class="form-control"
-                                            
-                                            rows="2" placeholder="Proposed Follow up Action">
-                                        </textarea>
-                                      </div>
+                                      <div class="form-group col-md-6">                                                    
+                                            <label>Proposed Follow up Action</label>
+                                            <select required v-model="getForm(question.id).proposed_follow_up_action" 
+                                            class="form-control" 
+                                            @change="validateQuestionForm(question.id)"                                              
+                                            :class="{ 
+                                                'is-invalid': formErrors[question.id]?.proposed_follow_up_action, 
+                                                'is-valid': forms[question.id]?.proposed_follow_up_action && !formErrors[question.id]?.proposed_follow_up_action 
+                                            }"                                                    
+                                            >
+                                                <option value="">-- Select Proposed Followup Action --</option>
+                                                <option v-for="item in followupActionOptions" :key="item.id" :value="item.option">{{ item.option }}</option>
+                                            </select>    
+                                      </div>  
 
                                       <div class="form-group col-md-6">
                                         <label>Date of Closure</label>
@@ -433,16 +553,16 @@ const handleFileUpload = (questionId, event) => {
                                             @change="validateQuestionForm(question.id)"        
                                             :class="{ 
                                                 'is-invalid': formErrors[question.id]?.date_of_closure, 
-                                                'is-valid': forms[question.id].date_of_closure && !formErrors[question.id]?.date_of_closure 
+                                                'is-valid': forms[question.id]?.date_of_closure && !formErrors[question.id]?.date_of_closure 
                                             }"
                                                                                     
                                             placeholder="Date of Closure"
                                         /> 
-                                        <small v-if="formErrors[question.id]?.date_of_closure" class="text-danger">{{ formErrors[question.id].date_of_closure }}</small>                                                                                                                                                  
+                                        <small v-if="formErrors[question.id]?.date_of_closure" class="text-danger">{{ formErrors[question.id]?.date_of_closure }}</small>                                                                                                                                                  
                                       </div>
                                     </div>
 
-                                      <div class="row">                                                                                              
+                                    <div class="row">                                                                                              
                                       
 
                                     <div class="form-group col-md-6">                                    

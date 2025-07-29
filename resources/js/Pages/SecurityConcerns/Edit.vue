@@ -42,7 +42,15 @@ const findingCategoryOptions = [
 const statusOptions = [
   {id : 1, option  : 'Open'},
   {id : 2, option  : 'Closed'},  
+  {id : 3, option  : 'Overdue'},  
 ]
+
+const followupActionOptions = [
+  {id : 1, option  : 'Onsite'},
+  {id : 2, option  : 'Administrative'},  
+  {id : 3, option  : 'Onsite and Administrative'},  
+]
+
 
 const form = useForm({
     question_id: question.id || '',
@@ -53,10 +61,15 @@ const form = useForm({
     status: question.status || '',
     finding_category: question.finding_category || '',
     date_quality_control: question.date_quality_control || '',
+    immediate_corrective_action: question.immediate_corrective_action || '', // Assuming this is a new field for immediate corrective action
     problem_cause: question.problem_cause || '',
+    recommendations: question.recommendations || '', // Assuming this is a new field for recommendations
+    reference: question.reference || '', // Assuming this is a new field for reference
     proposed_follow_up_action: question.proposed_follow_up_action || '',
     short_term_action: question.short_term_action || '',
+    short_term_date: question.short_term_date || '', // Assuming this is a new field for short term date
     long_term_action: question.long_term_action || '',
+    long_term_date: question.long_term_date || '', // Assuming this is a new field for long term date
     completion_date: question.completion_date || '',
     date_of_closure: question.date_of_closure || '',
     follow_up_date: question.follow_up_date || '',    
@@ -105,10 +118,15 @@ function submitQuestionForm(){
     formData.append('status', form.status);
     formData.append('finding_category', form.finding_category);
     formData.append('date_quality_control', form.date_quality_control);
+    formData.append('immediate_corrective_action', form.immediate_corrective_action); // Append the new field for immediate corrective action
     formData.append('problem_cause', form.problem_cause);
+    formData.append('recommendations', form.recommendations); // Append the new field for recommendations
+    formData.append('reference', form.reference); // Append the new field for reference
     formData.append('proposed_follow_up_action', form.proposed_follow_up_action);
     formData.append('short_term_action', form.short_term_action);
+    formData.append('short_term_date', form.short_term_date); // Append the new field for short term date
     formData.append('long_term_action', form.long_term_action);
+    formData.append('long_term_date', form.long_term_date); // Append the new field for long term date
     formData.append('completion_date', form.completion_date);
     formData.append('date_of_closure', form.date_of_closure);
     formData.append('follow_up_date', form.follow_up_date);
@@ -165,7 +183,7 @@ function submitQuestionForm(){
     }
     
 };
-const fileName = ref('');
+let fileName = ref('');
 const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -183,6 +201,8 @@ const handleFileUpload = (event) => {
         form.evidence_file = null;
     }
 };
+
+
 
 </script>
 
@@ -350,6 +370,54 @@ const handleFileUpload = (event) => {
                                                     placeholder="Date of Quality Control"
                                                     />
                                                     <small v-if="formErrors.date_quality_control" class="text-danger">{{ formErrors.date_quality_control }}</small>                                                                                               
+                                                </div>                                                
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="form-group col-md-6">
+                                                    <label>Recommendations</label>
+                                                    <textarea required v-model="form.recommendations"
+                                                    class="form-control" rows="2" placeholder="Recommendations"                                                                                                        
+                                                    :class="{ 
+                                                                'is-invalid': formErrors.recommendations, 
+                                                                'is-valid': form.recommendations && !formErrors.recommendations 
+                                                        }" 
+                                                    >
+                                                    </textarea>
+                                                    <small v-if="formErrors.recommendations" class="text-danger">{{ formErrors.recommendations }}</small>                                                     
+                                                </div>
+
+                                                <div class="form-group col-md-6">
+                                                    <label>Reference</label>
+                                                    <input 
+                                                        required 
+                                                        v-model="form.reference"                                         
+                                                        type="text"
+                                                        class="form-control"                                                          
+                                                        :class="{ 
+                                                                'is-invalid': formErrors.reference, 
+                                                                'is-valid': form.reference && !formErrors.reference 
+                                                            }"                                                     
+                                                        placeholder="Reference"
+                                                    />
+                                                    <small v-if="formErrors.reference" class="text-danger">{{ formErrors.reference }}</small>                                                                                                         
+                                                </div>
+                                            </div>
+
+
+                                            <div class="row">
+                                                <div class="form-group col-md-12">
+                                                    <label>Immediate Corrective Actions</label>
+                                                    <textarea v-model="form.immediate_corrective_action
+                                                    "class="form-control" rows="2" placeholder="Immediate Corrective Action"
+                                                    
+                                                    @change="validateQuestionForm(question.id)"
+                                                    :class="{ 
+                                                                'is-invalid': formErrors.immediate_corrective_action, 
+                                                                'is-valid': form.immediate_corrective_action && !formErrors.immediate_corrective_action 
+                                                        }" 
+                                                    >
+                                                    </textarea>                                                                                  
                                                 </div>
                                             </div>
 
@@ -363,7 +431,7 @@ const handleFileUpload = (event) => {
 
                                                 <div class="form-group col-md-6">
                                                     <label>Root Cause of Problem</label>
-                                                    <textarea required v-model="form.problem_cause"
+                                                    <textarea v-model="form.problem_cause"
                                                         class="form-control" rows="2" placeholder="Cause of Problem"                                                                                   
                                                         :class="{ 
                                                                     'is-invalid': formErrors.problem_cause, 
@@ -373,7 +441,7 @@ const handleFileUpload = (event) => {
                                                     </textarea>
                                                     <small v-if="formErrors.problem_cause" class="text-danger">{{ formErrors.problem_cause }}</small>                                                     
                                                 </div>
-                                            </div> 
+                                            </div>                                             
 
                                             <div class="row">
                                                 <div class="form-group col-md-6">
@@ -382,13 +450,44 @@ const handleFileUpload = (event) => {
                                                     class="form-control" rows="2" placeholder="Short term CAP">
                                                     </textarea>
                                                 </div>
+                                                <div class="form-group col-md-6">
+                                                <label>Short term  Date</label>
+                                                <input                                                     
+                                                    v-model="form.short_term_date"                                         
+                                                    type="date"
+                                                    class="form-control"                                                             
+                                                    :class="{ 
+                                                        'is-invalid': formErrors.short_term_date, 
+                                                        'is-valid': form.short_term_date && !formErrors.short_term_date 
+                                                    }"                                                  
+                                                    placeholder="Short Term Date"
+                                                />  
+                                                <small v-if="formErrors.short_term_date" class="text-danger">{{ formErrors.short_term_date }}</small>                                      
+                                                </div>                                                
+                                            </div> 
 
+                                            <div class="row">
                                                 <div class="form-group col-md-6">
                                                     <label>Long term CAP</label>
                                                     <textarea v-model="form.long_term_action" class="form-control" rows="2" placeholder="Long term CAP">
                                                     </textarea>
                                                 </div>
-                                            </div> 
+
+                                                <div class="form-group col-md-6">
+                                                <label>Long term  Date</label>
+                                                <input                                                     
+                                                    v-model="form.long_term_date"                                         
+                                                    type="date"
+                                                    class="form-control"                                                             
+                                                    :class="{ 
+                                                        'is-invalid': formErrors.long_term_date, 
+                                                        'is-valid': form.long_term_date && !formErrors.long_term_date 
+                                                    }"                                                  
+                                                    placeholder="Long Term Date"
+                                                />  
+                                                <small v-if="formErrors.long_term_date" class="text-danger">{{ formErrors.long_term_date }}</small>                                      
+                                                </div> 
+                                            </div>
 
                                             <div class="row">
                                                 <div class="form-group col-md-6">
@@ -423,15 +522,23 @@ const handleFileUpload = (event) => {
                                                 </div>
                                             </div>
 
-                                            <div class="row">
-                                                <div class="form-group col-md-6">
+                                            <div class="row">                                                                                                
+                                                <div class="form-group col-md-6">                                                    
                                                     <label>Proposed Follow up Action</label>
-                                                    <textarea v-model="form.proposed_follow_up_action"
-                                                        class="form-control"
-                                                        
-                                                        rows="2" placeholder="Proposed Follow up Action">
-                                                    </textarea>
-                                                </div><div class="form-group col-md-6">
+                                                    <select required v-model="form.proposed_follow_up_action" 
+                                                    class="form-control"                                              
+                                                    :class="{ 
+                                                        'is-invalid': formErrors.proposed_follow_up_action, 
+                                                        'is-valid': form.proposed_follow_up_action && !formErrors.proposed_follow_up_action 
+                                                    }"
+                                                    
+                                                    >
+                                                        <option value="">-- Select Proposed Followup Action --</option>
+                                                        <option v-for="item in followupActionOptions" :key="item.id" :value="item.option">{{ item.option }}</option>
+                                                    </select>    
+                                                </div>  
+                                                
+                                                <div class="form-group col-md-6">
                                                     <label>Date of Closure</label>
                                                     <input required                                                      
                                                         v-model="form.date_of_closure"                                         

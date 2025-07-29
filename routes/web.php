@@ -16,6 +16,7 @@ use App\Http\Controllers\QualificationsController;
 use App\Http\Controllers\SecurityConcernsController;
 use App\Http\Controllers\SecurityEquipmentController;
 use App\Http\Controllers\TrainingController;
+use App\Http\Controllers\DashboardController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -27,16 +28,19 @@ Route::get('/', function () {
     ]);
 })->name('welcome');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class,'index'])->middleware(['auth', 'verified'])->name('dashboard');
+
 
 
 Route::get('/training', function () {
     return Inertia::render('Training');
 })->middleware(['auth', 'verified'])->name('training');
 
-
+Route::get('/errors', function () {
+    return Inertia::render('Errors/ErrorPage', [
+        'message' => session('error') ?? 'Something went wrong.'
+    ]);
+})->name('errors');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -166,6 +170,10 @@ Route::middleware('auth')->group(function () {
 
     //Sidebar Routes
     Route::get('/securityconcerns/count', [SecurityConcernsController::class, 'securityConcernsCount'])->name('securityconcerns.api.index');
+
+
+    //Dashboard Routes
+    Route::get('/dashboard/stats', [DashboardController::class, 'getDashboardStats'])->name('getDashboardStats');
 });
 
 

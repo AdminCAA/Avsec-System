@@ -211,7 +211,7 @@ const deleteCertificate = (id)=>{
             <div class="card card-info card-outline">
               <div class="card-body box-profile">                
                 <div class="text-center">
-                    <img class="profile-user-img img-fluid img-circle"
+                    <img class="profile-user-img img-fluid img-circle" style="width:120px"
                         :src="personnel.portrait ? 
                             `/storage/${personnel.portrait}` 
                             : '/storage/portraits/avatar.png'"
@@ -222,7 +222,7 @@ const deleteCertificate = (id)=>{
                 <p class="text-muted text-center">Status:  {{personnel.is_certified}}</p>
                 <p class="text-muted text-center">Gender:  {{personnel.gender}}</p>
                 <p class="text-muted text-center">NRC:  {{personnel.nrc}}</p>
-                <p class="text-muted text-center">Operator:<Link :href="route('facilities.show',personnel.facility_id)">{{personnel.facility_name}}</Link></p>
+                <p class="text-muted text-center">Operator: <Link :href="route('facilities.show',personnel.facility_id)">{{personnel.facility_name}}</Link></p>
                 <p class="text-muted text-center">Email:  {{personnel.email}}</p>
                 <p class="text-muted text-center">Contact:  {{personnel.phone_number}}</p> <hr>     
                 <div class="d-flex justify-content-center mb-2">
@@ -245,81 +245,87 @@ const deleteCertificate = (id)=>{
                     <!-- Post -->
                      <div class="d-flex justify-content-end mb-2">
                         <Link :href="route('certifications.create', personnel.id)" data-bs-toggle="tooltip" data-bs-placement="top"  title="Add Certification" class="btn btn-info btn-sm "><i class="fas fa-plus"></i> Add New</Link>
-                     </div>                                                  
-                     <table v-if="certifications.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
-                  <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Issuer</th>
-                    <th>Number</th>                                       
-                    <th>D/Issue</th>                                                        
-                    <th>E/Date</th>
-                    <th>Status</th>
-                    <th>Score</th>                                         
-                    <th>Actions</th>             
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr  v-for="(certificate, index) in certifications" :key="certificate.id"
-                    :class="{'table table-selected': selectedRowId === certificate.id }" 
-                    @click="selectRow(certificate.id)"                 
-                  >
-                    <td>{{  index + 1 }}</td>
-                    <td>
-                      {{ certificate.certification_name }}
-                    </td>
-                    <td>{{certificate.certification_body }}</td>
-                    <td>                        
-                        {{ certificate.certification_number }}           
-                    </td>                    
-                    <td>                        
-                        {{ certificate.date_issued ? dayjs(certificate.date_issued).format('DD-MM-YYYY') : 'N/A' }}           
-                    </td>
-                    <td>                        
-                        {{ certificate.expiry_date ? dayjs(certificate.expiry_date).format('DD-MM-YYYY') : 'N/A' }}           
-                    </td>
-                    <td class="text-center">
-                      <span class="badge p-2" :class="certificate.status === 'Active' ? 'bg-success' : 'bg-danger'">
-                        {{ certificate.status }}
-                      </span>
-                    </td>
-                    <td>{{ certificate.score }}%</td>
-                                                           
-                    <td>
-                      <div class="d-flex justify-content-end">
-                        <a v-if="certificate.certification_file"
-                            class="btn btn-success btn-sm mr-2"
-                            data-bs-toggle="tooltip"
-                            title="View Attachment"
-                            :href="`/storage/${certificate.certification_file}`" 
-                            target="_blank"
-                        >
-                            <i class="fas fa-paperclip"></i><span></span>
-                        </a>
-                        <Link class="btn btn-info btn-sm mr-2" data-bs-toggle="tooltip"  title="Edit" 
-                        :href="route('certifications.edit',  certificate.id )"
->
-                          <i class="fas fa-edit"></i> <span></span>
-                        </Link>
-                        <button class="btn btn-danger btn-sm" data-bs-toggle="tooltip"  title="Delete" @click="deleteCertificate(certificate.id)">
-                          <i class="fas fa-trash"></i> <span></span>
-                        </button>
-                      </div>
-                    </td>                    
-                  </tr> 
-                  </tbody>                
-                    </table>
-                    <div v-else class="text-center mt-4">
-                            <h5>No Certification found for this personnel</h5>
-                    </div> 
+                     </div> 
+                     <div class="table-responsive">
+
+                        <table v-if="certifications.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
+                    <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Name</th>
+                      <th>Issuer</th>
+                      <th>Number</th>                                       
+                      <th>D/Issue</th>                                                        
+                      <th>E/Date</th>
+                      <th>Status</th>
+                      <th>Score</th>                                         
+                      <th>Actions</th>             
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr  v-for="(certificate, index) in certifications" :key="certificate.id"
+                      :class="{'table table-selected': selectedRowId === certificate.id }" 
+                      @click="selectRow(certificate.id)"                 
+                    >
+                      <td>{{  index + 1 }}</td>
+                      <td>
+                        {{ certificate.certification_name }}
+                      </td>
+                      <td>{{certificate.certification_body }}</td>
+                      <td>                        
+                          {{ certificate.certification_number }}           
+                      </td>                    
+                      <td>                        
+                          {{ certificate.date_issued ? dayjs(certificate.date_issued).format('DD-MM-YYYY') : 'N/A' }}           
+                      </td>
+                      <td>                        
+                          {{ certificate.expiry_date ? dayjs(certificate.expiry_date).format('DD-MM-YYYY') : 'N/A' }}           
+                      </td>
+                      <td class="text-center">
+                        <span class="badge p-2" :class="certificate.status === 'Active' ? 'bg-success' : 'bg-danger'">
+                          {{ certificate.status }}
+                        </span>
+                      </td>
+                      <td>{{ certificate.score }}%</td>
+                                                            
+                      <td>
+                        <div class="d-flex justify-content-end">
+                          <a v-if="certificate.certification_file"
+                              class="btn btn-success btn-sm mr-2"
+                              data-bs-toggle="tooltip"
+                              title="View Attachment"
+                              :href="`/storage/${certificate.certification_file}`" 
+                              target="_blank"
+                          >
+                              <i class="fas fa-paperclip"></i><span></span>
+                          </a>
+                          <Link class="btn btn-info btn-sm mr-2" data-bs-toggle="tooltip"  title="Edit" 
+                          :href="route('certifications.edit',  certificate.id )"
+  >
+                            <i class="fas fa-edit"></i> <span></span>
+                          </Link>
+                          <button class="btn btn-danger btn-sm" data-bs-toggle="tooltip"  title="Delete" @click="deleteCertificate(certificate.id)">
+                            <i class="fas fa-trash"></i> <span></span>
+                          </button>
+                        </div>
+                      </td>                    
+                    </tr> 
+                    </tbody>                
+                      </table>
+                      <div v-else class="text-center mt-4">
+                              <h5>No Certification found for this personnel</h5>
+                      </div> 
+                     </div>
+                    
                   </div>
                   
                   <div class="tab-pane" id="qualifications">
                     <div class="d-flex justify-content-end mb-2">
                         <Link :href="route('qualifications.create', personnel.id)" class="btn btn-info btn-sm "><i class="fas fa-plus"></i> Add New</Link>
-                     </div>                       
-                        <table v-if="qualifications.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
+                     </div>  
+                     
+                     <div class="table-responsive">
+                      <table v-if="qualifications.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
                             <thead>
                             <tr>
                                 <th>#</th>
@@ -377,7 +383,9 @@ const deleteCertificate = (id)=>{
                         </table> 
                         <div v-else class="text-center mt-4">
                             <h5>No qualifications found for this personnel</h5>
-                        </div>                   
+                        </div> 
+                     </div>
+                                          
                   </div>
                 </div>                
               </div>

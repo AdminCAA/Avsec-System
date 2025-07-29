@@ -24,6 +24,9 @@ const {qualityControls} = defineProps({
   let pageNumber = ref(1);  
 
   let search = ref(usePage().props.search);
+  let startDate = ref(usePage().props.start_date);
+  let endDate = ref(usePage().props.end_date);
+ 
 
   let qualityControlsUrl = computed(()=>{
         let url = new URL(route('quality-controls.index'));
@@ -34,6 +37,12 @@ const {qualityControls} = defineProps({
         // if(class_id.value){
         //     url.searchParams.append('class_id', class_id.value);
         // }
+        if(startDate.value){
+            url.searchParams.append('start_date', startDate.value);
+        }
+        if(endDate.value){
+            url.searchParams.append('end_date', endDate.value);
+        }        
         return url;
   });
 
@@ -43,7 +52,7 @@ const {qualityControls} = defineProps({
         preserveState: true,
         replace: true
     });
-})
+  })
 
 watch(()=>search.value, (newvalue)=>{
     if(newvalue){
@@ -51,6 +60,10 @@ watch(()=>search.value, (newvalue)=>{
     } 
 })
 
+watch([startDate, endDate], () => {
+  pageNumber.value = 1; // reset to first page when filters change
+  
+});
    
 
   const updatePageNumber = (link)=>{
@@ -58,6 +71,7 @@ watch(()=>search.value, (newvalue)=>{
         router.visit("/quality-controles?page=" +  pageNumber.value, {
             preserveScroll:true,
         });    
+        
   }
 
   const deleteQualityControl = (id)=>{
@@ -132,6 +146,16 @@ watch(()=>search.value, (newvalue)=>{
     }
   }
 
+
+  const getUserColor= (name)=> {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const hue = Math.abs(hash % 360); // 0–360 for color variety
+    return `hsl(${hue}, 70%, 80%)`; // pastel-like background
+  }
+
 </script>
 
 <template>
@@ -172,18 +196,50 @@ watch(()=>search.value, (newvalue)=>{
                                 <input 
                                     type="search" 
                                     class="form-control form-control-lg" 
-                                    placeholder="Search for Quality Control Here.." 
+                                    placeholder="Search for Quality Control Here..." 
                                     v-model="search">
                                 <div class="input-group-append">
                                     <button type="submit" class="btn btn-lg btn-default">
                                         <i class="fa fa-search"></i>
                                     </button>
                                 </div>
+
+                             
                             </div>
-                        </div>
+                        </div>                        
                   </div>
+                  <div class="col-md-9">                    
+                    <div class="row">                      
+                      <div class="col-md-3">
+                        <div class="form-group d-flex align-items-center gap-2">
+                          <p class="mb-0 mr-1" style="white-space: nowrap;"> Start Date</p>
+                          <input 
+                            type="date" 
+                            class="form-control form-control-sm" 
+                            placeholder="Start Date" 
+                            v-model="startDate"                            
+                          >
+                        </div>
+                      </div>
+
+                      <div class="col-md-3">
+                        <div class="form-group d-flex align-items-center gap-2">
+                          <p class="mb-0 mr-1" style="white-space: nowrap;">End Date</p>
+                          <input 
+                            type="date" 
+                            class="form-control form-control-sm" 
+                            placeholder="End Date" 
+                            v-model="endDate"                          
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div> 
+
+
                  </div>
-                <table v-if="qualityControls.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
+                 <div class="table-responsive">
+                <table  v-if="qualityControls.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
                   <thead>
                   <tr>
                     <th>#</th>
@@ -193,6 +249,7 @@ watch(()=>search.value, (newvalue)=>{
                     <th>Status</th>
                     <th>Start Date</th>                           
                     <th>End Date</th>   
+                    <th>Inspectors</th>
                     <th>Actions</th>             
                   </tr>
                   </thead>
@@ -219,14 +276,47 @@ watch(()=>search.value, (newvalue)=>{
                     </td>
 
                     <td>{{dayjs(item.end_date).format('DD-MM-YYYY')}}</td>
-                    
+                    <!-- Full names (Desktop / Large screens) -->
+                      <td class="d-none d-lg-table-cell">
+                        <span
+                          v-for="user in item.users"
+                          :key="user.id"
+                          class="px-1 py-1 mr-1 mb-1 rounded"
+                          style="background-color: #93DA97; display: inline-block; font-size: 0.8rem;"
+                        >
+                          {{ user.name }}
+                        </span>
+                      </td>
+
+                      <!-- Avatars (Mobile / Small screens) -->
+                      <td class="d-lg-none">
+                        <div class="d-flex">
+                          <div 
+                            v-for="(user, index) in item.users" 
+                            :key="user.id" 
+                            class="rounded-circle border border-white overflow-hidden me-n2"
+                            style="width:32px; height:32px; background:#ccc; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:500;"
+                            :title="user.name"
+                          >
+                            <img 
+                              v-if="user.portrait" 
+                              :src="user.portrait ? `/storage/${user.portrait}` : '/storage/portraits/avatar.png'"
+                              alt="User profile picture"
+                              class="w-100 h-100 object-fit-cover"
+                            />
+                            <span v-else>
+                              {{ user.name.charAt(0).toUpperCase() }}
+                            </span>
+                          </div>
+                        </div>
+                      </td>                    
                     <td>
                       <div class="d-flex justify-content-end">
                         <Link class="btn btn-info btn-sm mr-2" :href="route('quality-controls.edit', item.id)">
-                          <i class="fas fa-clipboard-list"></i><span> Details</span>
+                          <i class="fas fa-clipboard-list"></i><span> More</span>
                         </Link>
                         <button class="btn btn-danger btn-sm" @click="deleteQualityControl(item.id)">
-                          <i class="fas fa-trash"></i> <span>Delete</span>
+                          <i class="fas fa-trash"></i> <span>Del</span>
                         </button>
                       </div>
                     </td>                    
@@ -234,6 +324,7 @@ watch(()=>search.value, (newvalue)=>{
  
                   </tbody>                
                 </table>
+              </div>
 
                 <div v-if="qualityControls.data.length > 0" class="card mt-3">
                   <Pagination :data="qualityControls" :updatePageNumber="updatePageNumber"/>                               
@@ -273,6 +364,11 @@ watch(()=>search.value, (newvalue)=>{
         text-align: center;
         background-color: #B2C6D5;  
     }
+
+
+
+    
+
 </style>
 
 

@@ -202,56 +202,59 @@ const {facilities} = defineProps({
                     </div>
                   </div>
                  </div>
-               
-                <table v-if="facilities.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
-                  <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Operator</th>
-                    <th>Category</th>                                   
-                    <th>Email</th>       
-                    <th>Contact</th>  
-                    <th>Created</th>   
-                    <th>Actions</th>             
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr  v-for="(facility, index) in facilities.data" :key="facility.id"
-                    :class="{'table table-selected': selectedRowId === facility.id }" 
-                    @click="selectRow(facility.id)"                 
-                  >
-                    <td>{{ (facilities.current_page - 1) * facilities.per_page + index + 1 }}</td>
-                    <td>{{ facility.name }}</td>
+                 <div class="table-responsive">
+  <table v-if="facilities.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
+                    <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Operator</th>
+                      <th>Category</th>                                   
+                      <th>Email</th>       
+                      <th>Contact</th>  
+                      <th>Created</th>   
+                      <th>Actions</th>             
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr  v-for="(facility, index) in facilities.data" :key="facility.id"
+                      :class="{'table table-selected': selectedRowId === facility.id }" 
+                      @click="selectRow(facility.id)"                 
+                    >
+                      <td>{{ (facilities.current_page - 1) * facilities.per_page + index + 1 }}</td>
+                      <td>{{ facility.name }}</td>
 
-                    <td>{{ facility.category }}</td>
-                    
-                                       
-                    <td>                        
-                        {{ facility.email }}           
-                    </td>
-                    <td>                        
-                        {{ facility.contact_number }}          
-                    </td>
+                      <td>{{ facility.category }}</td>
+                      
+                                        
+                      <td>                        
+                          {{ facility.email }}           
+                      </td>
+                      <td>                        
+                          {{ facility.contact_number }}          
+                      </td>
 
-                    <td>{{dayjs(facility.created_at).format('DD-MM-YYYY')}}</td>
-                    
-                    <td>
-                      <div class="d-flex justify-content-end">
-                        <Link class="btn btn-success btn-sm mr-2" :href="route('facilities.show', facility.id)">
-                            <i class="fas fa-clipboard-list"></i><span> Details</span>
-                        </Link>
-                        <Link class="btn btn-info btn-sm mr-2" :href="route('facilities.edit', facility.id)">
-                          <i class="fas fa-edit"></i> <span>Edit</span>
-                        </Link>
-                        <button class="btn btn-danger btn-sm" @click="deleteFacility(facility.id)">
-                          <i class="fas fa-trash"></i> <span>Delete</span>
-                        </button>
-                      </div>
-                    </td>                    
-                  </tr>
- 
-                  </tbody>                
-                </table>
+                      <td>{{dayjs(facility.created_at).format('DD-MM-YYYY')}}</td>
+                      
+                      <td>
+                        <div class="d-flex justify-content-end">
+                          <Link class="btn btn-success btn-sm mr-2" :href="route('facilities.show', facility.id)">
+                              <i class="fas fa-clipboard-list"></i><span> Details</span>
+                          </Link>
+                          <Link class="btn btn-info btn-sm mr-2" :href="route('facilities.edit', facility.id)">
+                            <i class="fas fa-edit"></i> <span>Edit</span>
+                          </Link>
+                          <button class="btn btn-danger btn-sm" @click="deleteFacility(facility.id)">
+                            <i class="fas fa-trash"></i> <span>Delete</span>
+                          </button>
+                        </div>
+                      </td>                    
+                    </tr>
+  
+                    </tbody>                
+                  </table>
+
+                 </div>
+                
 
                 <div v-if="facilities.data.length > 0" class="card mt-3">
                   <Pagination :data="facilities" :updatePageNumber="updatePageNumber"/>                               

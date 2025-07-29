@@ -91,7 +91,7 @@
                   >                  
                     <i class="nav-icon fas fa-boxes"></i>
                   <p>
-                      Quality Control Areas
+                     Control Target Areas
                   </p>
                 </Link>
               </li>

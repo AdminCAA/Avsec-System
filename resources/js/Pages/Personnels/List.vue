@@ -165,80 +165,86 @@ const {personnels} = defineProps({
                         </div>
                   </div>
                  </div>
-                <table v-if="personnels.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
-                  <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Avatar</th>
-                    <th>Names</th>
-                    <th>Email</th> 
-                    <th>NRC</th>                                   
-                     
-                    <th>Phone</th>
-                    <th>Status</th>
-                    <th>Category</th>                    
-                    <th>Operator</th>  
-                    <th>Created</th>   
-                    <th style="width: 240px;">Actions</th>             
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr  v-for="(personnel, index) in personnels.data" :key="personnel.id"
-                    :class="{'table table-selected': selectedRowId === personnel.id }" 
-                    @click="selectRow(personnel.id)"                 
-                  >
-                    <td>{{ (personnels.current_page - 1) * personnels.per_page + index + 1 }}</td>
-                    <td>
-                      <div class="d-flex align-items-center">
+                 <div class="table-responsive">
+                    <table v-if="personnels.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
+                    <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Avatar</th>
+                      <th>Names</th>
+                      <th>Gender</th>
+                      <th>Email</th> 
+                      <th>NRC</th>                                   
+                      
+                      <th>Phone</th>
+                      <th>Status</th>
+                      <th>Category</th>                    
+                      <th>Operator</th>  
+                      <th>Created</th>   
+                      <th style="width: 240px;">Actions</th>             
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr  v-for="(personnel, index) in personnels.data" :key="personnel.id"
+                      :class="{'table table-selected': selectedRowId === personnel.id }" 
+                      @click="selectRow(personnel.id)"                 
+                    >
+                      <td>{{ (personnels.current_page - 1) * personnels.per_page + index + 1 }}</td>
+                      <td>
                         <div class="d-flex align-items-center">
-                            <img 
-                                :src="personnel.portrait ? `/storage/${personnel.portrait}` : '/storage/portraits/avatar.png'" 
-                                class="rounded-circle mr-2" 
-                                width="30" 
-                                height="30" 
-                                alt="Avatar"
-                            >                      
-                          </div>                        
-                      </div>
-                    </td>
-                    <td>{{ personnel.name }}</td>
-                    <td>                        
-                        {{ personnel.email }}           
-                    </td>
-                    <td>{{ personnel.nrc }}</td>
-                    <td>                        
-                        {{ personnel.phone_number }}          
-                    </td>
-                    <td class="text-center">
-                      <span class="badge p-2" :class="personnel.is_certified === 'Certified' ? 'bg-success' : 'bg-danger'">
-                        {{ personnel.is_certified }}
-                      </span>
-                    </td>
+                          <div class="d-flex align-items-center">
+                              <img 
+                                  :src="personnel.portrait ? `/storage/${personnel.portrait}` : '/storage/portraits/avatar.png'" 
+                                  class="rounded-circle mr-2" 
+                                  width="30" 
+                                  height="30" 
+                                  alt="Avatar"
+                              >                      
+                            </div>                        
+                        </div>
+                      </td>
+                      <td>{{ personnel.name }}</td>
+                      <td>{{ personnel.gender }}</td>
+                      <td>                        
+                          {{ personnel.email }}           
+                      </td>
+                      <td>{{ personnel.nrc }}</td>
+                      <td>                        
+                          {{ personnel.phone_number }}          
+                      </td>
+                      <td class="text-center">
+                        <span class="badge p-2" :class="personnel.is_certified === 'Certified' ? 'bg-success' : 'bg-danger'">
+                          {{ personnel.is_certified }}
+                        </span>
+                      </td>
 
-                    <td>{{ personnel.user_type }}</td>
-                    <td>                        
-                        {{ personnel.facility_name }}
-                    </td>
+                      <td>{{ personnel.user_type }}</td>
+                      <td>                        
+                          {{ personnel.facility_name }}
+                      </td>
 
-                    <td>{{dayjs(personnel.created_at).format('DD-MM-YYYY')}}</td>
-                    
-                    <td>
-                      <div class="d-flex justify-content-end">
-                        <Link class="btn btn-success btn-sm mr-2" :href="route('personnels.show', personnel.id)">
-                            <i class="fas fa-clipboard-list"></i><span> Details</span>
-                        </Link>
-                        <Link class="btn btn-info btn-sm mr-2" :href="route('personnels.edit', personnel.id)">
-                          <i class="fas fa-edit"></i> <span>Edit</span>
-                        </Link>
-                        <button class="btn btn-danger btn-sm" @click="deletePersonnel(personnel.id)">
-                          <i class="fas fa-trash"></i> <span>Delete</span>
-                        </button>
-                      </div>
-                    </td>                    
-                  </tr>
- 
-                  </tbody>                
-                </table>
+                      <td>{{dayjs(personnel.created_at).format('DD-MM-YYYY')}}</td>
+                      
+                      <td>
+                        <div class="d-flex justify-content-end">
+                          <Link class="btn btn-success btn-sm mr-2" :href="route('personnels.show', personnel.id)">
+                              <i class="fas fa-clipboard-list"></i><span> Details</span>
+                          </Link>
+                          <Link class="btn btn-info btn-sm mr-2" :href="route('personnels.edit', personnel.id)">
+                            <i class="fas fa-edit"></i> <span>Edit</span>
+                          </Link>
+                          <button class="btn btn-danger btn-sm" @click="deletePersonnel(personnel.id)">
+                            <i class="fas fa-trash"></i> <span>Delete</span>
+                          </button>
+                        </div>
+                      </td>                    
+                    </tr>
+  
+                    </tbody>                
+                  </table>
+                 </div>
+
+                
 
                 <div v-if="personnels.data.length > 0" class="card mt-3">
                   <Pagination :data="personnels" :updatePageNumber="updatePageNumber"/>                               
@@ -266,7 +272,7 @@ const {personnels} = defineProps({
 </template>
 <style>
   .table .table-selected {
-    background-color: #4962df !important; /* or any other color */
+    background-color: #bebebe !important; /* or any other color */
     color: white !important; /* or any other color */
   }
   

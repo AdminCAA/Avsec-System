@@ -24,7 +24,8 @@ class AuditQuestion extends Model
         return $query->where(function($query) use ($request){
             return $query->when($request->search,function($query) use ($request){ 
                 return $query->where(function ($query) use ($request){
-                    $query->where('question','like','%'.$request->search.'%');
+                    $query->where('question','like','%'.$request->search.'%')
+                    ->orWhere('audit_area_name','like','%'.$request->search.'%');
                 });
             });
         });

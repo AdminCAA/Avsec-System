@@ -25,15 +25,27 @@ class Facility extends Model
     ];
 
     public const CATEGORIES = [        
+        // 'Airport Operator',
+        // 'Airline Operator',
+        // 'Regulated Agent',
+        // 'Catering Agent',        
+        // 'Ground Handling Agent',
+        // 'Fuel Supplier',
+        // 'Security Agent',
+        // 'Maintenance Provider',        
+        // 'Training Organization', 
+        // 'Regulatory Authority',  
         'Airport Operator',
         'Airline Operator',
         'Regulated Agent',
         'Catering Agent',        
         'Ground Handling Agent',
         'Fuel Supplier',
-        'Security Agent',
-        'Maintenance Provider',        
-        'Training Organization',        
+        'Outsourced Security Service Provider',
+        //'Security Agent',
+        //'Maintenance Provider',        
+        'Air Navigation Service Provider' ,
+        'Training Organization',     
     ];
 
     public function scopeSearch(Builder $query , Request $request){       

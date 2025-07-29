@@ -15,7 +15,9 @@ const {
     qualityControlTypes,
     hasChecklistQuestions,
     auditQuestions,
-    groupedAuditQuestions
+    groupedAuditQuestions,
+    users,
+    hasAssignedUsers
 } = defineProps({ 
     groupedAuditQuestions: {
         type: Object,
@@ -41,8 +43,23 @@ const {
     type: Array,
     required: true
   },
+  users: {
+    type: Object,
+    required: true
+  },
+  hasAssignedUsers: {
+        type: Array,
+        required: true
+    }
   
 });
+
+
+
+const selectedUsers = ref([]);
+
+selectedUsers.value = hasAssignedUsers;
+
 const statusOptions = [
   { label: 'In Progress', value: 'In Progress' },
   { label: 'Pending', value: 'Pending' }, 
@@ -75,7 +92,8 @@ function editQualityControl() {
     scheduled_date: form.scheduled_date || '', // Ensure scheduled_date is always a string
     end_date: form.end_date || '',
     status: form.status || '', // Ensure status is always a string
-    selectedCheckListQuestions: selectedCheckListQuestions.value 
+    selectedCheckListQuestions: selectedCheckListQuestions.value ,
+    selectedUsers: selectedUsers.value || [] // Ensure selectedUsers is always an array
   })
     .then(() => {
       Swal.fire({
@@ -158,6 +176,18 @@ watch(() => form.facility_id, (value) => {
     : '';
 });
 
+const canStart = computed(() => {
+  return hasChecklistQuestions.length > 0 && hasAssignedUsers.length > 0;
+});
+
+const handleClick = () => {
+  if (!canStart) return;
+  router.visit(route('quality-controls.show', qualityControl.id));
+};
+
+
+
+
 
 </script>
 
@@ -169,18 +199,20 @@ watch(() => form.facility_id, (value) => {
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h3 class="m-0">Quality Control</h3>
+                    <h3 class="m-0"><Link :href="route('facilities.show',qualityControl.facility_id)">{{ qualityControl.facility.name }} - Quality Control</Link></h3>
                 </div>    
                 <div class="col-sm-6">
                   <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><Link class="btn btn-info" :href="route('quality-controls.index')"><i class="fas fa-arrow-left"></i> Back</Link></li>
                     <li class="breadcrumb-item">
-                      <Link class="btn btn-success mr-2"
-                      :class="{ 'disabled': hasChecklistQuestions.length === 0 }"
-                      @click.prevent="hasChecklistQuestions.length === 0"  
-                      :href="route('quality-controls.show',qualityControl.id)"><i class="fas fa-play"></i> 
+                      <button class="btn btn-success mr-2"
+                      
+                      :class="{ 'disabled': !canStart }"
+                      @click.prevent="handleClick" 
+                      :href="route('quality-controls.show',qualityControl.id)">
+                      <i class="fas fa-play"></i> 
                         Start {{ qualityControl.control_type }}
-                    </Link></li>             
+                      </button></li>             
                   </ol>
                 </div><!-- /.col -->            
             </div>
@@ -192,7 +224,18 @@ watch(() => form.facility_id, (value) => {
       <div class="container-fluid">
         <div class="d-flex justify-content-center align-items-center min-vh-60  bg-light">
             <div class="row w-100 justify-content-center">
-                <div class="col-md-12 mb-4">                    
+                <div class="col-md-12 mb-4">       
+                  
+
+
+
+
+
+
+
+
+
+
                     <!-- general form elements -->
                     <div class="card card-info">
                         <div class="card-header">
@@ -259,7 +302,7 @@ watch(() => form.facility_id, (value) => {
 
                                   <div class="row">
                                     <div class="form-group col-md-6">
-                                      <label>Date</label>
+                                      <label>Start Date</label>
                                       <input 
                                           required 
                                           v-model="form.scheduled_date"                                         
@@ -278,8 +321,7 @@ watch(() => form.facility_id, (value) => {
                                     <label>End Date</label>
                                     <input 
                                         required 
-                                        v-model="form.end_date" 
-                                        :min="today"
+                                        v-model="form.end_date"                                         
                                         type="date"
                                         class="form-control"
                                         :class="{ 
@@ -300,7 +342,47 @@ watch(() => form.facility_id, (value) => {
                                 </div>
                               </div>                                                                          
                               
-                              <label class="d-flex justify-content-center" for="name">Select Quality Control Checklist Questions</label>                            
+                              
+                              <div class="col-sm-6">
+                                <h3 class="mb-2">Assign Inspectors</h3>
+                              </div>                            
+                              <div class="row">
+                                    <div class="col-sm-12">    
+                                        <div class="card card-info card-outline">    
+                                            <div class="card-header">
+                                                <h5 class="card-title">Assign Inspectors</h5>                                                                                       
+                                            </div>            
+                                            <div v-if="users.length > 0" class="form-group d-flex flex-wrap card-body">                                                                                                                                                                                                         
+                                                <div 
+                                                    class="custom-control custom-checkbox mr-3 mb-2" 
+                                                    v-for="(user, index) in users" :key="user.id">
+                                                    <input class="custom-control-input" 
+                                                        :id="'user-' + user.id"
+                                                        type="checkbox"                                               
+                                                        v-model="selectedUsers"                                                
+                                                        :value="user.id">
+                                                    <label :for="'user-' + user.id" class="custom-control-label">
+                                                      <Link :href="route('personnels.show', user.id)" class="d-flex align-items-center">
+                                                          <!-- User Avatar -->                                                     
+                                                        <span class="badge px-1 mr-2" style="border-radius:10px; background-color:whitesmoke ;">
+                                                          <img class="profile-user-img img-fluid img-circle"
+                                                              :src="user.portrait ? `/storage/${user.portrait}`: '/storage/portraits/avatar.png'"
+                                                              alt="User profile picture">
+                                                              {{ user.name }}                              
+                                                          </span>
+
+                                                         </Link>
+                                                    </label>
+                                                </div>
+                                            </div>                                           
+                                        </div>                                                                                                                                                    
+                                    </div>
+                                </div>  
+
+                              <!-- <label class="d-flex justify-content-center" for="name">Select Quality Control Checklist Questions</label>    -->
+                              <div class="col-sm-6">
+                                <h3 class="mb-2">Select Quality Control Checklist Questions</h3>
+                              </div>                          
                               <div class="row">
                                   <div class="col-md-12" v-for="(questions, area) in groupedAuditQuestions"
                                   :key="area" >
@@ -369,4 +451,20 @@ watch(() => form.facility_id, (value) => {
       opacity: 0.6;
       cursor: not-allowed;
     }
+
+    .img-circle {
+    border-radius: 50%;
+  }
+
+
+.profile-user-img {
+    border: 1px solid #adb5bd;
+    margin: 0 auto;
+    padding: 3px;
+    width: 30px;
+}
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}
 </style>

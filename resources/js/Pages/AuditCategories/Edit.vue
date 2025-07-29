@@ -9,11 +9,15 @@ import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import { ref,watch } from 'vue';
 
-const {auditCategory } = defineProps({
+const {auditCategory,categories } = defineProps({
     auditCategory:{
         type:Object,
         required: true
-    }
+    },
+    categories: {
+    type: Array,
+    required: true
+  }
 });
 
 const form = useForm({
@@ -143,11 +147,11 @@ function editAuditAreaCategory() {
                                 </div>
                                 <div class="form-group">
                                   <label>Target Area</label>
-                                  <select required v-model="form.category" class="form-control"
-                                    :class="{ 'is-invalid': formErrors.category, 'is-valid': form.category && !formErrors.category }"
+                                  <select required v-model="form.category_name" class="form-control"
+                                    :class="{ 'is-invalid': formErrors.category, 'is-valid': form.category_name && !formErrors.category_name }"
                                   >
                                     <option value="">-- Select Target Area --</option>
-                                    <option v-for="option in props.categories" :key="option" :value="option">{{ option }}</option>
+                                    <option v-for="option in categories" :key="option" :value="option">{{ option }}</option>
                                   </select>
                                   <InputError :message="formErrors.category" class="mt-1" />
                                   <div v-if="form.category_name && !formErrors.category_name" class="valid-feedback d-block">
@@ -172,8 +176,8 @@ function editAuditAreaCategory() {
                                         </span>
                                     </button> 
 
-                                    <Link :href="route('permissions.index')" class="btn btn-default float-right">
-                                        <i class="fas fa-window-close"> </i>Cancel
+                                    <Link :href="route('audit-categories.index')" class="btn btn-default float-right">
+                                        <i class="fas fa-window-close"> </i> Cancel
                                     </Link>                
                                 </div>                                                                
                             </div>
