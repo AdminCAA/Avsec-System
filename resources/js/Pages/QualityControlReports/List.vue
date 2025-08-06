@@ -29,7 +29,7 @@ const {qualityControls} = defineProps({
  
 
   let qualityControlsUrl = computed(()=>{
-        let url = new URL(route('quality-controls.index'));
+        let url = new URL(route('quality-control-reports.index'));
         url.searchParams.append('page', pageNumber.value);
         if(search.value){
             url.searchParams.append('search', search.value);
@@ -68,7 +68,7 @@ watch([startDate, endDate], () => {
 
   const updatePageNumber = (link)=>{
         pageNumber.value = link.url.split('=')[1];            
-        router.visit("/quality-controles?page=" +  pageNumber.value, {
+        router.visit("/quality-control-reports?page=" +  pageNumber.value, {
             preserveScroll:true,
         });    
         
@@ -156,10 +156,38 @@ watch([startDate, endDate], () => {
     return `hsl(${hue}, 70%, 80%)`; // pastel-like background
   }
 
+
+  const generateQualityControlReport = async (id) => {   
+    try{
+      const response = await axios.get(`/api/quality-control-reports/${id}/generateQualityControlReport`,{
+        responseType:'blob'
+      });      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link =  document.createElement('a');
+      link.href = url;
+      link.setAttribute('download','QualityControlReport.pdf');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+    }catch(error){
+      console.log(error);
+      Swal.fire({
+              icon: "error",
+              title: "PDF Generation Failed",
+              text: 'Something went wrong while generating the PDF file.',
+              toast: true,  
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 1000,
+              timerProgressBar: true,
+          });
+    }    
+  }
 </script>
 
 <template>
-    <Head title="Quality Controls" />
+    <Head title="Quality Controls Reports" />
     <AuthenticatedLayout>
         <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -167,13 +195,14 @@ watch([startDate, endDate], () => {
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h3 class="m-0">Quality Control Activities</h3>
+            <h3 class="m-0">Quality Control Reports</h3>
           </div><!-- /.col -->
-          <div class="col-sm-6">
+          <!-- <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><Link class="btn btn-info" :href="route('quality-controls.create')"><i class="fas fa-plus"></i> Create</Link></li>             
             </ol>
-          </div><!-- /.col -->
+          </div> -->
+          <!-- /.col -->
         </div><!-- /.row -->
       </div><!-- /.container-fluid -->
     </div>
@@ -312,12 +341,12 @@ watch([startDate, endDate], () => {
                       </td>                    
                     <td>
                       <div class="d-flex justify-content-center">
-                        <Link class="btn btn-info btn-sm mr-2" :href="route('quality-controls.edit', item.id)">
-                          <i class="fas fa-clipboard-list"></i><span> Details</span>
-                        </Link>
-                        <button class="btn btn-danger btn-sm" @click="deleteQualityControl(item.id)">
-                          <i class="fas fa-trash"></i> <span>Del</span>
+                        <button class="btn btn-success btn-sm mr-2" @click="generateQualityControlReport(item.id)">
+                            <i class="fas fa-chart-bar"></i> <span>Generate Report</span>
                         </button>
+                        <Link class="btn btn-info btn-sm" :href="route('quality-controls.edit', item.id)">
+                          <i class="fas fa-clipboard-list"></i><span> Details</span>
+                        </Link>                        
                       </div>
                     </td>                    
                   </tr>

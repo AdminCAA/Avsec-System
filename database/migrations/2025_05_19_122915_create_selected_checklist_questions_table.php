@@ -15,12 +15,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('quality_control_id')->constrained()->onDelete('cascade');
             $table->text('question');            
-            $table->string('finding_observation')->nullable();
+            $table->text('finding_observation')->nullable();
             $table->string('finding_category')->nullable();
             $table->text('action_taken')->nullable();
-            $table->string('problem_cause')->nullable();
-            $table->string('short_term_action')->nullable();
-            $table->string('long_term_action')->nullable();
+            $table->text('problem_cause')->nullable();
+            $table->text('short_term_action')->nullable();
+            $table->text('long_term_action')->nullable();
             $table->date('completion_date')->nullable();
             $table->date('follow_up_date')->nullable();
             $table->string('proposed_follow_up_action')->nullable();

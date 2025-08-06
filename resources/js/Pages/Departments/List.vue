@@ -7,24 +7,29 @@ import { Head,Link, usePage, router } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 import { ref ,computed, watch} from 'vue';
 
-const {securityEquipments} = defineProps({
-    securityEquipments: {
+const {departments} = defineProps({
+    departments: {
           type: Object,
           required: true
       },    
   });
 
   const selectedRowId = ref(null);
+
   
   const selectRow = (id) => {
     selectedRowId.value = id;
   };
 
   let pageNumber = ref(1);  
-  let search = ref(usePage().props.search);
 
-  let securityEquipmentsUrl = computed(()=>{
-        let url = new URL(route('security-equipments.index'));
+  let search = ref(usePage().props.search);
+  let startDate = ref(usePage().props.start_date);
+  let endDate = ref(usePage().props.end_date);
+ 
+
+  let qualityControlsUrl = computed(()=>{
+        let url = new URL(route('quality-controls.index'));
         url.searchParams.append('page', pageNumber.value);
         if(search.value){
             url.searchParams.append('search', search.value);
@@ -32,33 +37,43 @@ const {securityEquipments} = defineProps({
         // if(class_id.value){
         //     url.searchParams.append('class_id', class_id.value);
         // }
+        if(startDate.value){
+            url.searchParams.append('start_date', startDate.value);
+        }
+        if(endDate.value){
+            url.searchParams.append('end_date', endDate.value);
+        }        
         return url;
   });
 
-  watch(()=>securityEquipmentsUrl.value, (newUrl)=>{
+  watch(()=>qualityControlsUrl.value, (newUrl)=>{
     router.visit(newUrl,{
         preserveScroll: true,
         preserveState: true,
         replace: true
     });
+  })
+
+watch(()=>search.value, (newvalue)=>{
+    if(newvalue){
+    pageNumber.value = 1;
+    } 
 })
 
-    watch(()=>search.value, (newvalue)=>{
-        if(newvalue){
-        pageNumber.value = 1;
-        } 
-    })
-
+watch([startDate, endDate], () => {
+  pageNumber.value = 1; // reset to first page when filters change
+  
+});
    
 
   const updatePageNumber = (link)=>{
-        pageNumber.value = link.url.split('=')[1];            
-        router.visit("/security-equipments?page=" +  pageNumber.value, {
-            preserveScroll:true,
-        });    
+    pageNumber.value = link.url.split('=')[1];            
+    router.visit("/departments?page=" +  pageNumber.value, {
+        preserveScroll:true,
+    });            
   }
 
-  const deleteSecurityEquipment = (id)=>{
+  const deleteDepartment = (id)=>{
     Swal.fire({
       title: 'Are you sure?',
       text: 'This action cannot be undone.',
@@ -70,11 +85,11 @@ const {securityEquipments} = defineProps({
     })
     .then((result)=>{
       if (result.isConfirmed) {
-        axios.delete(route('security-equipments.destroy', id),{data:{}})
+        axios.delete(route('departments.destroy', id),{data:{}})
         .then(response => {            
           Swal.fire({
             icon: 'success',
-            title: 'Security Equipment deleted successfully',
+            title: 'Department deleted successfully',
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
@@ -83,7 +98,7 @@ const {securityEquipments} = defineProps({
           });
           //redirect to the permissions index page
           setTimeout(() => {
-              router.visit(route('security-equipments.index'), {
+              router.visit(route('departments.index'), {
               preserveScroll: true,
               replace: true
             });          
@@ -114,33 +129,11 @@ const {securityEquipments} = defineProps({
         });
       }
     })
-  }
-
-  const getStatusClass = (status)=>{
-    switch (status) {
-      
-      case 'Under Maintenance':
-        return 'bg-info text-white';
-
-      case 'Active':
-        return 'bg-success text-white';
-
-      case 'Due for Maintenance':
-        return 'bg-danger text-white';
-
-      case 'Decommissioned':
-        return 'bg-warning text-dark';
-
-      case 'Inactive':
-        return 'bg-dark text-white';
-      default:
-        return 'bg-light text-dark';
-    }
-  }
+  } 
 </script>
 
 <template>
-    <Head title="Security Equipment" />
+    <Head title="Departments" />
     <AuthenticatedLayout>
         <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -148,11 +141,11 @@ const {securityEquipments} = defineProps({
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h3 class="m-0">Aviation Security Equipment</h3>
+            <h3 class="m-0">Departments</h3>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><Link class="btn btn-info" :href="route('security-equipments.create')"><i class="fas fa-plus"></i> Create</Link></li>             
+              <li class="breadcrumb-item"><Link class="btn btn-info" :href="route('departments.create')"><i class="fas fa-plus"></i> Create</Link></li>             
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -168,71 +161,63 @@ const {securityEquipments} = defineProps({
             <div class="card">
               
               <!-- /.card-header -->
-              <div class="card-body">
-
-                <div class="row mb-3">
-                  <div class="col-md-3">
-                    <div class="form-group">
-                            <div class="input-group input-group-sm">
-                                <input 
-                                    type="search" 
-                                    class="form-control form-control-lg" 
-                                    placeholder="Search for Equipment here.." 
-                                    v-model="search">
-                                <div class="input-group-append">
-                                    <button type="submit" class="btn btn-lg btn-default">
-                                        <i class="fa fa-search"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                  </div>
-                 </div>
-                <table v-if="securityEquipments.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
+              <div class="card-body">                
+                 <div class="table-responsive">
+                <table  v-if="departments.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
                   <thead>
                   <tr>
                     <th>#</th>
                     <th>Name</th>
-                    <th>Serial</th>  
-                    <th>Facility</th>                                   
-                    <th>Status</th>       
-                    
-                    <th>Created</th>   
+                    <th>Created</th>
+                    <th>Modified</th>                     
                     <th>Actions</th>             
                   </tr>
                   </thead>
                   <tbody>
-                  <tr  v-for="(equipment, index) in securityEquipments.data" :key="equipment.id"
-                    :class="{'table table-selected': selectedRowId === equipment.id }" 
-                    @click="selectRow(equipment.id)"                 
+                  <tr  v-for="(item, index) in departments.data" :key="item.id"
+                    :class="{'table table-selected': selectedRowId === item.id }" 
+                    @click="selectRow(item.id)"                 
                   >
-                    <td>{{ (securityEquipments.current_page - 1) * securityEquipments.per_page + index + 1 }}</td>
-                    <td>{{ equipment.name }}</td>
+                    <td>{{ index + 1 }}</td>
+                    <td style="text-align: center;">{{ item.name }}</td>
 
-                    <td>                        
-                        {{ equipment.serial_number }}          
-                    </td>
-
-                    <td>{{ equipment.facility_name }}</td>
-                    
-                                       
-                    <td :class="getStatusClass(equipment.status)" class="text-center">                           
-                        {{ equipment.status }}           
-                    </td>
+                                                                  
+                    <td style="text-align: center;">{{dayjs(item.created_at).format('DD-MM-YYYY')}}</td>
+                    <td style="text-align: center;">{{dayjs(item.updated_at).format('DD-MM-YYYY')}}</td>
                     
 
-                    <td>{{dayjs(equipment.created_at).format('DD-MM-YYYY')}}</td>
                     
+                   
+
+                      <!-- Avatars (Mobile / Small screens) -->
+                      <!-- <td class="d-lg-none">
+                        <div class="d-flex">
+                          <div 
+                            v-for="(user, index) in item.users" 
+                            :key="user.id" 
+                            class="rounded-circle border border-white overflow-hidden me-n2"
+                            style="width:32px; height:32px; background:#ccc; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:500;"
+                            :title="user.name"
+                          >
+                            <img 
+                              v-if="user.portrait" 
+                              :src="user.portrait ? `/storage/${user.portrait}` : '/storage/portraits/avatar.png'"
+                              alt="User profile picture"
+                              class="w-100 h-100 object-fit-cover"
+                            />
+                            <span v-else>
+                              {{ user.name.charAt(0).toUpperCase() }}
+                            </span>
+                          </div>
+                        </div>
+                      </td>                     -->
                     <td>
                       <div class="d-flex justify-content-center">
-                        <!-- <Link class="btn btn-success btn-sm mr-2" :href="route('security-equipments.show', equipment.id)">
-                            <i class="fas fa-clipboard-list"></i><span> Details</span>
-                        </Link> -->
-                        <Link class="btn btn-info btn-sm mr-2" :href="route('security-equipments.edit', equipment.id)">
-                          <i class="fas fa-edit"></i> <span>Edit</span>
+                        <Link class="btn btn-info btn-sm mr-2" :href="route('departments.edit', item.id)">
+                          <i class="fas fa-edit"></i><span> Edit</span>
                         </Link>
-                        <button class="btn btn-danger btn-sm" @click="deleteSecurityEquipment(equipment.id)">
-                          <i class="fas fa-trash"></i> <span>Delete</span>
+                        <button class="btn btn-danger btn-sm" @click="deleteDepartment(item.id)">
+                          <i class="fas fa-trash"></i> <span>Del</span>
                         </button>
                       </div>
                     </td>                    
@@ -240,13 +225,14 @@ const {securityEquipments} = defineProps({
  
                   </tbody>                
                 </table>
+              </div>
 
-                <div v-if="securityEquipments.data.length > 0" class="card mt-3">
-                  <Pagination :data="securityEquipments" :updatePageNumber="updatePageNumber"/>                               
+                <div v-if="departments.data.length > 0" class="card mt-3">
+                  <Pagination :data="departments" :updatePageNumber="updatePageNumber"/>                               
                 </div>
                 <div v-else class="card mt-3">
-                  <h3 class="text-center">No Security equipment found</h3>
-                  <p class="text-center">Please create a equipment to get started.</p>                         
+                  <h3 class="text-center">No item found</h3>
+                  <p class="text-center">Please create a item to get started.</p>                         
                 </div>
                 
               </div>
@@ -278,7 +264,7 @@ const {securityEquipments} = defineProps({
     .table th {
         text-align: center;
         background-color: #B2C6D5;  
-    }
+    }    
 </style>
 
 

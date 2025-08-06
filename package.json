@@ -21,6 +21,7 @@
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.4",
+        "@popperjs/core": "^2.11.8",
         "dayjs": "^1.11.13",
         "highcharts-vue": "^2.0.1",
         "vue-router": "^4.5.0",

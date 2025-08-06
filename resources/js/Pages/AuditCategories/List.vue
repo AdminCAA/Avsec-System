@@ -187,7 +187,7 @@ defineProps({
                       <td>{{dayjs(item.created_at).format('DD-MM-YYYY')}}</td>
                       
                       <td>
-                        <div class="d-flex justify-content-end">
+                        <div class="d-flex justify-content-center">
                           <Link class="btn btn-info btn-sm mr-2" :href="route('audit-categories.edit', item.id)">
                             <i class="fas fa-edit"></i> <span>Edit</span>
                           </Link>
@@ -227,9 +227,10 @@ defineProps({
 </template>
 <style>
   .table .table-selected {
-    background-color: #3A59D1 !important; /* or any other color */
+    background-color: #bebebe !important; /* or any other color */
     color: white !important; /* or any other color */
   }
+  
   .table th {
         text-align: center;
         background-color: #B2C6D5;  

@@ -17,6 +17,9 @@ use App\Http\Controllers\SecurityConcernsController;
 use App\Http\Controllers\SecurityEquipmentController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FollowupController;
+use App\Http\Controllers\QualityControlReportController;
+use App\Http\Controllers\DepartmentsController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -130,6 +133,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/security-equipments/{id}', [SecurityEquipmentController::class, 'update'])->name('security-equipments.update');
     Route::delete('/security-equipments/{id}', [SecurityEquipmentController::class, 'destroy'])->name('security-equipments.destroy');
     Route::delete('/security-equipments/deleteMaintenanceSchedule/{id}', [SecurityEquipmentController::class, 'deleteMaintenanceSchedule'])->name('security-equipments.deleteMaintenanceSchedule');
+    
 
 
     //Training Routes
@@ -167,6 +171,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/securityconcerns', [SecurityConcernsController::class, 'index'])->name('securityconcerns.index');
     Route::get('/securityconcerns/{id}/edit', [SecurityConcernsController::class, 'edit'])->name('securityconcerns.edit');
     Route::post('/securityconcerns/{id}', [SecurityConcernsController::class, 'update'])->name('securityconcerns.update');
+    Route::get('/api/securityconcerns/{id}/generateCar', [SecurityConcernsController::class, 'generateCar'])->name('securityconcerns.generateCar');
+
 
     //Sidebar Routes
     Route::get('/securityconcerns/count', [SecurityConcernsController::class, 'securityConcernsCount'])->name('securityconcerns.api.index');
@@ -174,6 +180,26 @@ Route::middleware('auth')->group(function () {
 
     //Dashboard Routes
     Route::get('/dashboard/stats', [DashboardController::class, 'getDashboardStats'])->name('getDashboardStats');
+
+    //Followup Routes
+    Route::get('/followups/{id}/create', [FollowupController::class, 'create'])->name('followups.create');
+    Route::get('/followups/{id}/edit', [FollowupController::class, 'edit'])->name('followups.edit');
+    Route::post('/followups/{id}/followups', [FollowupController::class, 'store'])->name('followups.store');    
+    Route::post('/followups/{id}/update', [FollowupController::class, 'update'])->name('followups.update');
+    Route::delete('/followups/{id}', [FollowupController::class, 'destroy'])->name('followups.destroy');        
+
+
+    //Quality Control Report Routes
+    Route::get('/quality-control-reports', [QualityControlReportController::class, 'index'])->name('quality-control-reports.index');
+    Route::get('/api/quality-control-reports/{id}/generateQualityControlReport', [QualityControlReportController::class, 'generateQualityControlReport'])->name('quality-control-reports.generateQualityControlReport');
+
+    //Department Routes
+    Route::get('/departments', [DepartmentsController::class, 'index'])->name('departments.index');
+    Route::get('/departments/create', [DepartmentsController::class, 'create'])->name('departments.create');
+    Route::post('/departments', [DepartmentsController::class, 'store'])->name('departments.store');
+    Route::get('/departments/{id}/edit', [DepartmentsController::class, 'edit'])->name('departments.edit');
+    Route::post('/departments/{id}', [DepartmentsController::class, 'update'])->name('departments.update');
+    Route::delete('/departments/{id}', [DepartmentsController::class, 'destroy'])->name('departments.destroy');
 });
 
 

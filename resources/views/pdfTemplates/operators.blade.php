@@ -5,7 +5,11 @@
     <style>
          body { font-family: sans-serif; font-size: 12px; }
        /* table { width: 100%; border-collapse: collapse; margin-bottom: 20px; } */
-        th, td { border: 1px solid #ccc; padding: 6px; }
+       table {
+          width: 100%;
+          border-collapse: collapse; /* Important to remove spacing between borders */
+        }
+        th, td { border: 1px solid #000; padding: 6px; margin:0 }
         h2, h3 { margin-top: 15px; }
         th { background-color: #a8a8a8; }
         .header, .footer { text-align: center; }
@@ -22,13 +26,7 @@
             <h4>CIVIL AVIATION AUTHORITY</h4>
         </div>
       <hr>
-    <h4> AVSEC OPERATORS LIST</h4>
-    {{-- <h6 style="margin-top: 2px;"><strong>{{ $application->application_code ?? 'N/A' }}</strong> </h6>
-    </div>
-    <p><strong>Full Name:</strong> {{ $application->user->name ?? 'N/A' }}</p>
-    <p><strong>Email ID:</strong> {{ $application->user->email ?? 'N/A' }}</p>
-    <p><strong>Application Type:</strong> {{ $application->application_type->name ?? 'N/A' }}</p>
-    <p><strong>Action Type:</strong> {{ $application->actionType }}</p> --}}    
+    <h4> AVSEC OPERATORS LIST</h4>    
     <table>
         <thead>
             <tr>

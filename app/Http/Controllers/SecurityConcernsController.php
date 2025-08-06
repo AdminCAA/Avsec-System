@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SelectedChecklistQuestion;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 
@@ -59,11 +60,14 @@ class SecurityConcernsController extends Controller
         //
         $question = SelectedChecklistQuestion::findOrFail($id);        
         $qualityControl = $question->qualityControl;
+        $followups = $question->followups()->orderBy('created_at', 'DESC')->get();
         $facility = $qualityControl->facility ?? null;
+        
         return Inertia::render('SecurityConcerns/Edit', [
             'question' => $question,
             'qualityControl' => $qualityControl,
             'facility' => $facility,
+            'followups' => $followups,            
         ]);
     }
 
@@ -147,5 +151,29 @@ class SecurityConcernsController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function generateCar(string $id)
+    {
+        // Find the selected checklist question by ID        
+        
+        $question = SelectedChecklistQuestion::findOrFail($id);        
+        $qualityControl = $question->qualityControl;                
+        $facility = $qualityControl->facility ?? null;
+        $users = $qualityControl->users()->get();
+        // Check if the question has an immediate corrective action
+        if (!$question->immediate_corrective_action) {
+            return redirect()->back()->with('error', 'Immediate corrective action is required to generate a CAR.');
+        }
+        // Generate the CAR PDF
+        $pdf = PDF::loadView('pdfTemplates.car', [
+            'question' => $question,
+            'qualityControl' => $qualityControl,
+            'operator' => $facility,
+            'users'=>$users
+        ]);
+        // Return the generated PDF as a download
+        return $pdf->download('car_' . $question->id . '.pdf');
+
     }
 }

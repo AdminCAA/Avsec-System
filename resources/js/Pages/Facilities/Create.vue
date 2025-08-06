@@ -10,11 +10,16 @@ const props = defineProps({
   categories: {
     type: Array,
     required: true
+  }, 
+  departments: {
+    type: Object,
+    required: true
   }
 });
 
 const form = useForm({
   name: '',
+  department_id: '',
   description: '',
   category: '',
   location: '',
@@ -80,6 +85,7 @@ watch(() => form.email, (value) => {
     : '';
 });
 
+
 </script>
 
 <template>
@@ -90,7 +96,7 @@ watch(() => form.email, (value) => {
         <div class="container-fluid">
             <div class="row mb-2">
             <div class="col-sm-6">
-                <h1 class="m-0">Operator / Create</h1>
+                <h3 class="m-0">Operator / Create</h3>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -144,7 +150,19 @@ watch(() => form.email, (value) => {
                              
                               <!-- Row 2: Description -->
                               <div class="row">
-                                <div class="form-group col-md-12">
+                                <div class="form-group col-md-6">
+                                    <label>Target Department</label>
+                                    <select required v-model="form.department_id" class="form-control"
+                                        :class="{ 'is-invalid': formErrors.department_id, 'is-valid': form.department_id && !formErrors.department_id }"
+                                    >
+                                        <option value="">-- Target Department --</option>
+                                        <option v-for="item in props.departments" :key="item" :value="item.id">{{ item.name }}</option>
+                                    </select>
+                                    <InputError :message="formErrors.status" class="mt-1" />
+                                    </div>
+                                   
+
+                                <div class="form-group col-md-6">
                                   <label>Description</label>
                                   <textarea v-model="form.description" class="form-control" rows="2" placeholder="Optional"></textarea>
                                 </div>

@@ -2,12 +2,15 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import { ref, watch,computed } from 'vue';
+import { Chart } from 'highcharts-vue';
+import Exporting from 'highcharts/modules/exporting';
+import Accessibility from 'highcharts/modules/accessibility'
 import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import InputError from '@/Components/InputError.vue';
 import dayjs from 'dayjs';
 
-const {facility , qualityControlCounts,audits,inspections,securityTests,usersCount } = defineProps({
+const {facility , qualityControlCounts,audits,inspections,securityTests,usersCount,operatorStats } = defineProps({
   facility: {
     type: Object,
     required: true
@@ -19,7 +22,7 @@ const {facility , qualityControlCounts,audits,inspections,securityTests,usersCou
   audits: {type: Object, required:true},
   inspections:{type: Object, required:true},
   securityTests: {type: Object, required:true},
-  usersCount:{type: Number, required:true},
+  usersCount:{type: Number, required:true},  
 });
 
 
@@ -46,7 +49,169 @@ const goToPage = (url) => {
   router.visit(url, { preserveScroll: true, preserveState: true });
 };
 
-console.log(facility);
+//const categories = [facility.name || 'Facility'];
+
+const operatorStatisticOptions = {
+  accessibility: {
+    enabled: false
+  },
+  chart: {
+    type: 'column',
+    backgroundColor: '#ffffff',
+    spacingTop: 20,
+    spacingBottom: 20,
+    style: {
+      fontFamily: 'Arial, sans-serif'
+    }
+  },
+  credits: {
+    enabled: false
+  },
+  exporting: {
+    enabled: true,
+    buttons: {
+      contextButton: {
+        menuItems: [
+          'viewFullscreen',
+          'printChart',
+          'separator',
+          'downloadPNG',
+          'downloadJPEG',
+          'downloadPDF',
+          'downloadSVG',
+          'separator',
+          'downloadCSV',
+          'downloadXLS'
+        ],
+        symbolStroke: '#3498db',
+        theme: {
+          fill: '#fff',
+          stroke: '#ccc',
+          states: {
+            hover: { fill: '#f0f0f0' },
+            select: { fill: '#e0e0e0' }
+          }
+        }
+      }
+    }
+  },
+  title: {
+    text: 'Operator Quality Control Statistics',
+    style: {
+      fontSize: '18px',
+      fontWeight: 'bold',
+      color: '#2c3e50'
+    }
+  },
+  xAxis: {
+    // categories: [facility.name || 'Facility'], // Use facility name as category
+    crosshair: true,
+    labels: {
+      style: {
+        fontSize: '12px',
+        color: '#2c3e50'
+      }
+    },
+    title: {
+      text: 'Operator',
+      style: {
+        fontWeight: 'bold',
+        color: '#2c3e50'
+      }
+    }
+  },
+  yAxis: {
+    min: 0,
+    title: {
+      text: 'Indicator Count',
+      style: {
+        fontWeight: 'bold',
+        color: '#2c3e50'
+      }
+    },
+    gridLineColor: '#e6e6e6'
+  },
+  tooltip: {
+    shared: true,
+    useHTML: true,
+    borderRadius: 8,
+    backgroundColor: '#fdfdfd',
+    headerFormat: '<b>{point.key}</b><br/>',
+    pointFormat:
+      '<span style="color:{series.color}">\u25CF</span> {series.name}: <b>{point.y}</b><br/>'
+  },
+  legend: {
+    align: 'center',
+    verticalAlign: 'bottom',
+    layout: 'horizontal',
+    itemStyle: {
+      fontWeight: 'normal',
+      color: '#2c3e50',
+      width: '100px',      
+      fontSize: '11px'      
+    }
+  },
+  plotOptions: {
+    column: {
+      pointPadding: 0.1,
+      borderWidth: 0,
+      groupPadding: 0.2
+    },
+    series: {
+      dataLabels: {
+        enabled: true,
+        format: '{point.y}',
+        style: {
+          fontSize: '11px',
+          fontWeight: 'bold',
+          color: '#000'
+        }
+      }
+    }
+  },
+  responsive: {
+    rules: [
+      {
+        condition: {
+          maxWidth: 600
+        },
+        chartOptions: {
+          xAxis: {
+            labels: {
+              rotation: -45,
+              style: { fontSize: '10px' }
+            }
+          },
+          legend: {
+            itemWidth: 80
+          }
+        }
+      }
+    ]
+  },
+  series: [
+    {
+      name: 'Completed',
+      data: [facility.completed_count || 0],
+      color: '#2ecc71' // Green      
+    },
+    {
+      name: 'Pending',
+      data: [facility.pending_count || 0],
+      color: '#3498db' // Blue      
+    },    
+    {
+      name: 'In Progress',
+      data: [facility.in_progress_count || 0],
+      color: '#f1c40f' // Yellow      
+    },
+    {
+      name: 'Overdue',
+      data: [facility.overdue_count || 0],      
+      color: '#e74c3c' // Red
+    }    
+  ]
+}
 </script>
 
 <template>
@@ -76,39 +241,43 @@ console.log(facility);
             <div class="row w-100 justify-content-center">
                 
               
-          <div class="col-md-3">
+          <div class="col-md-4">
 
             <!-- Profile Image -->
             <div class="card card-info card-outline">
               <div class="card-body box-profile">                
-
                 <h3 class="profile-username text-center">{{facility.name}}</h3>
                 <p class="text-muted text-center">Category:  {{facility.category}}</p>
                 <p class="text-muted text-center">Email:  {{facility.email}}</p>
                 <p class="text-muted text-center">Contact:  {{facility.contact_number}}</p>
 
                 <ul class="list-group list-group-unbordered mb-3">
-                  <li class="list-group-item">
-                    <b>Audits</b> <a class="float-right">{{qualityControlCounts.audits}}</a>
+                  <li class="list-group-item">                    
+                    <h5>Audits <span class="float-right badge bg-primary">{{qualityControlCounts.audits}}</span></h5>
                   </li>
-                  <li class="list-group-item">
-                    <b>Inspections</b> <a class="float-right">{{qualityControlCounts.inspections}}</a>
+                  <li class="list-group-item">                   
+                    <h5>Inspections <span class="float-right badge bg-success">{{qualityControlCounts.inspections}}</span></h5>
                   </li>
-                  <li class="list-group-item">
-                    <b>Tests</b> <a class="float-right">{{qualityControlCounts.securityTests}}</a>
+                  <li class="list-group-item">                  
+                    <h5>Security Tests <span class="float-right badge bg-warning">{{qualityControlCounts.securityTests}}</span></h5>
                   </li>
-                  <li class="list-group-item">
-                    <b>Certified Personnels</b> <a class="float-right">{{usersCount}}</a>
+                  <li class="list-group-item">                 
+                    <h5>Certified Personnels <span class="float-right badge bg-danger">{{usersCount}}</span></h5>
                   </li>
                 </ul>               
               </div>
               <!-- /.card-body -->
+
+
+              <div class="col-sm-12 mb-4">
+                <Chart :options="operatorStatisticOptions" />          
+              </div> 
             </div>
             <!-- /.card -->
 
           </div>
           <!-- /.col -->
-          <div class="col-md-9">
+          <div class="col-md-8">
             <div class="card card-info card-outline">
               <div class="card-header p-2">
                 <ul class="nav nav-pills">

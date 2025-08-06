@@ -19,6 +19,8 @@ class QualityControl extends Model
         'end_date', 
         'status',
         'user_id',
+        'department_id',
+        'department_name',
     ];
 
     public const CONTROL_TYPE = [        
@@ -74,6 +76,11 @@ class QualityControl extends Model
     {
         return $this->belongsTo(Facility::class);
     }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }   
 
     public function selectedchecklistQuestions(){
         return $this->hasMany(SelectedChecklistQuestion::class);

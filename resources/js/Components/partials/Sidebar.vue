@@ -32,6 +32,8 @@
                       class="nav-link"
                       :class="{ active: currentPath.startsWith('/dashboard') }"
                   >
+                      
+                      <!-- <i class="nav-icon fas fa-chart-bar"></i> -->
                       <i class="nav-icon fas fa-tachometer-alt"></i>
                       <p>
                           Dashboard                                                                
@@ -147,6 +149,35 @@
                   </p>
                   </a>
               </li>
+
+
+              <li class="nav-item">
+                    <Link :href="route('departments.index')" class="nav-link"
+                        :class="{ active: currentPath.startsWith('/departments') }">
+                        <i class="nav-icon fas fa-warehouse"></i> <p>Target Departments</p>
+                  </Link>
+              </li>              
+
+
+              <li class="nav-item">
+                  <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-chart-pie"></i> 
+                  <p>Reports <i class="right fas fa-angle-left"></i>
+                  </p>
+                  </a>
+                  <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                      <Link :href="route('quality-control-reports.index')" class="nav-link"
+                      :class="{ active: currentPath.startsWith('/quality-control-reports') }"
+                      >
+                          <i class="fas fa-chevron-circle-right nav-icon"></i>
+                      <p>Quality Control Report</p>
+                      </Link>
+                  </li>
+                  
+                  </ul>
+              </li>
+
               <li class="nav-item">
                   <a href="#" class="nav-link">
                   <i class="nav-icon fas fa-users-cog"></i>
@@ -200,23 +231,17 @@
       </div>
       <!-- /.sidebar -->
   </aside>
-
-
-
-
 </template>
 <script setup>
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import Dropdown from '@/Components/Dropdown.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
-import NavLink from '@/Components/NavLink.vue';
-import { ref ,computed,onMounted} from 'vue';
-import { Link } from '@inertiajs/vue3';
-import { usePage } from '@inertiajs/vue3';
-import { useRoute } from 'vue-router';
-import axios from 'axios';
-
-
+    import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+    import Dropdown from '@/Components/Dropdown.vue';
+    import DropdownLink from '@/Components/DropdownLink.vue';
+    import NavLink from '@/Components/NavLink.vue';
+    import { ref ,computed,onMounted} from 'vue';
+    import { Link } from '@inertiajs/vue3';
+    import { usePage } from '@inertiajs/vue3';
+    import { useRoute } from 'vue-router';
+    import axios from 'axios';
 defineProps({
     currentUser: {
         type: Object,

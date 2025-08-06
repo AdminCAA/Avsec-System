@@ -69,7 +69,7 @@ function handleImageError() {
         <div class="hero-content">
           <h1>
             <span class="slide-in word1">AVIATION SECURITY</span> <br>
-            <span class="slide-in word2">IMFORMATION MANAGEMENT</span> <br>
+            <span class="slide-in word2">INFORMATION MANAGEMENT</span> <br>
             <span class="slide-in word3">SYSTEM</span>
           </h1>
         </div>

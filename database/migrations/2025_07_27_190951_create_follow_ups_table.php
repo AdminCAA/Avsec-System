@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('follow_ups', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->nullable();
-            $table->string('user_name')->nulable();
+            $table->string('title')->nullable();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('selected_checklist_question_id')->constrained()->onDelete('cascade');
+            $table->string('user_name')->nullable();
             $table->text('followup_comments');
             $table->date('followup_date')->nullable();
             $table->timestamps();

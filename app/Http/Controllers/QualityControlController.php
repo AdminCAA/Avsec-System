@@ -7,6 +7,7 @@ use App\Models\Facility;
 use Inertia\Inertia;
 use App\Models\QualityControl;
 use App\Models\AuditQuestion;
+use App\Models\Department;
 use App\Models\User;
 use App\Models\SelectedChecklistQuestion;
 use Illuminate\Http\Request;
@@ -36,11 +37,13 @@ class QualityControlController extends Controller
         $qualityControlTypes = QualityControl::CONTROL_TYPE;
         //Get all the facilities from the Facility model
         $facilities = Facility::all();
+        $departments = Department::all();
 
         return inertia('QualityControls/Create',
         [
             'facilities' => $facilities,
             'qualityControlTypes' => $qualityControlTypes,
+            'departments' => $departments,
         ]);
     }
 
@@ -52,7 +55,8 @@ class QualityControlController extends Controller
         //Get all users with user_type of Inspector
         $users = User::where('user_type', 'Inspector')->select('id', 'name', 'portrait')->get();
         //Get the users that have been assigned to this quality control
-        $hasAssignedUsers = $qualityControl->users->pluck('id');  
+        $hasAssignedUsers = $qualityControl->users->pluck('id'); 
+        $departments = Department::all(); 
 
         //Get all quality control types from the QualityControl model        
         $qualityControlTypes = QualityControl::CONTROL_TYPE;
@@ -74,7 +78,7 @@ class QualityControlController extends Controller
             'groupedAuditQuestions' => $groupedAuditQuestions,
             'users' => $users,
             'hasAssignedUsers' => $hasAssignedUsers, 
-            
+            'departments' => $departments,            
         ]);
     }
 
@@ -99,11 +103,12 @@ class QualityControlController extends Controller
             $qualityControl->update([
                 'title' => $request->title,
                 'facility_id' => $request->facility_id,
+                'department_id' => $request->department_id,                
                 'control_type' => $request->control_type,
                 'description' => $request->description,
+                'status' => $request->status, 
                 'scheduled_date' => $request->scheduled_date,  
-                'end_date' => $request->end_date, // Update end_date if provided 
-
+                'end_date' => $request->end_date, 
             ]);   
 
             if (!empty($request->selectedCheckListQuestions)) {
@@ -176,7 +181,7 @@ class QualityControlController extends Controller
         // Find the quality control record by id
         $qualityControl = QualityControl::find($id);        
         if (!$qualityControl || $qualityControl->id != $id) {
-            return response()->json(['error' => 'Facility not found'], 404);
+            return response()->json(['error' => 'Quality Control not found'], 404);
         }
         // Delete the quality control record
         $qualityControl->delete();
@@ -208,6 +213,8 @@ class QualityControlController extends Controller
             // Create a new quality control record
             QualityControl::create([
                 'title' => $request->title,
+                'department_id' => $request->department_id,                
+                 // Include department_id if needed
                 'status' => 'Pending',
                 'facility_id' => $request->facility_id,
                 'control_type' => $request->control_type,

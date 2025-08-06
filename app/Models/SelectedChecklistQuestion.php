@@ -52,4 +52,8 @@ class SelectedChecklistQuestion extends Model
         return $this->belongsTo(QualityControl::class);
     }
 
+    public function followups(){
+        return $this->hasMany(FollowUp::class);
+    }
+
 }

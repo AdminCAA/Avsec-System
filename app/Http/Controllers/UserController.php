@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
@@ -36,8 +37,10 @@ class UserController extends Controller
     {
         //
         $roles = Role::orderBy('name', 'asc')->get();
+        $departments = Department::all();
         return inertia('Users/Create', [
             'roles' => $roles,
+            'departments' => $departments
         ]);
     }
 
@@ -51,7 +54,7 @@ class UserController extends Controller
         [
             'name' => 'required|string|max:255|min:3',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required','string','confirmed',Password::min(8)
+            'password' => ['required','string','confirmed', Password::min(8)
                 ->mixedCase()
                 ->letters()
                 ->numbers()
@@ -61,9 +64,12 @@ class UserController extends Controller
         ]);
 
         if($validator->passes()){
+            $department = Department::find($request->department_id);
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
+                'department_id' => $department ? $department->id : null, 
+                'department_name' => $department ? $department->name : null,
                 'password' => bcrypt($request->password),
             ]);
             // Assign roles to the user
@@ -96,7 +102,9 @@ class UserController extends Controller
     {
         //
         $user = User::find($id);
+        $departments = Department::all();
         $userRoles = $user->roles->pluck('name');
+        
         if($user == null){
             return response()->json(['errors' => 'User not found'], 404);
         }
@@ -105,6 +113,7 @@ class UserController extends Controller
             'user' => $user,
             'roles' => $roles,
             'userRoles' => $userRoles,
+            'departments'=>$departments
         ]);
     }
 
@@ -129,9 +138,14 @@ class UserController extends Controller
             'roles' => 'array',
         ]);
 
-        if($validator->passes()){                      
+        if($validator->passes()){        
+            $department = Department::find($request->department_id);                       
             $user->name = $request->name;
             $user->email = $request->email;
+            // Update department if provided
+            $user->department_id = $department ? $department->id : null; 
+            $user->department_name = $department ? $department->name : null;
+
             if($request->password != null){
                 $user->password = bcrypt($request->password);
             }

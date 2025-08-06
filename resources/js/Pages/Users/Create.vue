@@ -13,12 +13,17 @@ const props =defineProps({
     roles: {
         type: Object,
         required: true
+    },
+    departments:{
+        type:Object,
+        required:true
     }
 });
 
 const formErrors = ref({
   name: '',
   email: '',
+  department_id: '',
   password: '',
   confirm_password: ''
 });
@@ -27,6 +32,7 @@ const formErrors = ref({
 const form = useForm({
     name:"",    
     email:"",
+    department_id: "",
     password:"",
     confirm_password:""
 });
@@ -42,6 +48,7 @@ function createUser() {
     axios.post(route('users.store'), {
         name: form.name, // assuming you're using reactive `form` or `ref()`
         email: form.email, // assuming you're using reactive `form` or `ref()`
+        department_id: form.department_id, // assuming you're using reactive `form` or `ref()`
         roles: selectedRoles.value // Get the selected permission IDs
     })
     .then(response => {
@@ -211,6 +218,18 @@ watch([() => form.password, () => form.confirm_password], ([pwd, confPwd]) => {
                                             Email looks good!
                                         </div>
                                 </div>
+
+                                <div class="form-group">
+                                    <label>Department</label>
+                                    <select required v-model="form.department_id" class="form-control"
+                                        :class="{ 'is-invalid': formErrors.department_id, 'is-valid': form.department_id && !formErrors.department_id }"
+                                    >
+                                        <option value="">-- Department --</option>
+                                        <option v-for="item in props.departments" :key="item" :value="item.id">{{ item.name }}</option>
+                                    </select>
+                                    <InputError :message="formErrors.status" class="mt-1" />
+                                </div>
+
 
                                 <div class="form-group">
                                     <label for="name">Password</label>

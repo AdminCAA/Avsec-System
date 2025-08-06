@@ -1,13 +1,15 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head,Link, useForm } from '@inertiajs/vue3';
-import { ref,onMounted} from 'vue';
+import { ref} from 'vue';
 import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import 'vue-select/dist/vue-select.css'
 import {router} from '@inertiajs/vue3';
+import dayjs from 'dayjs';
 
-const {qualityControl, question,facility } = defineProps({ 
+
+const {qualityControl, question,facility,followups} = defineProps({ 
     qualityControl:{
         type: Object,
         required: true
@@ -20,6 +22,10 @@ const {qualityControl, question,facility } = defineProps({
       type: Object,
       required: true
     },
+    followups: {
+      type: Object,
+      required: true
+    }
 });
 
 const responseOptions = [
@@ -76,6 +82,12 @@ const form = useForm({
     evidence_file: null, // For file upload    
 });
 
+
+const selectedRowId = ref(null);
+  
+const selectRow = (id) => {
+    selectedRowId.value = id;
+};
 const isLoading = ref(false);
 const formErrors = ref({});
 
@@ -183,6 +195,35 @@ function submitQuestionForm(){
     }
     
 };
+
+const generateCAR = async () => {   
+    try{
+      const response = await axios.get(`/api/securityconcerns/${question.id}/generateCar`,{
+        responseType:'blob'
+      });      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link =  document.createElement('a');
+      link.href = url;
+      link.setAttribute('download','correctiveActionRequest.pdf');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+    }catch(error){
+      console.log(error);
+      Swal.fire({
+              icon: "error",
+              title: "PDF Generation Failed",
+              text: 'Something went wrong while generating the PDF file.',
+              toast: true,  
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 1000,
+              timerProgressBar: true,
+          });
+    }    
+  }
+
 let fileName = ref('');
 const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -202,7 +243,63 @@ const handleFileUpload = (event) => {
     }
 };
 
-
+const deleteFollowup = (id)=>{
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    })
+    .then((result)=>{
+      if (result.isConfirmed) {
+        axios.delete(route('followups.destroy', id),{data:{}})
+        .then(response => {            
+          Swal.fire({
+            icon: 'success',
+            title: 'Followup deleted successfully',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 1000,
+            timerProgressBar: true,
+          });
+          //redirect to the permissions index page
+          setTimeout(() => {
+              router.visit(route('securityconcerns.edit',question.id), {
+              preserveScroll: true,
+              replace: true
+            });          
+          }, 1000);        
+        })
+        .catch(error => {    
+          let message = "Something went wrong.";
+          if (error.response && error.response.status === 422){
+              const errors = error.response.data.errors;
+              message = Object.values(errors).flat().join("\n");
+          }
+          if(error.response && error.response.status === 404) {                        
+            message = error.response.data.error;
+          }
+          if(error.response && error.response.status === 403) {                        
+            message = error.response.data.errors;
+          }
+          Swal.fire({
+              icon: "error",
+              title: "Processing failed",
+              text: message,
+              toast: true,  
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 1000,
+              timerProgressBar: true,
+          });
+        });
+      }
+    })    
+  }
 
 </script>
 
@@ -224,7 +321,7 @@ const handleFileUpload = (event) => {
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h3 class="m-0">Update Quality Control Checklist</h3>
+                    <h4 class="m-0">Update Quality Control Question</h4>
                 </div>    
                 <div class="col-sm-6">
                   <ol class="breadcrumb float-sm-right">
@@ -287,8 +384,14 @@ const handleFileUpload = (event) => {
                             </div>
                         </li>
                     </li>                                 -->
-                    
-                    <li class="breadcrumb-item"><Link class="btn btn-info" :href="route('securityconcerns.index')"><i class="fas fa-arrow-left"></i> Back</Link></li>                                
+                    <li class="breadcrumb-item">
+                        <button @click="generateCAR" class="btn  btn-primary">
+                            <i class="fas fa-file-pdf"></i> Generate CAR                        
+                        </button>
+                    </li> 
+                    <li class="breadcrumb-item">
+                        <Link class="btn btn-info" :href="route('securityconcerns.index')"><i class="fas fa-arrow-left"></i> Back</Link>
+                    </li>                                
                   </ol>
                 </div><!-- /.col -->            
             </div>
@@ -404,7 +507,6 @@ const handleFileUpload = (event) => {
                                                 </div>
                                             </div>
 
-
                                             <div class="row">
                                                 <div class="form-group col-md-12">
                                                     <label>Immediate Corrective Actions</label>
@@ -420,8 +522,151 @@ const handleFileUpload = (event) => {
                                                     </textarea>                                                                                  
                                                 </div>
                                             </div>
+                                            <div class="row">                                                                                                                                              
+                                                <div class="form-group col-md-6">                                    
+                                                    <label v-if="!question.evidence_file">Evidence Attachment</label>  
+                                                    <a v-if="question.evidence_file"
+                                                       
+                                                        data-bs-toggle="tooltip"
+                                                        title="View Evidence Attachment"
+                                                        :href="`/storage/${question.evidence_file}`" 
+                                                        target="_blank"
+                                                    >
+                                                        <i class="fas fa-paperclip"></i><span><label>Evidence Attachment</label> </span>
+                                                    </a>                                      
+                                                    <div class="input-group">
+                                                        <div class="custom-file">
+                                                            <input 
+                                                                type="file"                                                     
+                                                                accept="image/*,application/pdf"   
+                                                                @change="handleFileUpload"
+                                                                class="custom-file-input" 
+                                                                id="exampleInputFile"
+                                                                :class="{ 'is-invalid': formErrors.evidence_file, 'is-valid': form.evidence_file && !formErrors.evidence_file }"
+                                                            >
+                                                            <label class="custom-file-label" for="exampleInputFile">
+                                                                {{ fileName || 'Choose file' }}
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <small v-if="formErrors.evidence_file" class="text-danger">{{ formErrors.evidence_file }}</small>
+                                                </div> 
+                                                <div class="form-group col-md-6">                                                    
+                                                    <label>Status</label>
+                                                    <select required v-model="form.status" 
+                                                    class="form-control"                                              
+                                                    :class="{ 
+                                                        'is-invalid': formErrors.status, 
+                                                        'is-valid': form.status && !formErrors.status 
+                                                    }"
+                                                    
+                                                    >
+                                                        <option value="">-- Select Status --</option>
+                                                        <option v-for="item in statusOptions" :key="item.id" :value="item.option">{{ item.option }}</option>
+                                                    </select>    
 
-                                            <div class="row">
+                                                </div>
+                                            </div>
+
+
+                                            <div class="card card-info collapsed-card">
+                                                <div class="card-header">
+                                                    <h3 style="font-weight: bold;"  class="card-title">Corrective Action Plan</h3>
+                                                    <div class="card-tools">
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+                                                        </button>
+                                                    </div>
+                                                <!-- /.card-tools -->
+                                                </div>
+                                                <!-- /.card-header -->
+                                                <div class="card-body">
+                                                    <div class="d-flex justify-content-end">
+                                                        <button @click="downLoadOperator" class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-file-pdf"></i> Export CAP                        
+                                                        </button>
+                                                    </div>                                                                             
+                                                </div>
+                                                <!-- /.card-body -->
+                                            </div>
+                                                                
+                                            <!-- general form elements -->
+                                            <div class="card card-info collapsed-card">
+                                                <div class="card-header">
+                                                    <h3 style="font-weight: bold;"  class="card-title">
+                                                        Followups <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning ml-1"> 
+                                                            {{followups.length}}
+                                                            
+                                                        </span>
+                                                    </h3>
+                                                    <div class="card-tools">
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+                                                        </button>
+                                                    </div>                                                
+                                                </div>
+                                                
+                                                <div class="card-body">
+                                                    <div class="d-flex justify-content-end mb-2">
+                                                        <Link :href="route('followups.create', question.id)" class="btn btn-primary btn-sm "><i class="fas fa-plus"></i> Add Followup</Link>                                                    
+                                                    </div>
+                                                    <div class="table-responsive">
+                                                        <table   id="example2" class="table table-sm table-bordered table-hover table-striped">
+                                                            <thead>
+                                                            <tr>
+                                                            <th>#</th>
+                                                            <th>Title</th>
+                                                            <th>Comment</th>                                   
+                                                            <th>Date</th>       
+                                                            <th>Inspector</th>                        
+                                                            <th>Actions</th>             
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            <tr  v-for="(followup, index) in followups" :key="followup.id"
+                                                            :class="{'table table-selected': selectedRowId === followup.id }" 
+                                                            @click="selectRow(followup.id)"                 
+                                                            >
+                                                            <td>{{  index + 1 }}</td>
+                                                            <td>{{ followup.title }}</td>
+
+                                                            <td>{{ followup.followup_comments }}</td>
+                                                            
+                                                                                
+                                                            <td>{{dayjs(followup.followup_date).format('DD-MM-YYYY')}}</td>
+                                                            <td>                        
+                                                                {{ followup.user_name }}          
+                                                            </td>
+                                                                                
+                                                            <td>
+                                                                <div class="d-flex justify-content-end">
+
+                                                                <Link class="btn btn-info btn-sm mr-2" :href="route('followups.edit', followup.id)">
+                                                                    <i class="fas fa-edit"></i> <span>Edit</span>
+                                                                </Link>
+                                                                <button type="button" class="btn btn-danger btn-sm" @click="deleteFollowup(followup.id)">
+                                                                    <i class="fas fa-trash"></i> <span>Del</span>
+                                                                </button>
+                                                                </div>
+                                                            </td>                    
+                                                            </tr>                                        
+                                                            </tbody>                
+                                                        </table>
+                                                    </div>
+                                                </div>                                                
+                                            </div>
+
+                                            <!-- general form elements -->
+                                            <div class="card card-info collapsed-card">
+                                                <div class="card-header">
+                                                    <h3 style="font-weight: bold;"  class="card-title">Operator Responses</h3>
+                                                    <div class="card-tools">
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+                                                        </button>
+                                                    </div>
+                                                <!-- /.card-tools -->
+                                                </div>
+                                                <!-- /.card-header -->
+                                                <div class="card-body">
+                                                    <div class="row">
                                                 <div class="form-group col-md-6">
                                                     <label>Action Taken By Operator</label>
                                                     <textarea v-model="form.action_taken
@@ -501,8 +746,7 @@ const handleFileUpload = (event) => {
                                                             'is-invalid': formErrors.completion_date, 
                                                             'is-valid': form.completion_date && !formErrors.completion_date 
                                                         }" 
-                                                    /> 
-                                                    
+                                                    />                                                     
                                                     <small v-if="formErrors.completion_date" class="text-danger">{{ formErrors.completion_date }}</small>                                                                                                      
                                                 </div>
                                                 <div class="form-group col-md-6">
@@ -551,69 +795,18 @@ const handleFileUpload = (event) => {
                                                                                                 
                                                         placeholder="Date of Closure"
                                                     /> 
-                                                    <small v-if="formErrors.date_of_closure" class="text-danger">{{ formErrors.date_of_closure }}</small>
-                                                
+                                                    <small v-if="formErrors.date_of_closure" class="text-danger">{{ formErrors.date_of_closure }}</small>                                                
                                                 </div>
+                                            </div>                                                                            
                                             </div>
-
-                                            <div class="row">                                                                                                                                              
-                                                <div class="form-group col-md-6">                                    
-                                                    <label v-if="!question.evidence_file">Evidence Attachment</label>  
-                                                    <a v-if="question.evidence_file"
-                                                       
-                                                        data-bs-toggle="tooltip"
-                                                        title="View Evidence Attachment"
-                                                        :href="`/storage/${question.evidence_file}`" 
-                                                        target="_blank"
-                                                    >
-                                                        <i class="fas fa-paperclip"></i><span><label>Evidence Attachment</label> </span>
-                                                    </a>                                      
-                                                    <div class="input-group">
-                                                        <div class="custom-file">
-                                                            <input 
-                                                                type="file"                                                     
-                                                                accept="image/*,application/pdf"   
-                                                                @change="handleFileUpload"
-                                                                class="custom-file-input" 
-                                                                id="exampleInputFile"
-                                                                :class="{ 'is-invalid': formErrors.evidence_file, 'is-valid': form.evidence_file && !formErrors.evidence_file }"
-                                                            >
-                                                            <label class="custom-file-label" for="exampleInputFile">
-                                                                {{ fileName || 'Choose file' }}
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                    <small v-if="formErrors.evidence_file" class="text-danger">{{ formErrors.evidence_file }}</small>
-                                                </div> 
-                                                <div class="form-group col-md-6">                                                    
-                                                    <label>Status</label>
-                                                    <select required v-model="form.status" 
-                                                    class="form-control"                                              
-                                                    :class="{ 
-                                                        'is-invalid': formErrors.status, 
-                                                        'is-valid': form.status && !formErrors.status 
-                                                    }"
-                                                    
-                                                    >
-                                                        <option value="">-- Select Status --</option>
-                                                        <option v-for="item in statusOptions" :key="item.id" :value="item.option">{{ item.option }}</option>
-                                                    </select>    
-
-                                                </div>  
-                                                
-                                                
-                                            
-
-                                            </div>
-                                            
-                                           
-
-                                        <div class="d-flex justify-content-end">
-                                            <button :disabled="isLoading" type="submit" class="btn btn-info mr-0">
-                                                <span v-if="isLoading"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
-                                                <span v-else><i class="fas fa-save"></i> Save</span>
-                                            </button>                                               
-                                        </div>                                                
+                                                <!-- /.card-body -->
+                                            </div>                                                                                       
+                                            <div class="d-flex justify-content-end">
+                                                <button :disabled="isLoading" type="submit" class="btn btn-info mr-0">
+                                                    <span v-if="isLoading"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
+                                                    <span v-else><i class="fas fa-save"></i> Save</span>
+                                                </button>                                               
+                                            </div>                                                
                                         </div>
                                     </div>                                                                            
                                 </form>                               
@@ -642,4 +835,22 @@ const handleFileUpload = (event) => {
   .card-success:not(.card-outline)>.card-header {
     background-color: #20c997 !important;
 }
+
+.table .table-selected {
+    background-color: #bebebe !important; /* or any other color */
+    color: white !important; /* or any other color */
+  }
+  
+  
+ 
+  .table td, .table th {    
+        vertical-align: middle;    
+    }
+    .table th {
+        text-align: center;
+        background-color: #B2C6D5;  
+    }
+
+
 </style>
+

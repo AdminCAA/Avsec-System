@@ -75,35 +75,6 @@ class DashboardController extends Controller
     public function getDashboardStats(){
         //Get Operators statistics
         $operators = Facility::all();
-        // $operators = Facility::whereHas('qualityControls') // Only facilities with quality controls
-        //     ->with([
-        //     'qualityControls' => function ($query) {
-        //         $query->with('selectedchecklistQuestions'); // Load checklist questions for each quality control
-        //     }
-        // ])->get();
-        
-        // $operators2 = Facility::whereHas('qualityControls')
-        //     ->with(['qualityControls' => function ($query) {
-        //         $query->withCount('selectedchecklistQuestions');
-        // }])->get();
-       
-
-        // $operators3 = Facility::whereHas('qualityControls.selectedchecklistQuestions') // Facility must have QCs with questions
-        //     ->with([
-        //         'qualityControls' => function ($query) {
-        //             $query->whereHas('selectedchecklistQuestions') // Only QCs that have questions
-        //             ->with('selectedchecklistQuestions');   // Load the questions
-        //         }
-        //     ])->get();
-
-
-        // Get all operators with their quality controls and selected checklist questions
-        // Group by operator type and count
-        // $operatorType = $operators->groupBy('category')->map(function ($controls) {
-        //     return $controls->count();
-        // });
-
-
         $operatorType = $operators->groupBy('category')->reject(function ($controls, $category) {
             return $category === 'Regulatory Authority';
         })->map(function ($controls) {
@@ -143,8 +114,7 @@ class DashboardController extends Controller
         $result = $operatorsStats->map(function ($facility) {
             $totalOpen = $facility->qualityControls->sum('open_questions_count');
             $totalOverdue = $facility->qualityControls->sum('overdue_questions_count');
-            $totalClosed = $facility->qualityControls->sum('closed_questions_count');
-        
+            $totalClosed = $facility->qualityControls->sum('closed_questions_count');        
             return [
                 'operator_name' => $facility->name,
                 'quality_control_count' => $facility->quality_control_count,
@@ -175,8 +145,6 @@ class DashboardController extends Controller
         $completedQualityControls = $qualityControls->where('status', 'Completed')->count();
         $overdueQualityControls = $qualityControls->where('status', 'Overdue')->count();
 
-
-
         return [                                                           
             'totalAudits' => $audits,
             'totalInspections' => $inspections,
@@ -195,6 +163,7 @@ class DashboardController extends Controller
             'overdueQualityControls' => $overdueQualityControls,
 
             'operatorStats'=> $result, // Quality control stats for each operator
+            
         ]; 
     }
 }

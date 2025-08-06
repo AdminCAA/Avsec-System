@@ -236,7 +236,7 @@ const {facilities} = defineProps({
                       <td>{{dayjs(facility.created_at).format('DD-MM-YYYY')}}</td>
                       
                       <td>
-                        <div class="d-flex justify-content-end">
+                        <div class="d-flex justify-content-center">
                           <Link class="btn btn-success btn-sm mr-2" :href="route('facilities.show', facility.id)">
                               <i class="fas fa-clipboard-list"></i><span> Details</span>
                           </Link>
@@ -281,10 +281,11 @@ const {facilities} = defineProps({
     </AuthenticatedLayout>
 </template>
 <style>
-  .table .table-selected {
-    background-color: #4962df !important; /* or any other color */
+ .table .table-selected {
+    background-color: #bebebe !important; /* or any other color */
     color: white !important; /* or any other color */
   }
+  
   
  
   .table td, .table th {    

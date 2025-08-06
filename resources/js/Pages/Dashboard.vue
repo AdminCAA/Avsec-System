@@ -207,6 +207,8 @@ const closedStats = props.stats.operatorStats.map(item => item.total_closed_ques
 const totalQualityControlsStats = props.stats.operatorStats.map(item => item.quality_control_count);
 const totalSecurityConcernsStats = props.stats.operatorStats.map(item => item.total_security);
 
+console.log(totalQualityControlsStats)
+console.log(openStats)
 
 const operatorStatisticOptions = {
   accessibility: {
@@ -373,7 +375,7 @@ const operatorStatisticOptions = {
   ]
 }
 
-console.log(props.stats);
+console.log(categoriesStats);
 
 </script>
 

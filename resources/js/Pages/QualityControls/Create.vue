@@ -18,6 +18,11 @@ const props = defineProps({
     type: Array,
     required: true
   },
+
+  departments: {
+    type: Object,
+    required: true
+  }
 });
 
 const statusOptions = [
@@ -29,6 +34,8 @@ const statusOptions = [
 
 const form = useForm({
   title: '',
+  department_id: '', // Assuming you want to link to a department  
+  department_name: '', // This will be set based on department_id selection
   control_type: '',  
   description: '',
   facility_id: '',
@@ -42,7 +49,8 @@ const formErrors = ref({});
 const today = new Date().toISOString().split('T')[0];
 
 function createQualityControl() {
-  isLoading.value = true;  
+  isLoading.value = true;   
+  form.department_name = props.departments.find(dept => dept.id === form.department_id)?.name || '';  
   axios.post(route('quality-controls.store'), form)
     .then(() => {
       Swal.fire({
@@ -127,6 +135,7 @@ watch(() => form.facility_id, (value) => {
     : '';
 });
 
+console.log(props.departments);
 
 </script>
 
@@ -203,15 +212,16 @@ watch(() => form.facility_id, (value) => {
                                     </div>
 
                                     <div class="form-group col-md-6">
-                                    <label>Status</label>
-                                    <select required v-model="form.status" class="form-control"
-                                        :class="{ 'is-invalid': formErrors.status, 'is-valid': form.status && !formErrors.status }"
+                                    <label>Departments</label>
+                                    <select required v-model="form.department_id" class="form-control"
+                                        :class="{ 'is-invalid': formErrors.department_id, 'is-valid': form.department_id && !formErrors.department_id }"
                                     >
-                                        <option value="">-- Select Status --</option>
-                                        <option v-for="item in statusOptions" :key="item" :value="item.value">{{ item.label }}</option>
+                                        <option value="">-- Area Department --</option>
+                                        <option v-for="item in props.departments" :key="item" :value="item.id">{{ item.name }}</option>
                                     </select>
                                     <InputError :message="formErrors.status" class="mt-1" />
                                     </div>
+                                   
 
 
                                     
@@ -255,7 +265,17 @@ watch(() => form.facility_id, (value) => {
 
                               <!-- Row 2: Description -->
                               <div class="row">
-                                <div class="form-group col-md-12">
+                                <div class="form-group col-md-6">
+                                    <label>Status</label>
+                                    <select required v-model="form.status" class="form-control"
+                                        :class="{ 'is-invalid': formErrors.status, 'is-valid': form.status && !formErrors.status }"
+                                    >
+                                        <option value="">-- Select Status --</option>
+                                        <option v-for="item in statusOptions" :key="item" :value="item.value">{{ item.label }}</option>
+                                    </select>
+                                    <InputError :message="formErrors.status" class="mt-1" />
+                                    </div>
+                                <div class="form-group col-md-6">
                                   <label>Description</label>
                                   <textarea v-model="form.description" class="form-control" rows="2" placeholder="Optional"></textarea>
                                 </div>

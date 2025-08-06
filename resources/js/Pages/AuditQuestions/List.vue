@@ -229,9 +229,10 @@ watch(()=>search.value, (newvalue)=>{
 </template>
 <style>
   .table .table-selected {
-    background-color: #4962df !important; /* or any other color */
+    background-color: #bebebe !important; /* or any other color */
     color: white !important; /* or any other color */
   }
+  
   
  
   .table td, .table th {    

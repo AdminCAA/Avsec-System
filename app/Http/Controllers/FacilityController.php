@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use App\Models\Facility;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
@@ -15,9 +17,30 @@ class FacilityController extends Controller
        
     public function index(Request $request)
     {        
-        // Fetch all facilities from the database
+        
+        // Ensure the user is authenticated
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+        // Get the current user
+        $currentUser = Auth::user();
+        // Get all facilities for the current user's department
         $searchQuery = Facility::search($request);
+        // If the user is an admin, show all facilities
+        
+        /*
+        if ($currentUser->isAdmin()) {
+            $facilities = $searchQuery->orderBy('category','asc')->paginate(50);
+            // Return the facilities to the view
+            return Inertia::render('Facilities/List', [
+                'facilities' => $facilities,
+                'search' => $request->search ?? '',
+            ]);
+        }
+        */
+
         $facilities =  $searchQuery->orderBy('category','asc')->paginate(50);
+        //$facilities =  $searchQuery->where('department_id',$currentUser->department_id)->orderBy('category','asc')->paginate(50);
         // Return the facilities to the view
         return Inertia::render('Facilities/List', [
             'facilities' => $facilities,
@@ -32,9 +55,13 @@ class FacilityController extends Controller
     {
         //Get all categories from the Facility model
         $categories = Facility::CATEGORIES;
+        //Get all Departments from the Department model
+        $departments = Department::all();
+        
         sort($categories);
         return Inertia::render('Facilities/Create', [
-            'categories' => $categories,           
+            'categories' => $categories,    
+            'departments' => $departments,                   
         ]);
     }
 
@@ -57,8 +84,10 @@ class FacilityController extends Controller
         // Check if validation passes
         if($validator->passes()){
             // Create a new facility
+            $department = Department::find($request->department_id);
             Facility::create([
                 'name' => $request->name,
+                'department_id' => $department ? $department->id : null, // Associate with department if provided                
                 'description' => $request->description,
                 'category' => $request->category,
                 'location' => $request->location,
@@ -89,15 +118,37 @@ class FacilityController extends Controller
             'inspections' => $facility->qualityControls->where('control_type', 'Inspection')->count(),
             'securityTests' => $facility->qualityControls->where('control_type', 'Security Test')->count(),
         ];
+
+        $operatorStats = Facility::where('id', $id)
+            ->withCount([
+                'qualityControls as completed_count' => function ($q) {
+                    $q->where('status', 'Completed');
+                    //->whereHas('selectedChecklistQuestions');
+                },
+                'qualityControls as overdue_count' => function ($q) {
+                    $q->where('status', 'Overdue');
+                    //->whereHas('selectedChecklistQuestions');
+                },
+                'qualityControls as in_progress_count' => function ($q) {
+                    $q->where('status', 'In Progress');
+                    //->whereHas('selectedChecklistQuestions');
+                },
+                'qualityControls as pending_count' => function ($q) {
+                    $q->where('status', 'Pending');
+                    //->whereHas('selectedChecklistQuestions');
+                }
+            ])->first();
+
+
+
         // Return the facility to the show view
-        return Inertia::render('Facilities/Show', [
-            'facility' => $facility,            
+        return Inertia::render('Facilities/Show', [                     
             'qualityControlCounts' => $qualityControlCounts,
             'audits' => $audits,
             'inspections' => $inspections,
             'securityTests' => $securityTests,    
-            'usersCount'  => $usersCount
-
+            'usersCount'  => $usersCount,
+            'facility' => $operatorStats
         ]);
     }
 
@@ -110,11 +161,14 @@ class FacilityController extends Controller
         $facility = Facility::findOrFail($id);
         // Get all categories from the Facility model
         $categories = Facility::CATEGORIES;
+        // Get all Departments from the Department model
+        $departments = Department::all();
         sort($categories);
         // Return the facility to the edit view
         return Inertia::render('Facilities/Edit', [
             'facility' => $facility,
             'categories' => $categories,
+            'departments' => $departments,
         ]);
     }
 
@@ -139,8 +193,10 @@ class FacilityController extends Controller
         // Check if validation passes
         if($validator->passes()){
             // Update the facility
+            $department = Department::find($request->department_id);
             $facility->update([
                 'name' => $request->name,
+                'department_id' => $department ? $department->id : null,                
                 'description' => $request->description,
                 'category' => $request->category,
                 'location' => $request->location,

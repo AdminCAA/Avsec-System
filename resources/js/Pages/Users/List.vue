@@ -7,7 +7,7 @@ import { Head,Link,usePage, router } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 import { ref ,computed, watch} from 'vue';
 
-defineProps({
+const {users, roles} = defineProps({
       users: {
           type: Object,
           required: true
@@ -122,6 +122,7 @@ defineProps({
       }
     })
   }
+  console.log(users);
 </script>
 
 <template>
@@ -179,8 +180,10 @@ defineProps({
                     <th>#</th>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Department</th>
                     <th>Roles</th>                    
                     <th>Created</th>
+                    
                     <th>Actions</th>                    
                   </tr>
                   </thead>
@@ -189,11 +192,12 @@ defineProps({
                     :class="{'table table-selected': selectedRowId === user.id }" 
                     @click="selectRow(user.id)"                 
                   >
-                    <td>{{ (users.current_page - 1) * users.per_page + index + 1 }}</td>
-                    <td>{{ user.name }}</td>
-                    <td>{{ user.email }}</td>
+                    <td style="text-align: center;">{{ (users.current_page - 1) * users.per_page + index + 1 }}</td>
+                    <td style="text-align: center;">{{ user.name }}</td>
+                    <td style="text-align: center;">{{ user.email }}</td>
+                    <td style="text-align: center;">{{ user.department_name ? user.department_name : 'No department assigned' }}</td>
 
-                    <td>                        
+                    <td style="text-align: center;">                        
                         <span v-if="user.roles && user.roles.length > 0">
                             <span v-for="(role, i) in user.roles" :key="role.id">
                                 {{ role.name }}
@@ -203,10 +207,10 @@ defineProps({
                         <span v-else>No roles assigned</span>                 
                     </td>
 
-                    <td>{{dayjs(user.created_at).format('DD-MM-YYYY')}}</td>
+                    <td style="text-align: center;">{{dayjs(user.created_at).format('DD-MM-YYYY')}}</td>
                     
                     <td>
-                      <div class="d-flex justify-content-end">
+                      <div class="d-flex justify-content-center">
                         <Link class="btn btn-info btn-sm mr-2" :href="route('users.edit', user.id)">
                           <i class="fas fa-edit"></i> <span>Edit</span>
                         </Link>

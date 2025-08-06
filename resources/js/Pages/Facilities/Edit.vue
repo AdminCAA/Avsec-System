@@ -6,7 +6,7 @@ import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import InputError from '@/Components/InputError.vue';
 
-const {facility, categories } = defineProps({
+const {facility, categories,departments } = defineProps({
   facility: {
     type: Object,
     required: true
@@ -14,11 +14,16 @@ const {facility, categories } = defineProps({
     categories: {
         type: Array,
         required: true
-    }
+    },
+  departments: {
+    type: Object,
+    required: true
+  }
 });
 
 const form = useForm({
   name: facility.name || '',
+  department_id: facility.department_id || '',
   description: facility.description || '',
   category: facility.category || '',
   location: facility.location || '',
@@ -148,7 +153,19 @@ watch(() => form.email, (value) => {
                              
                               <!-- Row 2: Description -->
                               <div class="row">
-                                <div class="form-group col-md-12">
+
+                                <div class="form-group col-md-6">
+                                    <label>Area Departments</label>
+                                    <select required v-model="form.department_id" class="form-control"
+                                        :class="{ 'is-invalid': formErrors.department_id, 'is-valid': form.department_id && !formErrors.department_id }"
+                                    >
+                                        <option value="">-- Area Department --</option>
+                                        <option v-for="item in departments" :key="item" :value="item.id">{{ item.name }}</option>
+                                    </select>
+                                    <InputError :message="formErrors.status" class="mt-1" />
+                                    </div>
+
+                                <div class="form-group col-md-6">
                                   <label>Description</label>
                                   <textarea v-model="form.description" class="form-control" rows="2" placeholder="Optional"></textarea>
                                 </div>

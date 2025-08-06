@@ -17,7 +17,8 @@ const {
     auditQuestions,
     groupedAuditQuestions,
     users,
-    hasAssignedUsers
+    hasAssignedUsers,
+    departments
 } = defineProps({ 
     groupedAuditQuestions: {
         type: Object,
@@ -50,6 +51,10 @@ const {
   hasAssignedUsers: {
         type: Array,
         required: true
+    },
+    departments:{
+        type: Object,
+        required: true
     }
   
 });
@@ -68,6 +73,8 @@ const statusOptions = [
 ];
 const form = useForm({
   title: qualityControl.title,
+  department_id: qualityControl.department_id || '',
+  department_name: qualityControl.department_name || '',
   control_type: qualityControl.control_type,  
   description: qualityControl.description,
   facility_id: qualityControl.facility_id,
@@ -84,7 +91,10 @@ const formErrors = ref({});
 
 function editQualityControl() {
   isLoading.value = true;  
+  form.department_name = departments.find(dept => dept.id === form.department_id)?.name || ''; 
   axios.post(route('quality-controls.update', qualityControl.id), {
+    department_id: form.department_id || '', // Ensure department_id is always a string
+    department_name: form.department_name || '', // Ensure department_name is always a string
     title: form.title || '', // Ensure title is always a string
     control_type: form.control_type || '', // Ensure control_type is always a string
     description: form.description || '', // Ensure description is always a string
@@ -273,7 +283,7 @@ const handleClick = () => {
 
                                 <div class="row">
                                     <div class="form-group col-md-6">                                    
-                                      <label>Operator</label>                                        
+                                      <label>Target Operator</label>                                        
                                       <v-select
                                           v-model="form.facility_id"
                                           :options="facilities"
@@ -287,17 +297,19 @@ const handleClick = () => {
                                       />
                                       <InputError :message="formErrors.facility_id" class="mt-1" />
                                     </div>
-
                                     <div class="form-group col-md-6">
-                                    <label>Status</label>
-                                    <select required v-model="form.status" class="form-control"
-                                        :class="{ 'is-invalid': formErrors.status, 'is-valid': form.status && !formErrors.status }"
+                                    <label>Departments</label>
+                                    <select required v-model="form.department_id" class="form-control"
+                                        :class="{ 'is-invalid': formErrors.department_id, 'is-valid': form.department_id && !formErrors.department_id }"
                                     >
-                                        <option value="">-- Select Status --</option>
-                                        <option v-for="item in statusOptions" :key="item" :value="item.value">{{ item.label }}</option>
+                                        <option value="">-- Area Department --</option>
+                                        <option v-for="item in departments" :key="item" :value="item.id">{{ item.name }}</option>
                                     </select>
                                     <InputError :message="formErrors.status" class="mt-1" />
-                                    </div>                                                                      
+                                    </div>
+
+
+                                                                                                        
                                   </div>   
 
                                   <div class="row">
@@ -336,7 +348,18 @@ const handleClick = () => {
 
                               <!-- Row 2: Description -->
                               <div class="row">
-                                <div class="form-group col-md-12">
+                                <div class="form-group col-md-6">
+                                    <label>Status</label>
+                                    <select required v-model="form.status" class="form-control"
+                                        :class="{ 'is-invalid': formErrors.status, 'is-valid': form.status && !formErrors.status }"
+                                    >
+                                        <option value="">-- Select Status --</option>
+                                        <option v-for="item in statusOptions" :key="item" :value="item.value">{{ item.label }}</option>
+                                    </select>
+                                    <InputError :message="formErrors.status" class="mt-1" />
+                                    </div>  
+
+                                <div class="form-group col-md-6">
                                   <label>Description</label>
                                   <textarea v-model="form.description" class="form-control" rows="2" placeholder="Optional"></textarea>
                                 </div>
@@ -344,7 +367,7 @@ const handleClick = () => {
                               
                               
                               <div class="col-sm-6">
-                                <h3 class="mb-2">Assign Inspectors</h3>
+                                <h3 class="mb-2">Responsible Inspectors</h3>
                               </div>                            
                               <div class="row">
                                     <div class="col-sm-12">    

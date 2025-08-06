@@ -33,6 +33,8 @@ class User extends Authenticatable
         'portrait',
         'signature',  
         'quality_control_id',
+        'department_id',
+        'department_name',
     ];
 
 
@@ -84,6 +86,11 @@ class User extends Authenticatable
         });
     }
 
+    public function followUps()
+    {
+        return $this->hasMany(FollowUp::class);
+    }
+
     public function qualityControls()
     {
         return $this->belongsToMany(QualityControl::class)->withTimestamps();
@@ -93,6 +100,11 @@ class User extends Authenticatable
     public function facility()
     {
         return $this->belongsTo(Facility::class);
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
     }
 
     public function qualifications()
@@ -111,5 +123,6 @@ class User extends Authenticatable
                     ->withPivot('date_taken', 'score', 'type')
                     ->withTimestamps();
     }
+
    
 }

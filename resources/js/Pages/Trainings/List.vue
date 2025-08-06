@@ -186,10 +186,10 @@ watch(()=>trainingsUrl.value, (newUrl)=>{
                         <span v-else>No permissions assigned</span>                 
                     </td> -->
 
-                    <td>{{dayjs(training.created_at).format('DD-MM-YYYY')}}</td>
+                    <td style="text-align: center;">{{dayjs(training.created_at).format('DD-MM-YYYY')}}</td>
                     
                     <td>
-                      <div class="d-flex justify-content-end">
+                      <div class="d-flex justify-content-center">
                         <Link class="btn btn-info btn-sm mr-2" :href="route('trainings.edit', training.id)">
                           <i class="fas fa-edit"></i> <span>Edit</span>
                         </Link>
