@@ -187,12 +187,12 @@ watch(()=>search.value, (newvalue)=>{
                       <td>{{dayjs(question.created_at).format('DD-MM-YYYY')}}</td>
                       
                       <td>
-                        <div class="d-flex justify-content-end">                        
+                        <div class="d-flex justify-content-center">                        
                           <Link class="btn btn-info btn-sm mr-2" :href="route('audit-questions.edit', question.id)">
                             <i class="fas fa-edit"></i> <span>Edit</span>
                           </Link>
                           <button class="btn btn-danger btn-sm" @click="deleteAuditQuestions(question.id)">
-                            <i class="fas fa-trash"></i> <span>Delete</span>
+                            <i class="fas fa-trash"></i> <span>Del</span>
                           </button>
                         </div>
                       </td>                    

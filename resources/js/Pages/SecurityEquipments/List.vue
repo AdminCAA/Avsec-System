@@ -232,7 +232,7 @@ const {securityEquipments} = defineProps({
                           <i class="fas fa-edit"></i> <span>Edit</span>
                         </Link>
                         <button class="btn btn-danger btn-sm" @click="deleteSecurityEquipment(equipment.id)">
-                          <i class="fas fa-trash"></i> <span>Delete</span>
+                          <i class="fas fa-trash"></i> <span>Del</span>
                         </button>
                       </div>
                     </td>                    
