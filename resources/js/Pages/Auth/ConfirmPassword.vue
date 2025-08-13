@@ -1,10 +1,7 @@
 <script setup>
 import GuestLayout from '@/Layouts/GuestLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm,Link } from '@inertiajs/vue3';
+
 
 const form = useForm({
     password: '',
@@ -21,35 +18,60 @@ const submit = () => {
     <GuestLayout>
         <Head title="Confirm Password" />
 
-        <div class="mb-4 text-sm text-gray-600">
-            This is a secure area of the application. Please confirm your
-            password before continuing.
+        <div class="card card-info mt-5">
+            <div class="card-header">
+                <h3 class="card-title">Confirm Password</h3>
+            </div>
+            <div class="card-body">
+
+                <div class="mb-4 text-secondary">
+                    This is a secure area of the application. Please confirm your
+                    password before continuing.
+                </div>
+
+                <form @submit.prevent="submit">
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input
+                            id="password"
+                            type="password"
+                            class="form-control"
+                            v-model="form.password"                            
+                            autocomplete="current-password"
+                            autofocus
+                            :class="{ 'is-invalid': form.errors.password }"
+                        />
+                        <div v-if="form.errors.password" class="invalid-feedback">
+                            {{ form.errors.password }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">                        
+                        <button
+                            type="submit"
+                            class="btn btn-info ms-3"
+                            :class="{ 'disabled opacity-50': form.processing }"
+                            :disabled="form.processing"
+                        >
+                            <span v-if="form.processing">
+                                <i class="fas fa-spinner fa-spin"></i> Wait..
+                            </span>
+                            <span v-else>
+                                Confirm
+                            </span>                          
+                        </button>
+
+                        <Link
+                            :href="route('profile.edit')"
+                            class="btn btn-warning ml-2 ms-3"
+                            
+                        >
+                            Cancel
+                    </Link>
+                    </div>
+                </form>
+
+            </div>
         </div>
-
-        <form @submit.prevent="submit">
-            <div>
-                <InputLabel for="password" value="Password" />
-                <TextInput
-                    id="password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password"
-                    required
-                    autocomplete="current-password"
-                    autofocus
-                />
-                <InputError class="mt-2" :message="form.errors.password" />
-            </div>
-
-            <div class="mt-4 flex justify-end">
-                <PrimaryButton
-                    class="ms-4"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
-                >
-                    Confirm
-                </PrimaryButton>
-            </div>
-        </form>
     </GuestLayout>
 </template>

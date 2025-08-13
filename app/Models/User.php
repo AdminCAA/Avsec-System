@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-class User extends Authenticatable
+use Laravel\Fortify\TwoFactorAuthenticatable;
+
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -59,8 +61,11 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_recovery_codes',
+        'two_factor_secret',
     ];
 
+    protected $appends = ['two_factor_enabled'];
     /**
      * Get the attributes that should be cast.
      *
@@ -124,5 +129,9 @@ class User extends Authenticatable
                     ->withTimestamps();
     }
 
+    public function getTwoFactorEnabledAttribute()
+    {
+        return !is_null($this->two_factor_secret) && $this->two_factor_secret !== '';
+    }
    
 }

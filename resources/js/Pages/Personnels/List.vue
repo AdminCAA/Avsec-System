@@ -193,6 +193,7 @@ const {personnels} = defineProps({
                       <td>
                         <div class="d-flex align-items-center">
                           <div class="d-flex align-items-center">
+                              {{ console.log(personnel.portrait) }}
                               <img 
                                   :src="personnel.portrait ? `/storage/${personnel.portrait}` : '/storage/portraits/avatar.png'" 
                                   class="rounded-circle mr-2" 

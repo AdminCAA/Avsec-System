@@ -202,9 +202,7 @@ watch([startDate, endDate], () => {
                                     <button type="submit" class="btn btn-lg btn-default">
                                         <i class="fa fa-search"></i>
                                     </button>
-                                </div>
-
-                             
+                                </div>                             
                             </div>
                         </div>                        
                   </div>

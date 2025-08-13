@@ -31,13 +31,7 @@ Route::get('/', function () {
     ]);
 })->name('welcome');
 
-Route::get('/dashboard', [DashboardController::class,'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
-
-
-Route::get('/training', function () {
-    return Inertia::render('Training');
-})->middleware(['auth', 'verified'])->name('training');
 
 Route::get('/errors', function () {
     return Inertia::render('Errors/ErrorPage', [
@@ -45,11 +39,17 @@ Route::get('/errors', function () {
     ]);
 })->name('errors');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+Route::middleware(['auth','verified'])->group(function () {
 
+    Route::get('/dashboard', [DashboardController::class,'index'])->name('dashboard');
+
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');    
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    //Training  Route
+    Route::get('/training', function () {
+        return Inertia::render('Training');
+    })->name('training');
     
     //Permission Routes
     Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');
@@ -58,7 +58,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/permissions/{id}/edit', [PermissionController::class, 'edit'])->name('permissions.edit');
     Route::post('/permissions/{id}', [PermissionController::class, 'update'])->name('permissions.update');
     Route::delete('/permissions/{id}', [PermissionController::class, 'destroy'])->name('permissions.destroy');
-
 
     //Permission Roles
     Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
@@ -200,11 +199,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/departments/{id}/edit', [DepartmentsController::class, 'edit'])->name('departments.edit');
     Route::post('/departments/{id}', [DepartmentsController::class, 'update'])->name('departments.update');
     Route::delete('/departments/{id}', [DepartmentsController::class, 'destroy'])->name('departments.destroy');
+
+    //Two Factor Authentication
+    Route::post('/users/disable2fa/{id}', [UserController::class, 'disable2fa'])->name('users.disable2fa');
+
 });
 
-
-
-
-
-
-require __DIR__.'/auth.php';
+//require __DIR__.'/auth.php';

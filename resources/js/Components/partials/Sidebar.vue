@@ -15,7 +15,7 @@
           <img :src="avatar" class="img-circle elevation-2" alt="User Image">
           </div>
           <div class="info">
-          <a href="#" class="d-block">{{ currentUser.name }}</a>
+          <Link :href="route('profile.edit')" class="d-block">{{ currentUser.name }}</Link>
           </div>
       </div>
 

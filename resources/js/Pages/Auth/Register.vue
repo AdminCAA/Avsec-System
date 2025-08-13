@@ -13,7 +13,7 @@ const form = useForm({
 
 const submit = () => {
     form.post(route('register'), {
-        //onFinish: () => form.reset('password', 'password_confirmation'),
+        onFinish: () => form.reset('password', 'password_confirmation'),
     });
 };
 
@@ -100,8 +100,7 @@ watch(()=> form.name, (value)=>{
                                     'is-invalid': nameError,
                                     'is-valid': form.name && !nameError
                                 }"   
-                                v-model="form.name"
-                                required
+                                v-model="form.name"                            
                                 min="3"
                                 autofocus
                                 placeholder="Full Name"
@@ -115,6 +114,9 @@ watch(()=> form.name, (value)=>{
                             </div>
                             <div style="width:100%" v-if="nameError" class="text-danger text-sm mb-3">
                                 {{ nameError }}
+                            </div>
+                            <div style="width:100%" v-if="form.errors.name" class="text-danger text-sm mb-3">
+                                {{ form.errors.name }}
                             </div>
                             <div v-if="form.name && !nameError" class="valid-feedback d-block">
                                 Name looks good!
@@ -130,8 +132,7 @@ watch(()=> form.name, (value)=>{
                                     'is-invalid': emailError,
                                     'is-valid': form.email && !emailError
                                 }" 
-                                v-model="form.email"
-                                required
+                                v-model="form.email"                                
                                 autocomplete="username"
                                 placeholder="Email"
                                 name="email"
@@ -144,6 +145,9 @@ watch(()=> form.name, (value)=>{
 
                             <div style="width:100%" v-if="emailError" class="text-danger text-sm mb-3">
                                 {{ emailError }}
+                            </div>
+                            <div style="width:100%" v-if="form.errors.email" class="text-danger text-sm mb-3">
+                                {{ form.errors.email }}
                             </div>
                             <div v-if="form.email && !emailError" class="valid-feedback d-block">
                                 Email looks good!
@@ -159,8 +163,7 @@ watch(()=> form.name, (value)=>{
                                 }" 
                                 placeholder="Password" 
                                 id="password"  
-                                v-model="form.password"
-                                required
+                                v-model="form.password"                                
                                 min="6"
                                 autocomplete="new-password"
                             >
@@ -172,6 +175,9 @@ watch(()=> form.name, (value)=>{
                             <div style="width:100%" v-if="passwordError" class="text-danger text-sm mb-3">
                                 {{ passwordError }}
                             </div>
+                            <div style="width:100%" v-if="form.errors.password" class="text-danger text-sm mb-3">
+                                {{ form.errors.password }}
+                            </div> 
                             <div v-if="form.password && !passwordError" class="valid-feedback d-block">
                                 Password looks good!
                             </div>                           
@@ -188,8 +194,7 @@ watch(()=> form.name, (value)=>{
                                 :class="{
                                     'is-invalid': form.password !== form.password_confirmation,
                                     'is-valid': form.password_confirmation && !confirm_passwordError
-                                }" 
-                                required
+                                }"                                 
                                 autocomplete="new-password"
                                 >
                             <div class="input-group-append">
@@ -197,6 +202,9 @@ watch(()=> form.name, (value)=>{
                                 <span class="fas fa-lock"></span>
                                 </div>
                             </div>
+                            <div style="width:100%" v-if="form.errors.password_confirmation" class="text-danger text-sm mb-3">
+                                {{ form.errors.password_confirmation }}
+                            </div> 
                             <div style="width:100%" v-if="form.errors.password_confirmation" class="text-danger text-sm mb-3">
                                 {{ form.errors.password_confirmation }}
                             </div> 
@@ -228,7 +236,7 @@ watch(()=> form.name, (value)=>{
                                     </span>                
                                 </button> 
 
-                                <Link :href="route('welcome')" class="btn btn-default float-right">
+                                <Link :href="route('welcome')" class="btn btn-warning float-right">
                                     Cancel
                                 </Link>                
                             </div>

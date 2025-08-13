@@ -33,10 +33,7 @@ const submit = () => {
             you to choose a new one.</p>
         </div>
 
-        <div
-            v-if="status"
-            class="mb-4 text-sm font-medium text-green-600"
-        >
+        <div v-if="status" class="mb-3 small fw-medium text-success">
             {{ status }}
         </div>
 
@@ -73,11 +70,16 @@ const submit = () => {
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Email Password Reset Link
+                <span v-if="form.processing">
+                        <i class="fas fa-spinner fa-spin"></i> Wait..
+                    </span>
+                    <span v-else>
+                        Email Password Reset Link
+                    </span>                      
                 </button>
                 <Link :href="route('welcome')" class="btn btn-default float-right">
-                                    Cancel
-                                </Link>  
+                    Cancel
+                </Link>  
             </div>
             </div>
             

@@ -7,6 +7,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { ref, watch } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { usePage, router } from '@inertiajs/vue3';
 
 defineProps({
     canResetPassword: {
@@ -28,6 +29,8 @@ const submit = () => {
         onFinish: () => form.reset('password'),
     });
 };
+
+
 
 
 const emailError = ref('');
@@ -61,7 +64,7 @@ watch(() => form.password, (value) => {
 <template>
     <GuestLayout>
         <Head title="Sign in" />
-        <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
+        <div v-if="status" class="mb-3 text-success fw-medium">
             {{ status }}
         </div>
 <!-- /.login-box -->
@@ -88,8 +91,7 @@ watch(() => form.password, (value) => {
                 emailError ? 'is-invalid' : '',
                 form.email && !emailError ? 'is-valid' : ''
             ]"
-            v-model="form.email"
-            required
+            v-model="form.email"            
             autofocus
             autocomplete="username">
             
@@ -102,6 +104,9 @@ watch(() => form.password, (value) => {
           <div style="width:100%" v-if="emailError" class="text-danger text-sm mb-3">
                 {{ emailError }}
           </div>
+          <div style="width:100%" v-if="form.errors.email" class="text-danger text-sm mb-3">
+                {{ form.errors.email }}
+            </div>
           <div v-if="form.email && !emailError" class="valid-feedback d-block">
               Email looks good!
           </div>
@@ -118,8 +123,7 @@ watch(() => form.password, (value) => {
                   'is-invalid': passwordError,
                   'is-valid': form.password && !passwordError
                 }"                                    
-                v-model="form.password"
-                required
+                v-model="form.password"                
                 autocomplete="current-password">
           <div class="input-group-append">
             <div class="input-group-text">
@@ -133,9 +137,9 @@ watch(() => form.password, (value) => {
             <div v-if="form.password && !passwordError" class="valid-feedback d-block">
                 Password looks good!
             </div>
-            <!-- <div style="width:100%" v-if="form.errors.password" class="text-danger text-sm mb-3">
+            <div style="width:100%" v-if="form.errors.password" class="text-danger text-sm mb-3">
                 {{ form.errors.password }}
-            </div> -->
+            </div>
         </div>
         <div class="row">
           <div class="col-6">
@@ -166,7 +170,7 @@ watch(() => form.password, (value) => {
                   </span>
                 </button> 
 
-                <Link :href="route('welcome')" class="btn btn-default float-right">Cancel</Link>
+                <Link :href="route('welcome')" class="btn btn-warning float-right">Cancel</Link>
             </div>
           <!-- /.col -->
         </div>

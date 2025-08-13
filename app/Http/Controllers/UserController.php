@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -80,6 +81,20 @@ class UserController extends Controller
                 // If no role is selected, assign the default role
                 $user->syncRoles([]);
             }
+
+
+         
+
+            // Notification::route('mail', $user->email)
+            // ->notify(new \App\Notifications\EmailConfirmation($user->email)); 
+            
+            $user->notify(new \App\Notifications\EmailConfirmation($user)); // Send welcome notification
+            Log::info('Email confirmation sent : ', [
+                'to' => $user->email,
+                'notification' => 'EmailConfirmation',
+            ]);
+            // Log the user creation
+
 
             return redirect()->route('users.index')->with('success', 'User created successfully');
         }else{
@@ -183,5 +198,14 @@ class UserController extends Controller
             'success' => 'User deleted successfully',
             'status' => true
         ], 200);
+    }
+
+    public function disable2fa(Request $request, string $id)
+    {
+        $user = User::findOrFail($request->id);
+        $user->two_factor_recovery_codes = null;
+        $user->two_factor_secret = null;
+        $user->save();      
+        return redirect()->route('users.index')->with('success', 'Two Factor Authentication disabled successfully');       
     }
 }

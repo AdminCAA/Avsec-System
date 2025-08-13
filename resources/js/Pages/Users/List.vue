@@ -61,7 +61,63 @@ const {users, roles} = defineProps({
         } 
     })
 
-   
+    const disableUser2FA = (id)=>{
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This action will disable two-factor authentication for this user.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, disable it!'
+    })
+    .then((result)=>{
+      if (result.isConfirmed) {
+        axios.post(route('users.disable2fa', id),{data:{}})
+        .then(response => {                          
+          Swal.fire({
+            icon: 'success',
+            title: 'Two-factor authentication disabled successfully',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 1000,
+            timerProgressBar: true,
+          });
+          //redirect to the permissions index page
+          setTimeout(() => {
+              router.visit(route('users.index'), {
+              preserveScroll: true,
+              replace: true
+            });          
+          }, 1000);        
+        })
+        .catch(error => {    
+          let message = "Something went wrong.";
+          if (error.response && error.response.status === 422){
+              const errors = error.response.data.errors;
+              message = Object.values(errors).flat().join("\n");
+          }
+          if(error.response && error.response.status === 404) {                        
+            message = error.response.data.error;
+          }
+          if(error.response && error.response.status === 403) {                        
+            message = error.response.data.errors;
+          }
+          Swal.fire({
+              icon: "error",
+              title: "Processing failed",
+              text: message,
+              toast: true,  
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 1000,
+              timerProgressBar: true,
+          });
+        });
+      }
+    })
+  }
   
 
   const deleteUser = (id)=>{
@@ -210,12 +266,19 @@ const {users, roles} = defineProps({
                     <td style="text-align: center;">{{dayjs(user.created_at).format('DD-MM-YYYY')}}</td>
                     
                     <td>
+                      
                       <div class="d-flex justify-content-center">
                         <Link class="btn btn-info btn-sm mr-2" :href="route('users.edit', user.id)">
                           <i class="fas fa-edit"></i> <span>Edit</span>
                         </Link>
+
+                        <button v-if="user.two_factor_enabled"  class="btn btn-warning btn-sm mr-2" @click="disableUser2FA(user.id)">
+                          <i class="fas fa-ban"></i> <span>Disable 2FA</span>
+                        </button>
+                        
+
                         <button class="btn btn-danger btn-sm" @click="deleteUser(user.id)">
-                          <i class="fas fa-trash"></i> <span>Delete</span>
+                          <i class="fas fa-trash"></i> <span>Del</span>
                         </button>
                       </div>
                     </td>                    
