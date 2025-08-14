@@ -8,7 +8,7 @@ import { Head,Link,usePage, router } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 import { ref ,computed, watch} from 'vue';
 
-defineProps({
+const {auditAreaCategories} = defineProps({
     auditAreaCategories: {
           type: Object,
           required: true
@@ -113,6 +113,51 @@ defineProps({
     })
   }
 
+  
+
+
+  const sortKey = ref(null);
+  const sortDirection = ref('asc');
+
+  const getNestedValue = (obj, key) => {
+    return key.split('.').reduce((o, k) => (o ? o[k] : null), obj);
+  };
+
+const sortTable = (key) => {
+  if (sortKey.value === key) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey.value = key;
+    sortDirection.value = 'asc';
+  }
+};
+
+const sortedAuditAreaCategories = computed(() => {
+  let sorted = [...auditAreaCategories.data];
+  if (sortKey.value) {
+    sorted.sort((a, b) => {
+      let valA = getNestedValue(a, sortKey.value);
+      let valB = getNestedValue(b, sortKey.value);
+
+      // Handle null/undefined values
+      if (valA == null) valA = '';
+      if (valB == null) valB = '';
+
+      // Handle date sorting if needed
+      if (sortKey.value.includes('created_at')) {
+        valA = new Date(valA);
+        valB = new Date(valB);
+      }
+
+      if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  return sorted;
+});
+
+
 </script>
 
 <template>
@@ -170,32 +215,44 @@ defineProps({
                     <thead>
                     <tr>
                       <th>#</th>
-                      <th>Name</th>
-                      <th>Target Area</th>
-                      <th>Created</th>
+                      <th @click="sortTable('name')" style="cursor: pointer">
+                        Area Name
+                        <i v-if="sortKey === 'name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                      </th>
+                      <th @click="sortTable('category_name')" style="cursor: pointer">
+                        Target Operator
+                        <i v-if="sortKey === 'category_name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i> 
+                      </th>
+                      <th @click="sortTable('created_at')" style="cursor: pointer">
+                        Created
+                        <i v-if="sortKey === 'created_at'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>  
+                      </th>                      
                       <th>Actions</th>                    
                     </tr>
                     </thead>
                     <tbody>
-                    <tr  v-for="(item, index) in auditAreaCategories.data" :key="item.id"
-                      :class="{'table table-selected': selectedRowId === item.id }" 
-                      @click="selectRow(item.id)"                 
-                    >
-                      <td>{{ (auditAreaCategories.current_page - 1) * auditAreaCategories.per_page + index + 1 }}</td>
-                      <td>{{ item.name }}</td>
-                      <td>{{ item.category_name }}</td>
-                      <td>{{dayjs(item.created_at).format('DD-MM-YYYY')}}</td>
-                      
-                      <td>
-                        <div class="d-flex justify-content-center">
-                          <Link class="btn btn-info btn-sm mr-2" :href="route('audit-categories.edit', item.id)">
-                            <i class="fas fa-edit"></i> <span>Edit</span>
+                      <tr v-for="(item, index) in sortedAuditAreaCategories" :key="item.id"
+                        :class="{ 'table table-selected': selectedRowId === item.id }" 
+                        @click="selectRow(item.id)"
+                      >
+                        <td>{{ (auditAreaCategories.current_page - 1) * auditAreaCategories.per_page + index + 1 }}</td>
+                        <td>
+                          <Link  :href="route('audit-categories.edit', item.id)">
+                            {{ item.name }}
                           </Link>
-                          <button class="btn btn-danger btn-sm" @click="deleteAuditCategory(item.id)">
-                            <i class="fas fa-trash"></i> <span>Del</span>
-                          </button>
-                        </div>
-                      </td>                    
+                        </td>
+                        <td>{{ item.category_name }}</td>
+                        <td>{{dayjs(item.created_at).format('DD-MM-YYYY')}}</td>                        
+                        <td>
+                          <div class="d-flex justify-content-center">
+                            <Link class="btn btn-info btn-sm mr-2" :href="route('audit-categories.edit', item.id)">
+                              <i class="fas fa-edit"></i> <span>Edit</span>
+                            </Link>
+                            <button class="btn btn-danger btn-sm" @click="deleteAuditCategory(item.id)">
+                              <i class="fas fa-trash"></i> <span>Del</span>
+                            </button>
+                          </div>
+                        </td>                    
                     </tr> 
                     </tbody>                
                   </table>

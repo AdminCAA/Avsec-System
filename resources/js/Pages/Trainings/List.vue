@@ -7,7 +7,7 @@ import { Head,Link, usePage, router } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 import { ref ,computed, watch} from 'vue';
 
-defineProps({
+const {trainings} = defineProps({
       trainings: {
           type: Object,
           required: true
@@ -65,8 +65,7 @@ watch(()=>trainingsUrl.value, (newUrl)=>{
     }).then((result)=>{
       if (result.isConfirmed) {
         axios.delete(route('trainings.destroy', id),{data:{}})
-        .then(response => {
-            console.log(response.data);
+        .then(response => {            
           Swal.fire({
             icon: 'success',
             title: 'Training record deleted successfully',
@@ -107,6 +106,46 @@ watch(()=>trainingsUrl.value, (newUrl)=>{
       }
     })
   }
+
+  const sortKey = ref(null);
+  const sortDirection = ref('asc');
+  const sortTable = (key) => {
+  if (sortKey.value === key) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey.value = key;
+    sortDirection.value = 'asc';
+  }
+};
+const getNestedValue = (obj, key) => {
+  return key.split('.').reduce((o, k) => (o ? o[k] : null), obj);
+};
+
+
+const sortedTrainings = computed(() => {
+  let sorted = [...trainings.data];
+  if (sortKey.value) {
+    sorted.sort((a, b) => {
+      let valA = getNestedValue(a, sortKey.value);
+      let valB = getNestedValue(b, sortKey.value);
+
+      // Handle null/undefined values
+      if (valA == null) valA = '';
+      if (valB == null) valB = '';
+
+      // Handle date sorting if needed
+      if (sortKey.value.includes('created_at')) {
+        valA = new Date(valA);
+        valB = new Date(valB);
+      }
+
+      if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  return sorted;
+});
 </script>
 
 <template>
@@ -163,29 +202,22 @@ watch(()=>trainingsUrl.value, (newUrl)=>{
                   <thead>
                   <tr>
                     <th>#</th>
-                    <th>Name</th>                             
+                    <th @click="sortTable('title')" style="cursor: pointer">
+                        Training Title 
+                        <i v-if="sortKey === 'title'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>                             
                     <th>Created</th>
                     <th>Actions</th>                    
                   </tr>
                   </thead>
                   <tbody>
-                  <tr  v-for="(training, index) in trainings.data" :key="training.id"
-                    :class="{'table table-selected': selectedRowId === training.id }" 
-                    @click="selectRow(training.id)"                 
-                  >
+                    <tr v-for="(training, index) in sortedTrainings" :key="training.id"
+                    :class="{ 'table table-selected': selectedRowId === training.id }" 
+                    @click="selectRow(training.id)">
                     <td>{{ (trainings.current_page - 1) * trainings.per_page + index + 1 }}</td>
-                    <td>{{ training.title }}</td>
-
-                    <!-- <td>                        
-                        <span v-if="training.permissions && training.permissions.length > 0">
-                            <span v-for="(permission, i) in training.permissions" :key="permission.id">
-                                {{ permission.name }}
-                                <span v-if="i < training.permissions.length - 1">, </span>
-                            </span>
-                        </span>
-                        <span v-else>No permissions assigned</span>                 
-                    </td> -->
-
+                    <td>
+                      <Link :href="route('trainings.edit', training.id)">{{ training.title }}</Link>
+                    </td>
                     <td style="text-align: center;">{{dayjs(training.created_at).format('DD-MM-YYYY')}}</td>
                     
                     <td>

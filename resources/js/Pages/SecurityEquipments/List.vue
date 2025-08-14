@@ -137,6 +137,50 @@ const {securityEquipments} = defineProps({
         return 'bg-light text-dark';
     }
   }
+
+
+const sortKey = ref(null);
+const sortDirection = ref('asc');
+
+const getNestedValue = (obj, key) => {
+  return key.split('.').reduce((o, k) => (o ? o[k] : null), obj);
+};
+
+const sortTable = (key) => {
+  if (sortKey.value === key) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey.value = key;
+    sortDirection.value = 'asc';
+  }
+};
+
+const sortedSecurityEquipments = computed(() => {
+  let sorted = [...securityEquipments.data];
+  if (sortKey.value) {
+    sorted.sort((a, b) => {
+      let valA = getNestedValue(a, sortKey.value);
+      let valB = getNestedValue(b, sortKey.value);
+
+      // Handle null/undefined values
+      if (valA == null) valA = '';
+      if (valB == null) valB = '';
+
+      // Handle date sorting if needed
+      if (sortKey.value.includes('created_at')) {
+        valA = new Date(valA);
+        valB = new Date(valB);
+      }
+
+      if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  return sorted;
+});
+
+
 </script>
 
 <template>
@@ -192,42 +236,56 @@ const {securityEquipments} = defineProps({
                   <thead>
                   <tr>
                     <th>#</th>
-                    <th>Name</th>
+                    <th @click="sortTable('name')" style="cursor: pointer">
+                      Name 
+                        <i v-if="sortKey === 'name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>                    
                     <th>Serial</th>  
-                    <th>Facility</th>                                   
-                    <th>Status</th>       
-                    
+                    <th>Status</th>  
+
+                    <th @click="sortTable('facility_name')" style="cursor: pointer">
+                      Operator
+                        <i v-if="sortKey === 'facility_name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>     
+
+                                             
                     <th>Created</th>   
                     <th>Actions</th>             
                   </tr>
                   </thead>
                   <tbody>
-                  <tr  v-for="(equipment, index) in securityEquipments.data" :key="equipment.id"
-                    :class="{'table table-selected': selectedRowId === equipment.id }" 
-                    @click="selectRow(equipment.id)"                 
-                  >
+                    <tr v-for="(equipment, index) in sortedSecurityEquipments" :key="equipment.id"
+                      :class="{ 'table table-selected': selectedRowId === equipment.id }" 
+                      @click="selectRow(equipment.id)"
+                      >
                     <td>{{ (securityEquipments.current_page - 1) * securityEquipments.per_page + index + 1 }}</td>
-                    <td>{{ equipment.name }}</td>
+                    
+                    <td>
+                      <Link :href="route('security-equipments.edit', equipment.id)">{{ equipment.name }}
+                      </Link>
+                    </td>
 
                     <td>                        
                         {{ equipment.serial_number }}          
                     </td>
-
-                    <td>{{ equipment.facility_name }}</td>
-                    
-                                       
-                    <td :class="getStatusClass(equipment.status)" class="text-center">                           
-                        {{ equipment.status }}           
+                    <td  class="text-center">                                                    
+                        <span  :class="getStatusClass(equipment.status)" class="badge p-2">
+                          {{ equipment.status }}  
+                      </span>          
+                    </td>
+                    <td>
+                      <Link :href="route('facilities.show', equipment.facility_id)">
+                          {{ equipment.facility_name }}
+                      </Link>
                     </td>
                     
-
+                                       
+                    
+                    
                     <td>{{dayjs(equipment.created_at).format('DD-MM-YYYY')}}</td>
                     
                     <td>
-                      <div class="d-flex justify-content-center">
-                        <!-- <Link class="btn btn-success btn-sm mr-2" :href="route('security-equipments.show', equipment.id)">
-                            <i class="fas fa-clipboard-list"></i><span> Details</span>
-                        </Link> -->
+                      <div class="d-flex justify-content-center">                        
                         <Link class="btn btn-info btn-sm mr-2" :href="route('security-equipments.edit', equipment.id)">
                           <i class="fas fa-edit"></i> <span>Edit</span>
                         </Link>

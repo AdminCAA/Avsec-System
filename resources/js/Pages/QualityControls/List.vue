@@ -156,6 +156,49 @@ watch([startDate, endDate], () => {
     return `hsl(${hue}, 70%, 80%)`; // pastel-like background
   }
 
+
+const sortKey = ref(null);
+const sortDirection = ref('asc');
+
+const getNestedValue = (obj, key) => {
+  return key.split('.').reduce((o, k) => (o ? o[k] : null), obj);
+};
+
+const sortTable = (key) => {
+  if (sortKey.value === key) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey.value = key;
+    sortDirection.value = 'asc';
+  }
+};
+
+const sortedQualityControls = computed(() => {
+  let sorted = [...qualityControls.data];
+  if (sortKey.value) {
+    sorted.sort((a, b) => {
+      let valA = getNestedValue(a, sortKey.value);
+      let valB = getNestedValue(b, sortKey.value);
+
+      // Handle null/undefined values
+      if (valA == null) valA = '';
+      if (valB == null) valB = '';
+
+      // Handle date sorting if needed
+      if (sortKey.value.includes('created_at')) {
+        valA = new Date(valA);
+        valB = new Date(valB);
+      }
+
+      if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  return sorted;
+});
+
+
 </script>
 
 <template>
@@ -240,35 +283,62 @@ watch([startDate, endDate], () => {
                 <table  v-if="qualityControls.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
                   <thead>
                   <tr>
-                    <th>#</th>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>Operator</th> 
-                    <th>Status</th>
-                    <th>Start Date</th>                           
-                    <th>End Date</th>   
+                    <th @click="sortTable('id')" style="cursor: pointer">#</th>
+                    <th @click="sortTable('title')" style="cursor: pointer">
+                      Title 
+                      <i v-if="sortKey === 'title'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
+                    <th @click="sortTable('control_type')" style="cursor: pointer">
+                      Type 
+                      <i v-if="sortKey === 'control_type'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
+
+                    <th @click="sortTable('status')" style="cursor: pointer">
+                      Status
+                      <i v-if="sortKey === 'status'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
+
+                    <th @click="sortTable('facility.name')" style="cursor: pointer">
+                      Operator
+                      <i v-if="sortKey === 'facility.name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i> 
+                    </th>
+                              
+                    <th @click="sortTable('scheduled_date')" style="cursor: pointer">
+                      Start Date
+                      <i v-if="sortKey === 'scheduled_date'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>  
+                    </th>
+                    <th @click="sortTable('end_date')" style="cursor: pointer">
+                      End Date
+                      <i v-if="sortKey === 'end_date'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>  
+                    </th>                                                            
                     <th>Inspectors</th>
                     <th>Actions</th>             
                   </tr>
                   </thead>
                   <tbody>
-                  <tr  v-for="(item, index) in qualityControls.data" :key="item.id"
-                    :class="{'table table-selected': selectedRowId === item.id }" 
-                    @click="selectRow(item.id)"                 
+                  <tr v-for="(item, index) in sortedQualityControls" :key="item.id"
+                    :class="{ 'table table-selected': selectedRowId === item.id }" 
+                    @click="selectRow(item.id)"
                   >
                     <td>{{ (qualityControls.current_page - 1) * qualityControls.per_page + index + 1 }}</td>
-                    <td>{{ item.title }}</td>
+                    <td>
+                      <Link :href="route('quality-controls.edit', item.id)">
+                        {{ item.title }}
+                      </Link>
 
-                    <td>{{ item.control_type }}</td>                                                           
-                    <td>                        
-                        {{ item.facility.name }}           
                     </td>
+
+                    <td>{{ item.control_type }}</td>    
                     <td class="text-center">      
                       <span  :class="getStatusClass(item.status)" class="badge p-2">
                         {{ item.status }}  
                       </span>                  
                                 
+                    </td>                                                       
+                    <td>                        
+                        {{ item.facility.name }}           
                     </td>
+                    
                     <td>                        
                         {{ dayjs(item.scheduled_date).format('DD-MM-YYYY') }}          
                     </td>

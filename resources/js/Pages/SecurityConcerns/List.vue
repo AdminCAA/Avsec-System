@@ -133,6 +133,46 @@ const { questionsWithConcerns} = defineProps({
         return category;
     }
   }  
+
+
+  const sortKey = ref(null);
+const sortDirection = ref('asc');
+
+const sortTable = (key) => {
+  if (sortKey.value === key) {
+    // toggle between asc and desc
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey.value = key;
+    sortDirection.value = 'asc';
+  }
+};
+
+const getNestedValue = (obj, key) => {
+  return key.split('.').reduce((o, k) => (o ? o[k] : null), obj);
+};
+
+const sortedQuestionsWithConcerns = computed(() => {
+  let sorted = [...questionsWithConcerns.data];
+  if (sortKey.value) {
+    sorted.sort((a, b) => {
+      let valA = getNestedValue(a, sortKey.value);
+      let valB = getNestedValue(b, sortKey.value);
+      
+      // Handle null/undefined values
+      if (valA == null) valA = '';
+      if (valB == null) valB = '';
+
+
+      if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  return sorted;
+});
+
+
 </script>
 
 <template>
@@ -182,12 +222,27 @@ const { questionsWithConcerns} = defineProps({
                 <table   id="example2" class="table table-sm table-bordered table-hover table-striped">
                   <thead>
                   <tr>
-                    <th>#</th>
+                    <th @click="sortTable('id')" style="cursor: pointer">#</th>
                     <!-- <th>Facility</th> -->
-                    <th>Question</th> 
-                    <th>Quality Control</th>
-                    <th>Type</th>   
-                    <th>Target Area</th>   
+                    <th @click="sortTable('question')" style="cursor: pointer">
+                          Question 
+                          <i v-if="sortKey === 'question'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
+
+                    <th @click="sortTable('quality_control.title')" style="cursor: pointer">
+                        Quality Control
+                        <i v-if="sortKey === 'quality_control.title'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i> 
+                    </th>
+                    
+                    <th @click="sortTable('quality_control.control_type')" style="cursor: pointer">
+                        Type
+                        <i v-if="sortKey === 'quality_control.control_type'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>  
+                    </th>
+
+                    <th @click="sortTable('audit_area_name')" style="cursor: pointer">
+                        Target Area
+                        <i v-if="sortKey === 'audit_area_name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>  
+                    </th>  
                                                
                     <th>Status</th>       
                     <th>Category</th>       
@@ -196,38 +251,34 @@ const { questionsWithConcerns} = defineProps({
                   </tr>
                   </thead>
                   <tbody>
-                  <tr  v-for="(securityConcern, index) in questionsWithConcerns.data" :key="securityConcern.id"
-                    :class="{'table table-selected': selectedRowId === securityConcern.id }" 
-                    @click="selectRow(securityConcern.id)"                 
-                  >
-                    <!-- <td>{{ index + 1 }}</td> -->
-                    <td>{{ (questionsWithConcerns.current_page - 1) * questionsWithConcerns.per_page + index + 1 }}</td>
-                    <!-- <td>{{ securityConcern.quality_control.facility.name }}</td> -->
-                    
-                    <td>          
-                        <Link :href="route('securityconcerns.edit', securityConcern.id)">
-                            {{ securityConcern.question}}           
-                        </Link>              
-                    </td>
-                    <td>
-                        <Link :href="route('quality-controls.edit', securityConcern.quality_control_id)">{{ securityConcern.quality_control.title }}</Link>
-                    </td>
+                    <tr v-for="(securityConcern, index) in sortedQuestionsWithConcerns" :key="securityConcern.id"
+                      :class="{ 'table table-selected': selectedRowId === securityConcern.id }" 
+                      @click="selectRow(securityConcern.id)">
 
-                    <td>{{ securityConcern.quality_control.control_type }}</td>
+                        <td>{{ (questionsWithConcerns.current_page - 1) * questionsWithConcerns.per_page + index + 1 }}</td>                    
+                        
+                        <td>          
+                            <Link :href="route('securityconcerns.edit', securityConcern.id)">
+                                {{ securityConcern.question}}           
+                            </Link>              
+                        </td>
+                        <td>
+                            <Link :href="route('quality-controls.edit', securityConcern.quality_control_id)">{{ securityConcern.quality_control.title }}</Link>
+                        </td>
 
-                    <td>{{ securityConcern.audit_area_name }}</td>
-                                       
-                    
-                    <td>                        
-                        <span :class="securityConcern.status==='Open','bg-danger text-white'" class="badge p-2">{{ securityConcern.status }}</span>          
-                    </td>
-                    <td>                        
-                        {{getFindingCategory(securityConcern.finding_category) }}
-                    </td>
-                    <td>{{dayjs(securityConcern.updated_at).format('DD-MM-YYYY')}}</td>
-                   
-                    
-                    <td>
+                        <td>{{ securityConcern.quality_control.control_type }}</td>
+
+                        <td>{{ securityConcern.audit_area_name }}</td>
+                                          
+                        
+                        <td>                        
+                            <span :class="securityConcern.status==='Open','bg-danger text-white'" class="badge p-2">{{ securityConcern.status }}</span>          
+                        </td>
+                        <td>                        
+                            {{getFindingCategory(securityConcern.finding_category) }}
+                        </td>
+                        <td>{{dayjs(securityConcern.updated_at).format('DD-MM-YYYY')}}</td>                                       
+                        <td>
                       <div class="d-flex justify-content-end">
                         <Link class="btn btn-success btn-sm mr-2" :href="route('securityconcerns.edit', securityConcern.id)">
                             <span><i class="fas fa-sync-alt"></i> Resolve</span>

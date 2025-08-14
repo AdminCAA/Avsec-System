@@ -133,8 +133,7 @@ const {users, roles} = defineProps({
     .then((result)=>{
       if (result.isConfirmed) {
         axios.delete(route('users.destroy', id),{data:{}})
-        .then(response => {
-            console.log(response.data);
+        .then(response => {            
           Swal.fire({
             icon: 'success',
             title: 'User deleted successfully',
@@ -178,7 +177,41 @@ const {users, roles} = defineProps({
       }
     })
   }
-  console.log(users);
+  
+  //SORTING LOGIC
+  const sortKey = ref(null);
+  const sortDirection = ref('asc');
+
+  const sortTable = (key) => {
+    if (sortKey.value === key) {
+      // toggle between asc and desc
+      sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortKey.value = key;
+      sortDirection.value = 'asc';
+    }
+  };
+
+  const sortedUsers = computed(() => {
+  let sorted = [...users.data];
+  if (sortKey.value) {
+    sorted.sort((a, b) => {
+      let valA = a[sortKey.value];
+      let valB = b[sortKey.value];
+
+      // Handle date sorting
+      if (sortKey.value === 'created_at') {
+        valA = new Date(valA);
+        valB = new Date(valB);
+      }
+
+      if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  return sorted;
+});
 </script>
 
 <template>
@@ -233,23 +266,35 @@ const {users, roles} = defineProps({
                 <table v-if="users.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
                   <thead>
                   <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Department</th>
+                    <th @click="sortTable('id')" style="cursor: pointer">#</th>
+                    <th @click="sortTable('name')" style="cursor: pointer">
+                      Name 
+                      <i v-if="sortKey === 'name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
+                    <th @click="sortTable('email')" style="cursor: pointer">
+                        Email
+                        <i v-if="sortKey === 'email'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
+                    <th @click="sortTable('department_name')" style="cursor: pointer">
+                        Department
+                        <i v-if="sortKey === 'department_name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
                     <th>Roles</th>                    
-                    <th>Created</th>
-                    
+                    <th @click="sortTable('created_at')" style="cursor: pointer">
+                        Created
+                        <i v-if="sortKey === 'created_at'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>                   
                     <th>Actions</th>                    
                   </tr>
                   </thead>
                   <tbody>
-                  <tr  v-for="(user, index) in users.data" :key="user.id"
-                    :class="{'table table-selected': selectedRowId === user.id }" 
-                    @click="selectRow(user.id)"                 
-                  >
+                    <tr v-for="(user, index) in sortedUsers" :key="user.id"
+                      :class="{ 'table table-selected': selectedRowId === user.id }" 
+                      @click="selectRow(user.id)"
+                      >
                     <td style="text-align: center;">{{ (users.current_page - 1) * users.per_page + index + 1 }}</td>
-                    <td style="text-align: center;">{{ user.name }}</td>
+                    <td style="text-align: center;">
+                      <Link :href="route('users.edit', user.id)">{{ user.name }}</Link></td>
                     <td style="text-align: center;">{{ user.email }}</td>
                     <td style="text-align: center;">{{ user.department_name ? user.department_name : 'No department assigned' }}</td>
 
@@ -324,6 +369,17 @@ const {users, roles} = defineProps({
     .table th {
         text-align: center;
         background-color: #B2C6D5;  
+    }
+
+
+    .table th {
+      text-align: center;
+      background-color: #B2C6D5;
+      cursor: pointer;
+      user-select: none;
+    }
+    .table th i {
+      margin-left: 5px;
     }
 </style>
 

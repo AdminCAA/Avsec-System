@@ -7,7 +7,7 @@ import { Head,Link, usePage, router } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 import { ref ,computed, watch} from 'vue';
 
-defineProps({
+const {auditQuestions} = defineProps({
     auditQuestions: {
           type: Object,
           required: true
@@ -112,6 +112,51 @@ watch(()=>search.value, (newvalue)=>{
       }
     })
   }
+
+  //SORTING LOGIC
+const sortKey = ref(null);
+const sortDirection = ref('asc');
+
+const sortTable = (key) => {
+  if (sortKey.value === key) {
+    // toggle between asc and desc
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey.value = key;
+    sortDirection.value = 'asc';
+  }
+};
+
+const getNestedValue = (obj, key) => {
+  return key.split('.').reduce((o, k) => (o ? o[k] : null), obj);
+};
+
+const sortedAuditQuestions = computed(() => {
+  let sorted = [...auditQuestions.data];
+  if (sortKey.value) {
+    sorted.sort((a, b) => {
+      let valA = getNestedValue(a, sortKey.value);
+      let valB = getNestedValue(b, sortKey.value);
+      
+      // Handle null/undefined values
+      if (valA == null) valA = '';
+      if (valB == null) valB = '';
+
+      // Handle date sorting
+      if (sortKey.value === 'created_at') {
+        valA = new Date(valA);
+        valB = new Date(valB);
+      }
+
+      if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  return sorted;
+});
+
+
 </script>
 
 <template>
@@ -168,21 +213,34 @@ watch(()=>search.value, (newvalue)=>{
                     <table v-if="auditQuestions.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
                     <thead>
                     <tr>
-                      <th>#</th>
-                      <th>Audit Question</th>
-                      <th>Audit Area</th>                                                       
+                      <th @click="sortTable('id')" style="cursor: pointer">#</th>
+                      <th @click="sortTable('question')" style="cursor: pointer">
+                          Question 
+                          <i v-if="sortKey === 'question'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                      </th>
+
+                      <th @click="sortTable('audit_area_category.name')" style="cursor: pointer">
+                        Audit Area
+                        <i v-if="sortKey === 'audit_area_category.name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>  
+                      </th>
+                                                                           
                       <th style="width: 100px;">Created</th>   
                       <th style="width: 160px;">Actions</th>             
                     </tr>
                     </thead>
                     <tbody>
-                    <tr  v-for="(question, index) in auditQuestions.data" :key="question.id"
-                      :class="{'table table-selected': selectedRowId === question.id }" 
-                      @click="selectRow(question.id)"                 
-                    >
+                      <tr v-for="(question, index) in sortedAuditQuestions" :key="question.id"
+                        :class="{ 'table table-selected': selectedRowId === question.id }" 
+                        @click="selectRow(question.id)"
+                        >
+
                       <td>{{ (auditQuestions.current_page - 1) * auditQuestions.per_page + index + 1 }}</td>
                       
-                      <td>{{ question.question }}</td>
+                      <td>
+                        <Link :href="route('audit-questions.edit', question.id)">
+                          {{ question.question }}
+                        </Link>
+                      </td>
                       <td>{{ question.audit_area_category.name }}</td>                                                                                                  
                       <td>{{dayjs(question.created_at).format('DD-MM-YYYY')}}</td>
                       
@@ -196,8 +254,7 @@ watch(()=>search.value, (newvalue)=>{
                           </button>
                         </div>
                       </td>                    
-                    </tr>
-  
+                    </tr>  
                     </tbody>                
                   </table>
                  </div>
@@ -209,8 +266,7 @@ watch(()=>search.value, (newvalue)=>{
                 <div v-else class="card mt-3">
                   <h3 class="text-center">No question found</h3>
                   <p class="text-center">Please create a question to get started.</p>                         
-                </div>
-                
+                </div>                
               </div>
               <!-- /.card-body -->
             </div>

@@ -5,9 +5,10 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Pagination from '@/Components/Pagination.vue';``
 import { Head,Link, router } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
-import { ref } from 'vue';
+import { ref,computed } from 'vue';
 
-defineProps({
+
+const {roles} = defineProps({
       roles: {
           type: Object,
           required: true
@@ -82,6 +83,42 @@ defineProps({
       }
     })
   }
+
+  const sortKey = ref(null);
+const sortDirection = ref('asc');
+
+const sortTable = (key) => {
+  if (sortKey.value === key) {
+    // toggle between asc and desc
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey.value = key;
+    sortDirection.value = 'asc';
+  }
+};
+
+const sortedRoles = computed(() => {
+  let sorted = [...roles.data];
+  if (sortKey.value) {
+    sorted.sort((a, b) => {
+      let valA = a[sortKey.value];
+      let valB = b[sortKey.value];
+
+      // Handle date sorting
+      if (sortKey.value === 'created_at') {
+        valA = new Date(valA);
+        valB = new Date(valB);
+      }
+
+      if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  return sorted;
+});
+
+
 </script>
 
 <template>
@@ -118,20 +155,26 @@ defineProps({
                 <table v-if="roles.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
                   <thead>
                   <tr>
-                    <th>#</th>
-                    <th>Name</th>
+                    <th @click="sortTable('id')" style="cursor: pointer">#</th>
+                    <th @click="sortTable('name')" style="cursor: pointer">
+                      Role Name 
+                        <i v-if="sortKey === 'name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
                     <th>Permissions</th>                    
-                    <th>Created</th>
+                    <th @click="sortTable('created_at')" style="cursor: pointer">
+                      Created
+                      <i v-if="sortKey === 'created_at'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
                     <th>Actions</th>                    
                   </tr>
                   </thead>
                   <tbody>
-                  <tr  v-for="(role, index) in roles.data" :key="role.id"
-                    :class="{'table table-selected': selectedRowId === role.id }" 
-                    @click="selectRow(role.id)"                 
-                  >
+                    <tr v-for="(role, index) in sortedRoles" :key="role.id"
+                      :class="{ 'table table-selected': selectedRowId === role.id }" 
+                      @click="selectRow(role.id)">
                     <td>{{ (roles.current_page - 1) * roles.per_page + index + 1 }}</td>
-                    <td>{{ role.name }}</td>
+                    <td>
+                      <Link :href="route('roles.edit', role.id)">{{ role.name }}</Link></td>
 
                     <td>                        
                         <span v-if="role.permissions && role.permissions.length > 0">
@@ -199,6 +242,16 @@ defineProps({
     .table th {
         text-align: center;
         background-color: #B2C6D5;  
+    }
+
+    .table th {
+      text-align: center;
+      background-color: #B2C6D5;
+      cursor: pointer;
+      user-select: none;
+    }
+    .table th i {
+      margin-left: 5px;
     }
 </style>
 

@@ -145,6 +145,41 @@ const {facilities} = defineProps({
   }
 
 
+const sortKey = ref(null);
+const sortDirection = ref('asc');
+
+const sortTable = (key) => {
+  if (sortKey.value === key) {
+    // toggle between asc and desc
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey.value = key;
+    sortDirection.value = 'asc';
+  }
+};
+
+const sortedFacilities = computed(() => {
+  let sorted = [...facilities.data];
+  if (sortKey.value) {
+    sorted.sort((a, b) => {
+      let valA = a[sortKey.value];
+      let valB = b[sortKey.value];
+
+      // Handle date sorting
+      if (sortKey.value === 'created_at') {
+        valA = new Date(valA);
+        valB = new Date(valB);
+      }
+
+      if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  return sorted;
+});
+
+
 </script>
 
 <template>
@@ -203,29 +238,46 @@ const {facilities} = defineProps({
                   </div>
                  </div>
                  <div class="table-responsive">
-  <table v-if="facilities.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
+                  <table v-if="facilities.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
                     <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Operator</th>
-                      <th>Category</th>                                   
-                      <th>Email</th>       
-                      <th>Contact</th>  
-                      <th>Created</th>   
-                      <th>Actions</th>             
-                    </tr>
+                  <tr>
+                    <th @click="sortTable('id')" style="cursor: pointer">#</th>
+                    <th @click="sortTable('name')" style="cursor: pointer">
+                      Operator 
+                      <i v-if="sortKey === 'name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
+                    <th @click="sortTable('category')" style="cursor: pointer">
+                      Category
+                      <i v-if="sortKey === 'category'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
+                    <th @click="sortTable('email')" style="cursor: pointer">
+                      Email
+                      <i v-if="sortKey === 'email'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
+                    <th @click="sortTable('contact_number')" style="cursor: pointer">
+                      Contact
+                      <i v-if="sortKey === 'contact_number'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
+                    <th @click="sortTable('created_at')" style="cursor: pointer">
+                      Created
+                      <i v-if="sortKey === 'created_at'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
+                    <th>Actions</th>
+                  </tr>
                     </thead>
                     <tbody>
-                    <tr  v-for="(facility, index) in facilities.data" :key="facility.id"
-                      :class="{'table table-selected': selectedRowId === facility.id }" 
-                      @click="selectRow(facility.id)"                 
-                    >
+                      <tr v-for="(facility, index) in sortedFacilities" :key="facility.id"
+                        :class="{ 'table table-selected': selectedRowId === facility.id }" 
+                        @click="selectRow(facility.id)">
                       <td>{{ (facilities.current_page - 1) * facilities.per_page + index + 1 }}</td>
-                      <td>{{ facility.name }}</td>
+                      <td>
+                        <Link :href="route('facilities.edit', facility.id)">
+                          {{ facility.name }}
+                          </Link> 
+                      </td>
 
                       <td>{{ facility.category }}</td>
-                      
-                                        
+                                                              
                       <td>                        
                           {{ facility.email }}           
                       </td>
@@ -294,6 +346,16 @@ const {facilities} = defineProps({
     .table th {
         text-align: center;
         background-color: #B2C6D5;  
+    }
+
+    .table th {
+      text-align: center;
+      background-color: #B2C6D5;
+      cursor: pointer;
+      user-select: none;
+    }    
+    .table th i {
+      margin-left: 5px;
     }
 </style>
 

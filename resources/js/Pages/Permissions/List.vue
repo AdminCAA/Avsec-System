@@ -5,9 +5,9 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Pagination from '@/Components/Pagination.vue';``
 import { Head,Link, router } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
-import { ref } from 'vue';
+import { ref,computed } from 'vue';
 
-defineProps({
+const {permissions} = defineProps({
       permissions: {
           type: Object,
           required: true
@@ -84,6 +84,44 @@ defineProps({
     })
   }
 
+
+  //SORTING LOGIC
+
+const sortKey = ref(null);
+const sortDirection = ref('asc');
+
+const sortTable = (key) => {
+  if (sortKey.value === key) {
+    // toggle between asc and desc
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey.value = key;
+    sortDirection.value = 'asc';
+  }
+};
+
+const sortedPermissions = computed(() => {
+  let sorted = [...permissions.data];
+  if (sortKey.value) {
+    sorted.sort((a, b) => {
+      let valA = a[sortKey.value];
+      let valB = b[sortKey.value];
+
+      // Handle date sorting
+      if (sortKey.value === 'created_at') {
+        valA = new Date(valA);
+        valB = new Date(valB);
+      }
+
+      if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  return sorted;
+});
+
+
 </script>
 
 <template>
@@ -95,45 +133,52 @@ defineProps({
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h3 class="m-0">Permission List</h3>
+            <h3 class="m-0">Permissions</h3>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><Link class="btn btn-info" :href="route('permissions.create')"><i class="fas fa-plus"></i> Create</Link></li>
-             
+              <li class="breadcrumb-item"><Link class="btn btn-info" :href="route('permissions.create')"><i class="fas fa-plus"></i> Create</Link></li>             
             </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
+          </div>
+        </div>
+      </div>
     </div>
-    <!-- /.content-header -->
+    
 
     <!-- Main content -->
     <div class="content">
       <div class="container-fluid">
         <div class="row">
           <div class="col-12">
-            <div class="card">
-              
-              <!-- /.card-header -->
+            <div class="card">                            
               <div class="card-body">
                 <div class="table-responsive">
-  <table v-if="permissions.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
+                  <table v-if="permissions.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
                     <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Name</th>
-                      <th>Created</th>
-                      <th>Actions</th>                    
-                    </tr>
+                      <tr>
+                        <th @click="sortTable('id')" style="cursor: pointer">#</th>
+                        <th @click="sortTable('name')" style="cursor: pointer">
+                          Perimission Name 
+                          <i v-if="sortKey === 'name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                        </th>    
+                        <th @click="sortTable('created_at')" style="cursor: pointer">
+                          Created
+                          <i v-if="sortKey === 'created_at'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                        </th>
+                        <th>Actions</th>
+                      </tr>
                     </thead>
-                    <tbody>
-                    <tr  v-for="(permission, index) in permissions.data" :key="permission.id"
-                      :class="{'table table-selected': selectedRowId === permission.id }" 
-                      @click="selectRow(permission.id)"                 
-                    >
+
+                    <tbody>                   
+                    <tr v-for="(permission, index) in sortedPermissions" :key="permission.id"
+                      :class="{ 'table table-selected': selectedRowId === permission.id }" 
+                      @click="selectRow(permission.id)"
+                    > 
                       <td>{{ (permissions.current_page - 1) * permissions.per_page + index + 1 }}</td>
-                      <td>{{ permission.name }}</td>
+                      <td>
+                        <Link :href="route('permissions.edit', permission.id)">{{ permission.name }}
+                        </Link> 
+                      </td>
                       <td>{{dayjs(permission.created_at).format('DD-MM-YYYY')}}</td>
                       
                       <td>
@@ -142,15 +187,13 @@ defineProps({
                             <i class="fas fa-edit"></i> <span>Edit</span>
                           </Link>
                           <button class="btn btn-danger btn-sm" @click="deletePermission(permission.id)">
-                            <i class="fas fa-trash"></i> <span>Delete</span>
+                            <i class="fas fa-trash"></i> <span>Del</span>
                           </button>
                         </div>
                       </td>                    
-                    </tr>
-  
+                    </tr>  
                     </tbody>                
                   </table>
-
                 </div>
                 
 
@@ -161,20 +204,13 @@ defineProps({
                   <h3 class="text-center">No Permissions found</h3>
                   <p class="text-center">Please create a permission to get started.</p>                         
                 </div>
-              </div>
-              <!-- /.card-body -->
+              </div>              
             </div>
-            <!-- /.card -->
-
-   
-            <!-- /.card -->
-          </div>
-          <!-- /.col -->
+          </div>          
         </div>
-        <!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
-    <!-- /.content -->
+        
+      </div>
+    </div>    
   </div>  
     </AuthenticatedLayout>
 </template>
@@ -183,10 +219,22 @@ defineProps({
     background-color: #bebebe !important; /* or any other color */
     color: white !important; /* or any other color */
   }
+
   .table th {
         text-align: center;
         background-color: #B2C6D5;  
     }
+
+
+  .table th {
+    text-align: center;
+    background-color: #B2C6D5;
+    cursor: pointer;
+    user-select: none;
+  }
+  .table th i {
+    margin-left: 5px;
+  }
 </style>
 
 

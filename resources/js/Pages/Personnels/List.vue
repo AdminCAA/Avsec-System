@@ -114,7 +114,49 @@ const {personnels} = defineProps({
         });
       }
     })
-  }  
+  }
+  
+  const sortKey = ref(null);
+  const sortDirection = ref('asc');
+
+  const getNestedValue = (obj, key) => {
+    return key.split('.').reduce((o, k) => (o ? o[k] : null), obj);
+  };
+
+const sortTable = (key) => {
+  if (sortKey.value === key) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey.value = key;
+    sortDirection.value = 'asc';
+  }
+};
+
+const sortedPersonnels = computed(() => {
+  let sorted = [...personnels.data];
+  if (sortKey.value) {
+    sorted.sort((a, b) => {
+      let valA = getNestedValue(a, sortKey.value);
+      let valB = getNestedValue(b, sortKey.value);
+
+      // Handle null/undefined values
+      if (valA == null) valA = '';
+      if (valB == null) valB = '';
+
+      // Handle date sorting if needed
+      if (sortKey.value.includes('created_at')) {
+        valA = new Date(valA);
+        valB = new Date(valB);
+      }
+
+      if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  return sorted;
+});
+
 </script>
 
 <template>
@@ -171,29 +213,57 @@ const {personnels} = defineProps({
                     <tr>
                       <th>#</th>
                       <th>Avatar</th>
-                      <th>Names</th>
-                      <th>Gender</th>
-                      <th>Email</th> 
-                      <th>NRC</th>                                   
-                      
-                      <th>Phone</th>
-                      <th>Status</th>
-                      <th>Category</th>                    
-                      <th>Operator</th>  
-                      <th>Created</th>   
+                      <th @click="sortTable('name')" style="cursor: pointer;">
+                        Names 
+                        <i v-if="sortKey === 'name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                      </th>                                            
+                      <th @click="sortTable('gender')" style="cursor: pointer;">
+                        Gender 
+                        <i v-if="sortKey === 'gender'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                      </th>  
+                      <th @click="sortTable('email')" style="cursor: pointer;">
+                        Email 
+                        <i v-if="sortKey === 'email'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i> 
+                      </th>
+                      <th @click="sortTable('nrc')" style="cursor: pointer;">
+                        NRC 
+                        <i v-if="sortKey === 'nrc'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i> 
+                      </th>
+                            
+                      <th @click="sortTable('phone_number')" style="cursor: pointer;">
+                        Phone 
+                        <i v-if="sortKey === 'phone_number'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>  
+                      </th>
+                      <th @click="sortTable('is_certified')" style="cursor: pointer;">
+                        Status 
+                        <i v-if="sortKey === 'is_certified'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>  
+                      </th>
+                      <th @click="sortTable('user_type')" style="cursor: pointer;">
+                        Category 
+                        <i v-if="sortKey === 'user_type'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i> 
+                      </th>
+                      <th @click="sortTable('facility_name')" style="cursor: pointer;">
+                        Operator 
+                        <i v-if="sortKey === 'facility_name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                      </th>
+                      <th @click="sortTable('created_at')" style="cursor: pointer;">
+                        Created 
+                        <i v-if="sortKey === 'created_at'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>  
+                        </th> 
+                         
                       <th style="width: 240px;">Actions</th>             
                     </tr>
                     </thead>
                     <tbody>
-                    <tr  v-for="(personnel, index) in personnels.data" :key="personnel.id"
-                      :class="{'table table-selected': selectedRowId === personnel.id }" 
-                      @click="selectRow(personnel.id)"                 
+
+                    <tr v-for="(personnel, index) in sortedPersonnels" :key="personnel.id"
+                      :class="{ 'table table-selected': selectedRowId === personnel.id }" 
+                      @click="selectRow(personnel.id)"
                     >
                       <td>{{ (personnels.current_page - 1) * personnels.per_page + index + 1 }}</td>
                       <td>
                         <div class="d-flex align-items-center">
-                          <div class="d-flex align-items-center">
-                              {{ console.log(personnel.portrait) }}
+                          <div class="d-flex align-items-center">                              
                               <img 
                                   :src="personnel.portrait ? `/storage/${personnel.portrait}` : '/storage/portraits/avatar.png'" 
                                   class="rounded-circle mr-2" 
@@ -204,7 +274,11 @@ const {personnels} = defineProps({
                             </div>                        
                         </div>
                       </td>
-                      <td>{{ personnel.name }}</td>
+                      <td>
+                        <Link :href="route('personnels.show', personnel.id)">
+                          {{ personnel.name }}
+                        </Link>
+                      </td>
                       <td>{{ personnel.gender }}</td>
                       <td>                        
                           {{ personnel.email }}           
@@ -220,8 +294,10 @@ const {personnels} = defineProps({
                       </td>
 
                       <td>{{ personnel.user_type }}</td>
-                      <td>                        
+                      <td >                        
+                        <Link v-if="personnel.facility_id"  :href="route('facilities.show', personnel.facility_id)">
                           {{ personnel.facility_name }}
+                        </Link>
                       </td>
 
                       <td>{{dayjs(personnel.created_at).format('DD-MM-YYYY')}}</td>

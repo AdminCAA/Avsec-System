@@ -110,11 +110,15 @@ const updatePassword = () => {
                                   <i class="fas fa-save" ></i> Save
                             </span>  
                         </button>
-                        <Transition enter-active-class="fade show" leave-active-class="fade">
-                            <p v-if="form.recentlySuccessful" class="small text-muted mb-0">
-                                Saved.
-                            </p>
-                        </Transition>
+                        <div 
+                            v-if="form.recentlySuccessful" 
+                            class="alert alert-success py-2 ml-2 mb-0" 
+                            role="alert"
+                            style="opacity: 0.6;"
+                        >
+                            <i class="fas fa-check-circle me-2"></i>
+                            Password saved successfully.
+                        </div>
                     </div>
                 </form>
             </div>

@@ -74,63 +74,7 @@ watch([startDate, endDate], () => {
         
   }
 
-  const deleteQualityControl = (id)=>{
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'This action cannot be undone.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, delete it!'
-    })
-    .then((result)=>{
-      if (result.isConfirmed) {
-        axios.delete(route('quality-controls.destroy', id),{data:{}})
-        .then(response => {            
-          Swal.fire({
-            icon: 'success',
-            title: 'Quality Control deleted successfully',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 1000,
-            timerProgressBar: true,
-          });
-          //redirect to the permissions index page
-          setTimeout(() => {
-              router.visit(route('quality-controls.index'), {
-              preserveScroll: true,
-              replace: true
-            });          
-          }, 1000);        
-        })
-        .catch(error => {    
-          let message = "Something went wrong.";
-          if (error.response && error.response.status === 422){
-              const errors = error.response.data.errors;
-              message = Object.values(errors).flat().join("\n");
-          }
-          if(error.response && error.response.status === 404) {                        
-            message = error.response.data.error;
-          }
-          if(error.response && error.response.status === 403) {                        
-            message = error.response.data.errors;
-          }
-          Swal.fire({
-              icon: "error",
-              title: "Processing failed",
-              text: message,
-              toast: true,  
-              position: "top-end",
-              showConfirmButton: false,
-              timer: 1000,
-              timerProgressBar: true,
-          });
-        });
-      }
-    })
-  }
+
   const getStatusClass = (status)=>{
     switch (status) {
       case 'Pending':
@@ -184,6 +128,44 @@ watch([startDate, endDate], () => {
           });
     }    
   }
+
+//SORTING LOGIC
+const sortKey = ref(null);
+const sortDirection = ref('asc');
+
+const sortTable = (key) => {
+  if (sortKey.value === key) {
+    // toggle between asc and desc
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey.value = key;
+    sortDirection.value = 'asc';
+  }
+};
+
+const sortedqualityControls = computed(() => {
+  let sorted = [...qualityControls.data];
+  if (sortKey.value) {
+    sorted.sort((a, b) => {
+      let valA = a[sortKey.value];
+      let valB = b[sortKey.value];
+
+      // Handle date sorting
+      if (sortKey.value === 'created_at') {
+        valA = new Date(valA);
+        valB = new Date(valB);
+      }
+
+      if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  return sorted;
+});
+
+
+
 </script>
 
 <template>
@@ -271,11 +253,26 @@ watch([startDate, endDate], () => {
                 <table  v-if="qualityControls.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
                   <thead>
                   <tr>
-                    <th>#</th>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>Operator</th> 
-                    <th>Status</th>
+                    <th @click="sortTable('id')" style="cursor: pointer">#</th>
+                    <th @click="sortTable('title')" style="cursor: pointer">
+                        Title 
+                        <i v-if="sortKey === 'title'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
+                    <th @click="sortTable('control_type')" style="cursor: pointer">
+                      Type
+                      <i v-if="sortKey === 'control_type'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
+                    
+                    
+                    <th @click="sortTable('status')" style="cursor: pointer">
+                      Status
+                      <i v-if="sortKey === 'status'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
+
+                    <th @click="sortTable('facility.name')" style="cursor: pointer">
+                      Operator
+                      <i v-if="sortKey === 'facility.name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i> 
+                    </th>                    
                     <th>Start Date</th>                           
                     <th>End Date</th>   
                     <th>Inspectors</th>
@@ -283,23 +280,28 @@ watch([startDate, endDate], () => {
                   </tr>
                   </thead>
                   <tbody>
-                  <tr  v-for="(item, index) in qualityControls.data" :key="item.id"
-                    :class="{'table table-selected': selectedRowId === item.id }" 
-                    @click="selectRow(item.id)"                 
-                  >
+                    <tr v-for="(item, index) in sortedqualityControls" :key="item.id"
+                      :class="{ 'table table-selected': selectedRowId === item.id }" 
+                      @click="selectRow(item.id)">
+                      
                     <td>{{ (qualityControls.current_page - 1) * qualityControls.per_page + index + 1 }}</td>
-                    <td>{{ item.title }}</td>
-
-                    <td>{{ item.control_type }}</td>                                                           
-                    <td>                        
-                        {{ item.facility.name }}           
+                    
+                    <td>
+                      <Link :href="route('quality-controls.edit', item.id)">
+                        {{ item.title }}
+                      </Link>
                     </td>
+
+                    <td>{{ item.control_type }}</td>    
                     <td class="text-center">      
                       <span  :class="getStatusClass(item.status)" class="badge p-2">
                         {{ item.status }}  
-                      </span>                  
-                                
+                      </span>                                                  
+                    </td>                                                       
+                    <td>                        
+                        {{ item.facility.name }}           
                     </td>
+                    
                     <td>                        
                         {{ dayjs(item.scheduled_date).format('DD-MM-YYYY') }}          
                     </td>
@@ -392,7 +394,17 @@ watch([startDate, endDate], () => {
     .table th {
         text-align: center;
         background-color: #B2C6D5;  
-    }    
+    }  
+    
+    table th {
+  text-align: center;
+  background-color: #B2C6D5;
+  cursor: pointer;
+  user-select: none;
+}
+.table th i {
+  margin-left: 5px;
+}
 </style>
 
 
