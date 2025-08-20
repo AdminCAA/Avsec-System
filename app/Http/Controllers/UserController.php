@@ -81,21 +81,6 @@ class UserController extends Controller
                 // If no role is selected, assign the default role
                 $user->syncRoles([]);
             }
-
-
-         
-
-            // Notification::route('mail', $user->email)
-            // ->notify(new \App\Notifications\EmailConfirmation($user->email)); 
-            
-            $user->notify(new \App\Notifications\EmailConfirmation($user)); // Send welcome notification
-            Log::info('Email confirmation sent : ', [
-                'to' => $user->email,
-                'notification' => 'EmailConfirmation',
-            ]);
-            // Log the user creation
-
-
             return redirect()->route('users.index')->with('success', 'User created successfully');
         }else{
             return response()->json(['errors' => $validator->errors()], 422);

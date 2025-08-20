@@ -253,7 +253,7 @@ const sortedQualityControls = computed(() => {
                     <div class="row">                      
                       <div class="col-md-3">
                         <div class="form-group d-flex align-items-center gap-2">
-                          <p class="mb-0 mr-1" style="white-space: nowrap;"> Start Date</p>
+                          <p class="mb-0 mr-1" style="white-space: nowrap;"><strong>Start Date</strong></p>
                           <input 
                             type="date" 
                             class="form-control form-control-sm" 
@@ -265,7 +265,7 @@ const sortedQualityControls = computed(() => {
 
                       <div class="col-md-3">
                         <div class="form-group d-flex align-items-center gap-2">
-                          <p class="mb-0 mr-1" style="white-space: nowrap;">End Date</p>
+                          <p class="mb-0 mr-1" style="white-space: nowrap;"><strong>End Date</strong></p>
                           <input 
                             type="date" 
                             class="form-control form-control-sm" 
@@ -304,7 +304,7 @@ const sortedQualityControls = computed(() => {
                     </th>
                               
                     <th @click="sortTable('scheduled_date')" style="cursor: pointer">
-                      Start Date
+                      
                       <i v-if="sortKey === 'scheduled_date'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>  
                     </th>
                     <th @click="sortTable('end_date')" style="cursor: pointer">

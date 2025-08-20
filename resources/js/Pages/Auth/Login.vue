@@ -69,7 +69,7 @@ watch(() => form.password, (value) => {
         </div>
 <!-- /.login-box -->
 
-<div class="login-box mt-10">  
+<div class="login-box" style="margin-top: 100px;">  
   <!-- /.login-logo -->
   <div class="card card-info">
     <div class="card-header">

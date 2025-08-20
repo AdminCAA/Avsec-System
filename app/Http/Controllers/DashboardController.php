@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Facility;
 use App\Models\QualityControl;
 use App\Models\SelectedChecklistQuestion;
+use Carbon\Carbon;
 use Inertia\Inertia;
 
 use function Pest\Laravel\json;
@@ -16,63 +17,42 @@ class DashboardController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
         return Inertia::render('Dashboard', [
-            'stats' => $this->getDashboardStats()
+            'stats' => $this->getDashboardStats($startDate, $endDate),
         ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Get dashboard statistics.
+     *
+     * @param string|null $startDate
+     * @param string|null $endDate
+     * @return array
      */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+    public function getDashboardStats($startDate = null, $endDate = null){
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        $startDate = $startDate ? Carbon::parse($startDate)->startOfDay() : null;
+        $endDate   = $endDate ? Carbon::parse($endDate)->endOfDay() : null;
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+        // Helper for applying date filter on QualityControls
+        $dateFilter = function ($query) use ($startDate, $endDate) {
+            if ($startDate && $endDate) {
+                $query->whereBetween('scheduled_date', [$startDate, $endDate]);
+            } elseif ($startDate) {
+                $query->where('scheduled_date', '>=', $startDate);
+            } elseif ($endDate) {
+                $query->where('scheduled_date', '<=', $endDate);
+            }
+        };
+        
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
-
-    public function getDashboardStats(){
         //Get Operators statistics
         $operators = Facility::all();
         $operatorType = $operators->groupBy('category')->reject(function ($controls, $category) {
@@ -85,13 +65,14 @@ class DashboardController extends Controller
         $operatorsStats = Facility::whereHas('qualityControls.selectedchecklistQuestions')
             ->withCount([
                 // Count all quality controls (regardless of status)
-                'qualityControls as quality_control_count' => function ($query) {
-                    $query->whereHas('selectedchecklistQuestions');
+                'qualityControls as quality_control_count' => function ($query) use ($dateFilter) {
+                    $query->whereHas('selectedchecklistQuestions')->where($dateFilter);
                 }
             ])
             ->with([
-                'qualityControls' => function ($query) {
+                'qualityControls' => function ($query) use ($dateFilter) {
                     $query->whereHas('selectedchecklistQuestions')
+                        ->where($dateFilter)
                         ->with(['selectedchecklistQuestions'])
                             ->withCount([
                                 // Open questions count
@@ -126,15 +107,15 @@ class DashboardController extends Controller
         });
                
 
-        $selectedChecklistQuestions = SelectedChecklistQuestion::all();
+        $selectedChecklistQuestions = SelectedChecklistQuestion::whereHas('qualityControl', $dateFilter)->get();
         $openSecurityConcerns = $selectedChecklistQuestions->where('status', 'Open')->count();
         $overdueSecurityConcerns = $selectedChecklistQuestions->where('status', 'Overdue')->count();
         $closedSecurityConcerns = $selectedChecklistQuestions->where('status', 'Closed')->count();
-        $totalSecurityConcerns = $selectedChecklistQuestions->count();            
-        
+                
+        $totalSecurityConcerns = $selectedChecklistQuestions->whereIn('status', ['Open', 'Overdue'])->count();
         // Get all quality controls
-        $qualityControls = QualityControl::all();
-        
+        $qualityControls = QualityControl::where($dateFilter)->get();
+                
         $audits = $qualityControls->where('control_type', 'Audit')->count();
         $inspections = $qualityControls->where('control_type', 'Inspection')->count();
         $securityTests = $qualityControls->where('control_type', 'Security Test')->count();
@@ -162,8 +143,7 @@ class DashboardController extends Controller
             'completedQualityControls' => $completedQualityControls,
             'overdueQualityControls' => $overdueQualityControls,
 
-            'operatorStats'=> $result, // Quality control stats for each operator
-            
+            'operatorStats'=> $result, // Quality control stats for each operator            
         ]; 
     }
 }

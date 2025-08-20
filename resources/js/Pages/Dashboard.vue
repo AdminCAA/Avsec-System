@@ -1,7 +1,9 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { Chart } from 'highcharts-vue';
+import { ref, computed, watch } from 'vue';
+
 import Exporting from 'highcharts/modules/exporting';
 import Accessibility from 'highcharts/modules/accessibility'
 
@@ -14,10 +16,28 @@ const props = defineProps({
     },
 });
 
-//Exporting(Highcharts)
+
 
 // Example Pie Chart Options
-const pieOptions = {
+
+// --- CHART OPTIONS (computed so they react to new props.stats) ---
+// const pieOptions = computed(() => ({
+//   chart: { type: 'pie', backgroundColor: '#fff' },
+//   title: { text: 'Security Concerns' },
+//   series: [
+//     {
+//       name: 'Concerns',
+//       colorByPoint: true,
+//       data: [
+//         { name: 'Open', y: props.stats.openSecurityConcerns, color: '#f39c12' },
+//         { name: 'Closed', y: props.stats.closedSecurityConcerns, color: '#2ecc71' },
+//         { name: 'Overdue', y: props.stats.overdueSecurityConcerns, color: '#e74c3c' }
+//       ]
+//     }
+//   ]
+// }));
+
+const pieOptions = computed(() => ({
   accessibility: {
     enabled: false
   },
@@ -40,7 +60,7 @@ const pieOptions = {
           'downloadPDF',
           'downloadSVG'
         ],
-        symbolStroke: '#3498db', // Brand color for button icon
+        symbolStroke: '#3498db',
         theme: {
           fill: '#fff',
           stroke: '#ccc',
@@ -88,7 +108,7 @@ const pieOptions = {
       ]
     }
   ]
-}
+}));
 
 
 
@@ -199,17 +219,45 @@ const operatorOptions = {
   ]
 }
 
-const categoriesStats = props.stats.operatorStats.map(item => item.operator_name);
-
-const openStats = props.stats.operatorStats.map(item => item.total_open_questions)
-const overdueStats = props.stats.operatorStats.map(item => item.total_overdue_questions)
-const closedStats = props.stats.operatorStats.map(item => item.total_closed_questions)
-const totalQualityControlsStats = props.stats.operatorStats.map(item => item.quality_control_count);
-const totalSecurityConcernsStats = props.stats.operatorStats.map(item => item.total_security);
 
 
+const categoriesStats = computed(() =>
+  props.stats.operatorStats.map(item => item.operator_name)
+);
 
-const operatorStatisticOptions = {
+const openStats = computed(() =>
+  props.stats.operatorStats.map(item => item.total_open_questions)
+);
+
+const overdueStats = computed(() =>
+  props.stats.operatorStats.map(item => item.total_overdue_questions)
+);
+
+const closedStats = computed(() =>
+  props.stats.operatorStats.map(item => item.total_closed_questions)
+);
+
+const totalQualityControlsStats = computed(() =>
+  props.stats.operatorStats.map(item => item.quality_control_count)
+);
+
+const totalSecurityConcernsStats = computed(() =>
+  props.stats.operatorStats.map(item => item.total_security)
+);
+
+
+
+// const categoriesStats = props.stats.operatorStats.map(item => item.operator_name);
+
+// const openStats = props.stats.operatorStats.map(item => item.total_open_questions)
+// const overdueStats = props.stats.operatorStats.map(item => item.total_overdue_questions)
+// const closedStats = props.stats.operatorStats.map(item => item.total_closed_questions)
+// const totalQualityControlsStats = props.stats.operatorStats.map(item => item.quality_control_count);
+// const totalSecurityConcernsStats = props.stats.operatorStats.map(item => item.total_security);
+
+
+
+const operatorStatisticOptions = computed(() => ({
   accessibility: {
     enabled: false
   },
@@ -262,7 +310,7 @@ const operatorStatisticOptions = {
     }
   },
   xAxis: {
-    categories: categoriesStats,
+    categories: categoriesStats.value,
     crosshair: true,
     labels: {
       style: {
@@ -348,38 +396,60 @@ const operatorStatisticOptions = {
   series: [
     {
       name: 'Quality Controls',
-      data: totalQualityControlsStats,
+      data: totalQualityControlsStats.value,
       color: '#3498db' // Blue
     },
     {
       name: 'Open Issues',
-      data: openStats,
+      data: openStats.value,
       color: '#f39c12' // Orange
     },
     {
       name: 'Overdue Issues',
-      data: overdueStats,
+      data: overdueStats.value,
       color: '#e74c3c' // Red
     },
     {
       name: 'Total Security Issues',
-      data: totalSecurityConcernsStats,
+      data: totalSecurityConcernsStats.value,
       color: '#9b59b6' // Purple
     },
     {
       name: 'Closed Issues',
-      data: closedStats,
+      data: closedStats.value,
       color: '#2ecc71' // Green
     }
   ]
-}
+}));
+
+
+
+const startDate = ref('');
+const endDate = ref('');
+
+const dashboardUrl = computed(() => {
+  return route('dashboard', {
+    ...(startDate.value ? { start_date: startDate.value } : {}),
+    ...(endDate.value ? { end_date: endDate.value } : {}),
+  });
+});
+
+// Reload dashboard data when dates change
+watch([startDate, endDate], () => {
+  router.visit(dashboardUrl.value, {
+    preserveState: true,
+    
+    replace: true,
+  });
+});
+
+
 
 </script>
 
 
 <template>
     <Head title="Dashboard" />
-
     <AuthenticatedLayout>
         <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -389,12 +459,13 @@ const operatorStatisticOptions = {
           <div class="col-sm-6">
             <h3 class="m-0">Dashboard</h3>
           </div><!-- /.col -->
-          <div class="col-sm-6">
+          <!-- <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
               <li class="breadcrumb-item active">Starter Page</li>
             </ol>
-          </div><!-- /.col -->
+          </div> -->
+          <!-- /.col -->
         </div><!-- /.row -->
       </div><!-- /.container-fluid -->
     </div>
@@ -404,6 +475,38 @@ const operatorStatisticOptions = {
     <div class="content">
       <div class="container-fluid">      
         <h3 class="text-center mb-4">Quality Control Statistics</h3>  
+        <div class="row">
+          <div class="col-md-9">                    
+            <div class="row g-3 align-items-end">
+  <!-- Start Date -->
+  <div class="col-md-3 col-sm-6">
+    <div class="form-group">
+      <label for="startDate" class="form-label fw-bold">Start Date</label>
+      <input
+        id="startDate"
+        type="date"
+        class="form-control form-control-sm"
+        v-model="startDate"
+      >
+    </div>
+  </div>
+
+  <!-- End Date -->
+  <div class="col-md-3 col-sm-6">
+    <div class="form-group">
+      <label for="endDate" class="form-label fw-bold">End Date</label>
+      <input
+        id="endDate"
+        type="date"
+        class="form-control form-control-sm"
+        v-model="endDate"
+      >
+    </div>
+  </div>
+</div>
+
+            </div> 
+        </div>
         <div class="row justify-content-center">
   <!-- Audits -->
   <div class="col-lg-3 col-6 mb-4">

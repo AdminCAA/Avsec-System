@@ -31,7 +31,7 @@ function handleImageError() {
         <Head title="Welcome" />
       <header>
         <div class="logo">
-            <img src="/assets/caa-logo.png" alt="PEL System Logo" style="width: 60px; height: auto;">
+            <img src="/assets/caa-logo.png" alt="AVSEC System Logo" style="width: 60px; height: auto;">
             <span>Zambia Civil Aviation Authority</span>
         </div>
         <div class="auth">

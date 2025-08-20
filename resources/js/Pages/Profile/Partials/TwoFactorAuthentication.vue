@@ -106,7 +106,7 @@ const fetchRecoveryCodes = async () => {
                                         <i class="fas fa-spinner fa-spin"></i> Enabling...
                                     </span>
                                     <span v-else>                                        
-                                        Enable Two Factor Authentication
+                                        <i class="fas fa-shield"></i>Enable Two Factor Authentication
                                     </span>
                                     </button>
 
