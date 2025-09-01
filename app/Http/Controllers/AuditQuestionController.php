@@ -58,8 +58,8 @@ class AuditQuestionController extends Controller
         // Create a new audit question
         AuditQuestion::create([
             'audit_area_category_id' => $request->audit_area_category_id,
-            'question' => $request->question,
-            'audit_area_name'=> $auditAreaCategory->name,
+            'question' => trim($request->question),
+            'audit_area_name'=> trim($auditAreaCategory->name),
         ]);
         return redirect()->route('audit-questions.index')->with('success', 'Audit question created successfully.');
       
@@ -106,8 +106,8 @@ class AuditQuestionController extends Controller
         // Update the audit question
         $auditQuestion->update([
             'audit_area_category_id' => $request->audit_area_category_id,
-            'question' => $request->question,
-            'audit_area_name'=> $auditAreaCategory->name,
+            'question' => trim($request->question),
+            'audit_area_name'=> trim($auditAreaCategory->name),
         ]);
         return redirect()->route('audit-questions.index')->with('success', 'Audit question updated successfully.');
     }

@@ -12,6 +12,7 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -53,8 +54,13 @@ class UserController extends Controller
         //
         $validator = Validator::make($request->all(),
         [
+            'portrait' => 'nullable|image|max:2048', // Optional portrait validation
             'name' => 'required|string|max:255|min:3',
             'email' => 'required|string|email|max:255|unique:users',
+            'nrc'=>'required|string|max:20',
+            'gender'=> 'required|string|max:6',
+            'designation' => 'nullable|string|max:100',	
+            'phone_number' => 'nullable|string|max:20',
             'password' => ['required','string','confirmed', Password::min(8)
                 ->mixedCase()
                 ->letters()
@@ -62,17 +68,29 @@ class UserController extends Controller
                 ->symbols()                
             ],
             'roles' => 'array',
-        ]);
+        ]);        
+         // For debugging purposes, remove in production
 
         if($validator->passes()){
             $department = Department::find($request->department_id);
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
+                'nrc' => $request->nrc,
+                'gender'=>$request->gender,
+                'designation' => $request->designation,
+                'phone_number' => $request->phone_number,
                 'department_id' => $department ? $department->id : null, 
                 'department_name' => $department ? $department->name : null,
                 'password' => bcrypt($request->password),
             ]);
+
+            // Handle portrait upload if provided
+            if ($request->hasFile('portrait')) {
+                $portraitPath = $request->file('portrait')->store('portraits', 'public');
+                $user->portrait = $portraitPath;
+                $user->save();
+            }
             // Assign roles to the user
             if(!empty($request->roles)){
                 // Check if the role exists
@@ -126,10 +144,14 @@ class UserController extends Controller
         $user = User::findOrFail($id);        
         $validator = Validator::make($request->all(),
         [
+            'portrait' => 'nullable|image|max:2048', // Optional portrait validation
             'name' => 'required|string|max:255|min:3',
             'email' => 'required|string|email|max:255|unique:users,email,'.$id,
-            'password' => ['nullable',
-                Password::min(8)
+            'nrc'=>'required|string|max:20',
+            'gender'=> 'required|string|max:6',
+            'designation' => 'nullable|string|max:100',	
+            'phone_number' => 'nullable|string|max:20',
+            'password' => ['nullable','string','confirmed', Password::min(8)
                 ->mixedCase()
                 ->letters()
                 ->numbers()
@@ -142,6 +164,20 @@ class UserController extends Controller
             $department = Department::find($request->department_id);                       
             $user->name = $request->name;
             $user->email = $request->email;
+            $user->nrc = $request->nrc;
+            $user->gender = $request->gender;
+            $user->designation = $request->designation;
+            $user->phone_number = $request->phone_number;            
+            // Handle portrait upload if provided
+            if ($request->hasFile('portrait')) {
+                if ($user->portrait && Storage::disk('public')->exists($user->portrait)) {
+                    Storage::disk('public')->delete($user->portrait);
+                }
+
+                $portraitPath = $request->file('portrait')->store('portraits', 'public');
+                $user->update(['portrait' => $portraitPath]);
+            }
+
             // Update department if provided
             $user->department_id = $department ? $department->id : null; 
             $user->department_name = $department ? $department->name : null;

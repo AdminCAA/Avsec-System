@@ -33,6 +33,9 @@ class SelectedChecklistQuestion extends Model
         'date_of_closure',
         'status',
         'evidence_file',
+        'cap_file',
+        'cap_status',
+        'reason_for_rejection'
     ];
 
     public function scopeSearch(Builder $query , Request $request){       

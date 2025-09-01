@@ -62,15 +62,15 @@ class CertificationsController extends Controller
 
         $certification = new Certification();
         $certification->user_id = $request->user_id;
-        $certification->certification_type = $request->certification_type;
-        $certification->certification_name = $request->certification_name;
-        $certification->certification_body = $request->certification_body;
+        $certification->certification_type = trim($request->certification_type);
+        $certification->certification_name = trim($request->certification_name);
+        $certification->certification_body = trim($request->certification_body);
         $certification->date_issued = $request->date_issued;
         $certification->expiry_date = $request->expiry_date;
-        $certification->certification_number = $request->certification_number;
-        $certification->status = $request->status;
+        $certification->certification_number = trim($request->certification_number);
+        $certification->status = trim($request->status);
         $certification->score = $request->score;
-        $certification->remarks = $request->remarks;
+        $certification->remarks = trim($request->remarks);
         if ($request->hasFile('certification_file')) {
             $certification->certification_file = $request->file('certification_file')->store('certifications', 'public');
         }
@@ -124,15 +124,15 @@ class CertificationsController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        $certification->certification_type = $request->certification_type;
-        $certification->certification_name = $request->certification_name;
-        $certification->certification_body = $request->certification_body;
+        $certification->certification_type = trim($request->certification_type);
+        $certification->certification_name = trim($request->certification_name);
+        $certification->certification_body = trim($request->certification_body);
         $certification->date_issued = $request->date_issued;
         $certification->expiry_date = $request->expiry_date;
-        $certification->certification_number = $request->certification_number;
-        $certification->status = $request->status;
+        $certification->certification_number = trim($request->certification_number);
+        $certification->status = trim($request->status);
         $certification->score = $request->score;
-        $certification->remarks = $request->remarks;
+        $certification->remarks = trim($request->remarks);
         
         if ($request->hasFile('certification_file')) {
             // Delete the old file if it exists

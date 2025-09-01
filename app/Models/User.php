@@ -37,6 +37,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'quality_control_id',
         'department_id',
         'department_name',
+        'designation',	
     ];
 
 

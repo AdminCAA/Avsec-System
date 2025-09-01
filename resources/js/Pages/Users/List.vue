@@ -266,7 +266,8 @@ const {users, roles} = defineProps({
                 <table v-if="users.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
                   <thead>
                   <tr>
-                    <th @click="sortTable('id')" style="cursor: pointer">#</th>
+                    <th  style="cursor: pointer">#</th>
+                    <th> Avatar</th>
                     <th @click="sortTable('name')" style="cursor: pointer">
                       Name 
                       <i v-if="sortKey === 'name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
@@ -292,7 +293,22 @@ const {users, roles} = defineProps({
                       :class="{ 'table table-selected': selectedRowId === user.id }" 
                       @click="selectRow(user.id)"
                       >
+                      
                     <td style="text-align: center;">{{ (users.current_page - 1) * users.per_page + index + 1 }}</td>
+                    
+                    <td>
+                        <div class="d-flex align-items-center">
+                          <div class="d-flex align-items-center">                              
+                              <img 
+                                  :src="user.portrait ? `/storage/${user.portrait}` : '/storage/portraits/avatar.png'" 
+                                  class="rounded-circle mr-2" 
+                                  width="30" 
+                                  height="30" 
+                                  alt="Avatar"
+                              >                      
+                            </div>                        
+                        </div>
+                      </td>
                     <td style="text-align: center;">
                       <Link :href="route('users.edit', user.id)">{{ user.name }}</Link></td>
                     <td style="text-align: center;">{{ user.email }}</td>

@@ -69,7 +69,7 @@ watch(() => form.password, (value) => {
         </div>
 <!-- /.login-box -->
 
-<div class="login-box" style="margin-top: 100px;">  
+<div class="login-box" style="margin-top: 150px;">  
   <!-- /.login-logo -->
   <div class="card card-info">
     <div class="card-header">
@@ -143,14 +143,15 @@ watch(() => form.password, (value) => {
         </div>
         <div class="row">
           <div class="col-6">
-              <div class="form-group">                
+              <div class="form-group">                                
                 <div class="custom-control custom-checkbox">
-                    <input class="custom-control-input" 
-                    type="checkbox"                                     
-                    id="remember"
-                    name="remember" v-model="form.remember"
+                  <input class="custom-control-input" 
+                      name="remember" 
+                      v-model="form.remember"
+                      type="checkbox" 
+                      id="customCheckbox2"
                     />
-                    <label for="customCheckbox1" class="custom-control-label">Remember Me</label>
+                  <label for="customCheckbox2" class="custom-control-label">Remember Me</label>
                 </div>
             </div>            
           </div>

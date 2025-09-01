@@ -86,14 +86,14 @@ class FacilityController extends Controller
             // Create a new facility
             $department = Department::find($request->department_id);
             Facility::create([
-                'name' => $request->name,
+                'name' => trim($request->name),
                 'department_id' => $department ? $department->id : null, // Associate with department if provided                
-                'description' => $request->description,
-                'category' => $request->category,
-                'location' => $request->location,
-                'address' => $request->address,
-                'contact_number' => $request->contact_number,
-                'email' => $request->email,
+                'description' => trim($request->description),
+                'category' => trim($request->category),
+                'location' => trim($request->location),
+                'address' => trim($request->address),
+                'contact_number' => trim($request->contact_number),
+                'email' => trim($request->email),
             ]);
             // Redirect to the facilities list with a success message
             return redirect()->route('facilities.index')->with('success', 'Operator created successfully.');
@@ -195,14 +195,14 @@ class FacilityController extends Controller
             // Update the facility
             $department = Department::find($request->department_id);
             $facility->update([
-                'name' => $request->name,
+                'name' => trim($request->name),
                 'department_id' => $department ? $department->id : null,                
-                'description' => $request->description,
-                'category' => $request->category,
-                'location' => $request->location,
-                'address' => $request->address,
-                'contact_number' => $request->contact_number,
-                'email' => $request->email,
+                'description' => trim($request->description),
+                'category' => trim($request->category),
+                'location' => trim($request->location),
+                'address' => trim($request->address),
+                'contact_number' => trim($request->contact_number),
+                'email' => trim($request->email),
             ]);
             
             // Redirect to the facilities list with a success message

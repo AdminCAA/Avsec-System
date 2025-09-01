@@ -88,16 +88,18 @@ class SecurityConcernsController extends Controller
             'status' => 'required|string|in:Open,Closed,Overdue',
             'finding_category' => 'required|string|in:Compliant,Not Compliant(Minor),Not Compliant(Serious),Not Applicable,Not Confirmed,Not Applicable,Not Confirmed',
             'date_quality_control' => 'required|date',
-            'problem_cause' => 'required|string',
-            'proposed_follow_up_action' => 'nullable|string|in:Onsite,Administrative,Onsite and Administrative',
+            'problem_cause' => 'nullable|string',
+            'proposed_follow_up_action' => 'nullable|string|in:Onsite,Administrative,Onsite and Administrative,Not Applicable',
             'short_term_action' => 'nullable|string',
             'short_term_date' => 'nullable|date',
             'long_term_action' => 'nullable|string',
             'long_term_action' => 'nullable|string',
             'completion_date' => 'nullable|date',
-            'date_of_closure' => 'required|date',
-            'follow_up_date' => 'required|date',
+            'date_of_closure' => 'nullable|date',
+            'follow_up_date' => 'nullable|date',
             'evidence_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', 
+            'cap_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', 
+            'cap_status' => 'nullable|string',
         ]);
 
         if($validator->fails()){
@@ -105,6 +107,7 @@ class SecurityConcernsController extends Controller
         }
 
         $selectedCheckliskQuestion = SelectedChecklistQuestion::findOrFail($request->question_id);
+
         $selectedCheckliskQuestion->update([                    
             'question_response' => $request->question_response,
             'finding_observation' => $request->finding_observation,
@@ -125,6 +128,8 @@ class SecurityConcernsController extends Controller
             'reference' => $request->reference,
             'short_term_date' => $request->short_term_date,
             'long_term_date' => $request->long_term_date,
+            'cap_status'=> $request->cap_status,            
+            'reason_for_rejection' => $request->cap_status === 'Rejected' ? $request->reason_for_rejection : null,
         ]);
 
         if ($request->hasFile('evidence_file')) {
@@ -133,6 +138,13 @@ class SecurityConcernsController extends Controller
                 Storage::disk('public')->delete($selectedCheckliskQuestion->evidence_file);
             }
             $selectedCheckliskQuestion->evidence_file = $request->file('evidence_file')->store('qc_evidences', 'public');
+        }
+        if ($request->hasFile('cap_file')) {
+            // Delete old file if exists
+            if ($selectedCheckliskQuestion->cap_file) {
+                Storage::disk('public')->delete($selectedCheckliskQuestion->cap_file);
+            }
+            $selectedCheckliskQuestion->cap_file = $request->file('cap_file')->store('qc_caps', 'public');
         }
         $selectedCheckliskQuestion->save();
         return redirect()->route('quality-controls.show',$request->quality_control_id)->with('success', 'Checklist updated successfully.');

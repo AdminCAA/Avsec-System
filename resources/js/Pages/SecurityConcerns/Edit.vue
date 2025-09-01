@@ -52,9 +52,10 @@ const statusOptions = [
 ]
 
 const followupActionOptions = [
-  {id : 1, option  : 'Onsite'},
+{id : 1, option  : 'Onsite'},
   {id : 2, option  : 'Administrative'},  
   {id : 3, option  : 'Onsite and Administrative'},  
+  {id : 4, option  : 'Not Applicable'},  
 ]
 
 
@@ -79,7 +80,11 @@ const form = useForm({
     completion_date: question.completion_date || '',
     date_of_closure: question.date_of_closure || '',
     follow_up_date: question.follow_up_date || '',    
+    cap_status: question.cap_status || '', // New field for CAP status
     evidence_file: null, // For file upload    
+    cap_file: null, // For CAP file upload
+    cap_status: question.cap_status || '', // New field for CAP status
+    reason_for_rejection: question.reason_for_rejection || '', // New field for reason for rejection
 });
 
 
@@ -100,11 +105,11 @@ function validateQuestionForm() {
     if (!form.question_response) errors.question_response = 'Response is required';
     if (!form.finding_category) errors.finding_category = 'Finding category is required';
     if (!form.date_quality_control) errors.date_quality_control = 'Date of Quality Control is required';
-    if (!form.problem_cause) errors.problem_cause = 'Problem cause is required';
+    //if (!form.problem_cause) errors.problem_cause = 'Problem cause is required';
     if (!form.status) errors.status = 'Status is required';
-    if (!form.date_of_closure) errors.date_of_closure = 'Date of closure is required';
-    if (!form.completion_date) errors.completion_date = 'Completion date is required';
-    if (!form.follow_up_date) errors.follow_up_date = 'Follow-up date is required';
+    //if (!form.date_of_closure) errors.date_of_closure = 'Date of closure is required';
+    //if (!form.completion_date) errors.completion_date = 'Completion date is required';
+    //if (!form.follow_up_date) errors.follow_up_date = 'Follow-up date is required';
     //Check if the evidence file is more the 2Mb
     if (form.evidence_file && form.evidence_file.size > 2 * 1024 * 1024) {
         errors.evidence_file = 'File size must be less than 2MB';
@@ -113,6 +118,15 @@ function validateQuestionForm() {
     if (form.evidence_file && !['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'].includes(form.evidence_file.type)) {
         errors.evidence_file = 'Only PDF, JPG, or PNG files are allowed.';
     } 
+
+    //Check if the cap file is more the 2Mb
+    if (form.cap_file && form.cap_file.size > 2 * 1024 * 1024) {
+        errors.cap_file = 'File size must be less than 2MB';
+    }
+    //Check if the cap file is file type
+    if (form.cap_file && !['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'].includes(form.cap_file.type)) {
+        errors.cap_file = 'Only PDF, JPG, or PNG files are allowed.';
+    }
 
     formErrors.value = errors;
     return Object.keys(errors).length === 0;
@@ -142,9 +156,15 @@ function submitQuestionForm(){
     formData.append('completion_date', form.completion_date);
     formData.append('date_of_closure', form.date_of_closure);
     formData.append('follow_up_date', form.follow_up_date);
+    formData.append('cap_status', form.cap_status); // Append the new field for CAP status
+    formData.append('reason_for_rejection', form.reason_for_rejection); // Append the new field for reason for rejection
+
     if (form.evidence_file) {
         formData.append('evidence_file', form.evidence_file);
     }   
+    if (form.cap_file) {
+        formData.append('cap_file', form.cap_file);
+    }
 
     axios.post(route('securityconcerns.update', question.id), formData)
     .then(() => {
@@ -243,6 +263,26 @@ const handleFileUpload = (event) => {
     }
 };
 
+let capfileName = ref('');
+const handleCapFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        form.cap_file = file;
+        capfileName.value = file.name;
+        // Optional: Basic file type validation
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+        if (!allowedTypes.includes(file.type)) {            
+            formErrors.cap_file = 'Only PDF, JPG, or PNG files are allowed.';
+        } else {
+            formErrors.cap_file = '';
+        }
+    } else {
+        capfileName = '';
+        form.cap_file = null;
+    }
+};
+
+
 const deleteFollowup = (id)=>{
     Swal.fire({
       title: 'Are you sure?',
@@ -324,66 +364,7 @@ const deleteFollowup = (id)=>{
                     <h4 class="m-0">Update Quality Control Question</h4>
                 </div>    
                 <div class="col-sm-6">
-                  <ol class="breadcrumb float-sm-right">
-                    <!-- <li class="breadcrumb-item">
-                        <li class="nav-item dropdown">
-                            <a class="btn btn-info" data-toggle="dropdown" href="#">Messages
-                                <i class="far fa-comments"></i>
-                                <span class="badge badge-danger navbar-badge ml-2" > 3</span>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                                <a href="#" class="dropdown-item">
-                                    
-                                    <div class="media">
-                                    <img :src="user2" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-                                    <div class="media-body">
-                                        <h3 class="dropdown-item-title">
-                                        Brad Diesel
-                                        <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                                        </h3>
-                                        <p class="text-sm">Call me whenever you can...</p>
-                                        <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                                    </div>
-                                    </div>
-                                    
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a href="#" class="dropdown-item">
-                                    
-                                    <div class="media">
-                                    <img :src="user3" alt="User Avatar" class="img-size-50 img-circle mr-3">
-                                    <div class="media-body">
-                                        <h3 class="dropdown-item-title">
-                                        John Pierce
-                                        <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
-                                        </h3>
-                                        <p class="text-sm">I got your message bro</p>
-                                        <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                                    </div>
-                                    </div>
-                                    
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a href="#" class="dropdown-item">
-                                    
-                                    <div class="media">
-                                    <img :src="user4" alt="User Avatar" class="img-size-50 img-circle mr-3">
-                                    <div class="media-body">
-                                        <h3 class="dropdown-item-title">
-                                        Nora Silvester
-                                        <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
-                                        </h3>
-                                        <p class="text-sm">The subject goes here</p>
-                                        <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                                    </div>
-                                    </div>
-                                    
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
-                            </div>
-                        </li>
-                    </li>                                 -->
+                  <ol class="breadcrumb float-sm-right">                    
                     <li class="breadcrumb-item">
                         <button @click="generateCAR" class="btn  btn-primary">
                             <i class="fas fa-file-pdf"></i> Generate CAR                        
@@ -508,7 +489,21 @@ const deleteFollowup = (id)=>{
                                             </div>
 
                                             <div class="row">
-                                                <div class="form-group col-md-12">
+                                                <div class="form-group col-md-6">                                                    
+                                                    <label>Proposed Follow up Action</label>
+                                                    <select required v-model="form.proposed_follow_up_action" 
+                                                    class="form-control"                                              
+                                                    :class="{ 
+                                                        'is-invalid': formErrors.proposed_follow_up_action, 
+                                                        'is-valid': form.proposed_follow_up_action && !formErrors.proposed_follow_up_action 
+                                                    }"
+                                                    
+                                                    >
+                                                        <option value="">-- Select Proposed Followup Action --</option>
+                                                        <option v-for="item in followupActionOptions" :key="item.id" :value="item.option">{{ item.option }}</option>
+                                                    </select>    
+                                                </div>  
+                                                <div class="form-group col-md-6">
                                                     <label>Immediate Corrective Actions</label>
                                                     <textarea v-model="form.immediate_corrective_action
                                                     "class="form-control" rows="2" placeholder="Immediate Corrective Action"
@@ -580,11 +575,42 @@ const deleteFollowup = (id)=>{
                                                 </div>
                                                 <!-- /.card-header -->
                                                 <div class="card-body">
-                                                    <div class="d-flex justify-content-end">
+
+                                                    <div class="row">                                                                                                                                              
+                                                        <div class="form-group col-md-6">                                    
+                                                            <label v-if="!question.cap_file">CAP Attachment</label>  
+                                                            <a v-if="question.cap_file"
+                                                            
+                                                                data-bs-toggle="tooltip"
+                                                                title="View CAP Attachment"
+                                                                :href="`/storage/${question.cap_file}`" 
+                                                                target="_blank"
+                                                            >
+                                                                <i class="fas fa-paperclip"></i><span><label>CAP Attachment</label> </span>
+                                                            </a>                                      
+                                                            <div class="input-group">
+                                                                <div class="custom-file">
+                                                                    <input 
+                                                                        type="file"                                                     
+                                                                        accept="image/*,application/pdf"   
+                                                                        @change="handleCapFileUpload"
+                                                                        class="custom-file-input" 
+                                                                        id="exampleInputFile"
+                                                                        :class="{ 'is-invalid': formErrors.cap_file, 'is-valid': form.cap_file && !formErrors.cap_file }"
+                                                                    >
+                                                                    <label class="custom-file-label" for="exampleInputFile">
+                                                                        {{ capfileName || 'Choose file' }}
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                            <small v-if="formErrors.cap_file" class="text-danger">{{ formErrors.cap_file }}</small>
+                                                        </div>                                                     
+                                                    </div>
+                                                    <!-- <div class="d-flex justify-content-end">
                                                         <button @click="downLoadOperator" class="btn btn-sm btn-primary">
                                                             <i class="fas fa-file-pdf"></i> Export CAP                        
                                                         </button>
-                                                    </div>                                                                             
+                                                    </div>                                                                              -->
                                                 </div>
                                                 <!-- /.card-body -->
                                             </div>
@@ -766,22 +792,7 @@ const deleteFollowup = (id)=>{
                                                 </div>
                                             </div>
 
-                                            <div class="row">                                                                                                
-                                                <div class="form-group col-md-6">                                                    
-                                                    <label>Proposed Follow up Action</label>
-                                                    <select required v-model="form.proposed_follow_up_action" 
-                                                    class="form-control"                                              
-                                                    :class="{ 
-                                                        'is-invalid': formErrors.proposed_follow_up_action, 
-                                                        'is-valid': form.proposed_follow_up_action && !formErrors.proposed_follow_up_action 
-                                                    }"
-                                                    
-                                                    >
-                                                        <option value="">-- Select Proposed Followup Action --</option>
-                                                        <option v-for="item in followupActionOptions" :key="item.id" :value="item.option">{{ item.option }}</option>
-                                                    </select>    
-                                                </div>  
-                                                
+                                            <div class="row">                                                                                                                                                                                                
                                                 <div class="form-group col-md-6">
                                                     <label>Date of Closure</label>
                                                     <input required                                                      
@@ -797,6 +808,37 @@ const deleteFollowup = (id)=>{
                                                     /> 
                                                     <small v-if="formErrors.date_of_closure" class="text-danger">{{ formErrors.date_of_closure }}</small>                                                
                                                 </div>
+                                                <div class="form-group col-md-2">
+                                                    <label class="d-block">Accept/Reject</label>
+                                                    <div class="custom-control custom-radio custom-control-inline">
+                                                        <input class="custom-control-input"
+                                                            type="radio"
+                                                            id="acceptCap"
+                                                            name="cap_status"
+                                                            value="Accepted"
+                                                            v-model="form.cap_status">
+                                                        <label for="acceptCap" class="custom-control-label">CAP Accepted</label>
+                                                    </div>
+
+                                                    <div class="custom-control custom-radio custom-control-inline">
+                                                        <input class="custom-control-input"
+                                                            type="radio"
+                                                            id="rejectCap"
+                                                            name="cap_status"
+                                                            value="Rejected"
+                                                            v-model="form.cap_status">
+                                                        <label for="rejectCap" class="custom-control-label">CAP Rejected</label>
+                                                    </div>                                                
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <div v-if="form.cap_status === 'Rejected'" class="form-group">
+                                                    <label>Reason for Rejecting CAP</label>
+                                                    <textarea v-model="form.reason_for_rejection" class="form-control"  placeholder="Reason for Rejecting CAP">
+                                                    </textarea>
+                                                </div>
+                                                </div>
+
+                                                
                                             </div>                                                                            
                                             </div>
                                                 <!-- /.card-body -->

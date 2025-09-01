@@ -91,7 +91,7 @@
                   <Link :href="route('audit-categories.index')" class="nav-link"
                   :class="{ active: currentPath.startsWith('/audit-categories') }"
                   >                  
-                    <i class="nav-icon fas fa-boxes"></i>
+                    <i class="nav-icon fas fa-server"></i>
                   <p>
                      Control Target Areas
                   </p>
@@ -106,8 +106,7 @@
                   >
                   <i class="nav-icon fas fa-microscope"></i>
                   <p>
-                      AVSEC Equipments
-                      
+                      AVSEC Equipments                      
                   </p>
                   </Link>
               </li>
@@ -116,7 +115,7 @@
                   <a href="#" class="nav-link">
                   <i class="nav-icon fas fa-user-graduate"></i>
                   <p>
-                      Training/Certification
+                      AVSEC Trainings
                       <i class="right fas fa-angle-left"></i>
                   </p>
                   </a>
@@ -126,7 +125,35 @@
                       :class="{ active: currentPath.startsWith('/personnels') }"
                       >
                           <i class="fas fa-chevron-circle-right nav-icon"></i>
-                      <p>Personnel</p>
+                      <p>Training Records</p>
+                      </Link>
+                  </li>
+                  <li class="nav-item">
+                      <Link :href="route('trainings.index')" class="nav-link"
+                      :class="{ active: currentPath.startsWith('/trainings') }"
+                      >
+                          <i class="fas fa-chevron-circle-right nav-icon"></i>
+                      <p>Trainings</p>
+                      </Link>
+                  </li>                  
+                  </ul>
+              </li>
+
+              <li class="nav-item">
+                  <a href="#" class="nav-link">
+                  <i class="nav-icon fas fa-user-graduate"></i>
+                  <p>
+                      Operator Certification
+                      <i class="right fas fa-angle-left"></i>
+                  </p>
+                  </a>
+                  <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                      <Link :href="route('personnels.index')" class="nav-link"
+                      :class="{ active: currentPath.startsWith('/personnels') }"
+                      >
+                          <i class="fas fa-chevron-circle-right nav-icon"></i>
+                      <p>Personnel Records</p>
                       </Link>
                   </li>
                   <li class="nav-item">

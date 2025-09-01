@@ -71,6 +71,7 @@ const statusOptions = [
   { label: 'Completed', value: 'Completed' },  
   { label: 'Overdue', value: 'Overdue' },  
 ];
+
 const form = useForm({
   title: qualityControl.title,
   department_id: qualityControl.department_id || '',
@@ -213,16 +214,17 @@ const handleClick = () => {
                 </div>    
                 <div class="col-sm-6">
                   <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><Link class="btn btn-info" :href="route('quality-controls.index')"><i class="fas fa-arrow-left"></i> Back</Link></li>
                     <li class="breadcrumb-item">
                       <button class="btn btn-success mr-2"
                       
                       :class="{ 'disabled': !canStart }"
                       @click.prevent="handleClick" 
                       :href="route('quality-controls.show',qualityControl.id)">
-                      <i class="fas fa-play"></i> 
+                      <i class="fas fa-binoculars"></i>
                         Start {{ qualityControl.control_type }}
-                      </button></li>             
+                      </button></li> 
+                    <li class="breadcrumb-item"><Link class="btn btn-info" :href="route('quality-controls.index')"><i class="fas fa-arrow-left"></i> Back</Link></li>
+                                
                   </ol>
                 </div><!-- /.col -->            
             </div>

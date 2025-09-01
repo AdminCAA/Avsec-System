@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\SelectedChecklistQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
 
 
 class QualityControlController extends Controller
@@ -114,6 +115,7 @@ class QualityControlController extends Controller
             if (!empty($request->selectedCheckListQuestions)) {
                 foreach ($request->selectedCheckListQuestions as $questionId) {
                     $questionItem = AuditQuestion::find($questionId);
+                    
                     if ($questionItem) {
                         // Check if this checklist question already exists for this QC
                         $alreadyExists = SelectedChecklistQuestion::where('quality_control_id', $qualityControl->id)
@@ -142,6 +144,15 @@ class QualityControlController extends Controller
             // Update the users assigned to this quality control
             if (!empty($request->selectedUsers)) {
                 $qualityControl->users()->sync($request->selectedUsers);
+                //send email to the users assigned to this quality control      
+                foreach($request->selectedUsers as $userId){
+                    $user = User::find($userId);
+                    if($user){
+                        //Send email to the user
+                        Mail::to($user->email)->send(new \App\Mail\notify_assigned_inspectors($user));
+                    }
+                }          
+
             } else {
                 // If no users assigned, detach all users
                 $qualityControl->users()->detach();
@@ -242,14 +253,14 @@ class QualityControlController extends Controller
             'finding_category' => 'required|string|in:Compliant,Not Compliant(Minor),Not Compliant(Serious),Not Applicable,Not Confirmed,Not Applicable,Not Confirmed',
             'date_quality_control' => 'required|date',
             'problem_cause' => 'nullable|string',
-            'proposed_follow_up_action' => 'nullable|string|in:Onsite,Administrative,Onsite and Administrative',
+            'proposed_follow_up_action' => 'nullable|string|in:Onsite,Administrative,Onsite and Administrative,Not Applicable',
             'short_term_action' => 'nullable|string',
             'short_term_date' => 'nullable|date',
             'long_term_action' => 'nullable|string',
             'long_term_date' => 'nullable|date',
             'completion_date' => 'nullable|date',
-            'date_of_closure' => 'required|date',
-            'follow_up_date' => 'required|date',
+            'date_of_closure' => 'nullable|date',
+            'follow_up_date' => 'nullable|date',
             'evidence_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', 
         ]);
 

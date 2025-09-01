@@ -47,8 +47,8 @@ class DepartmentsController extends Controller
         }
         // Create a new department
         $department = new Department();
-        $department->name = $request->name;
-        $department->description = $request->description;
+        $department->name = trim($request->name);
+        $department->description = trim($request->description);
         $department->save();
         return redirect()->route('departments.index')->with('success', 'Department created successfully.');
     }
@@ -89,8 +89,8 @@ class DepartmentsController extends Controller
         }
         // Update the department
         $department = Department::findOrFail($id);
-        $department->name = $request->name;
-        $department->description = $request->description;
+        $department->name = trim($request->name);
+        $department->description = trim($request->description);
         $department->save();
         return redirect()->route('departments.index')->with('success', 'Department updated successfully.');
 

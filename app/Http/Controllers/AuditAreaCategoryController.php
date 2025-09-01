@@ -50,8 +50,8 @@ class AuditAreaCategoryController extends Controller
         if ($validator->passes()) {
             // Create a new audit area category
             AuditAreaCategory::create([
-                'name' => $request->name .' - '.$request->category_name,
-                'category_name' => $request->category_name,
+                'name' => trim($request->name) .' - '. trim($request->category_name),
+                'category_name' => trim($request->category_name),
             ]);
             return redirect()->route('audit-categories.index')->with('success', 'Audit Category created successfully.');
         } else {
@@ -95,8 +95,8 @@ class AuditAreaCategoryController extends Controller
         if ($validator->passes()) {                        
             // Update the audit area category
             $auditCategory->update([
-                'name' => $request->name .' - '.$request->category_name,
-                'category_name' => $request->category_name,
+                'name' => trim($request->name) .' - '.trim($request->category_name),
+                'category_name' => trim($request->category_name),
             ]);
             return redirect()->route('audit-categories.index')->with('success', 'Audit Category updated successfully.');
         } else {

@@ -306,7 +306,7 @@ const handleFileUpload = (event) => {
         <div class="d-flex justify-content-center align-items-center min-vh-60  bg-light">
             <div class="row w-100 justify-content-center">
                 <div class="col-md-12"> 
-                    <div class="col-md-12">                    
+                                       
                         <!-- general form elements -->
                         <div class="card card-info">
                             <div class="card-header">
@@ -314,8 +314,7 @@ const handleFileUpload = (event) => {
                             </div>
                             <!-- form start -->
                             <form @submit.prevent="updateUser" method="post" enctype="multipart/form-data">
-                                <div class="card-body">                                    
-                                                                           
+                                <div class="card-body">                                                                                                               
                                     <div class="col-md-2">
                                         <div class="card card-info card-outline">
                                         <div class="card-body box-profile">
@@ -330,7 +329,7 @@ const handleFileUpload = (event) => {
                                             <p class="text-muted text-center">{{ personnel.user_type }}</p>                                                                                            
                                         </div>                                        
                                     </div>
-                                    </div>
+                                </div>
 
                                 <div class="row">
                                     
@@ -554,7 +553,7 @@ const handleFileUpload = (event) => {
                                 </div>
                             </form>
                         </div>
-                    </div>                    
+                                    
                 </div>
             </div>
     </div>
