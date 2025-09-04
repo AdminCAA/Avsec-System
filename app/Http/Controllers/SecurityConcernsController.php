@@ -80,7 +80,7 @@ class SecurityConcernsController extends Controller
             'question_id' => 'required|integer',
             'quality_control_id' => 'required|integer',
             'question_response' => 'required|string|in:Yes,No,Pass,Fail,Not Applicable,Not confirmed',
-            'finding_observation' => 'nullable|string',
+            'finding_observation' => 'required|string',
             'action_taken' => 'nullable|string',
             'immediate_corrective_action' => 'nullable|string',
             'recommendations' => 'nullable|string',

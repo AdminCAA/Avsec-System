@@ -173,10 +173,10 @@ const sortedRoles = computed(() => {
                       :class="{ 'table table-selected': selectedRowId === role.id }" 
                       @click="selectRow(role.id)">
                     <td>{{ (roles.current_page - 1) * roles.per_page + index + 1 }}</td>
-                    <td>
+                    <td class="text-center">
                       <Link :href="route('roles.edit', role.id)">{{ role.name }}</Link></td>
 
-                    <td>                        
+                    <td class="text-center">                        
                         <span v-if="role.permissions && role.permissions.length > 0">
                             <span v-for="(permission, i) in role.permissions" :key="permission.id">
                                 {{ permission.name }}
@@ -186,10 +186,10 @@ const sortedRoles = computed(() => {
                         <span v-else>No permissions assigned</span>                 
                     </td>
 
-                    <td>{{dayjs(role.created_at).format('DD-MM-YYYY')}}</td>
+                    <td class="text-center">{{dayjs(role.created_at).format('DD-MM-YYYY')}}</td>
                     
-                    <td>
-                      <div class="d-flex justify-content-end">
+                    <td >
+                      <div class="d-flex justify-content-center">
                         <Link class="btn btn-info btn-sm mr-2" :href="route('roles.edit', role.id)">
                           <i class="fas fa-edit"></i> <span>Edit</span>
                         </Link>

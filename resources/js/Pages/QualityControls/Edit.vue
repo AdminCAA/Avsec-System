@@ -236,18 +236,7 @@ const handleClick = () => {
       <div class="container-fluid">
         <div class="d-flex justify-content-center align-items-center min-vh-60  bg-light">
             <div class="row w-100 justify-content-center">
-                <div class="col-md-12 mb-4">       
-                  
-
-
-
-
-
-
-
-
-
-
+                <div class="col-md-12 mb-4">                         
                     <!-- general form elements -->
                     <div class="card card-info">
                         <div class="card-header">
@@ -415,7 +404,7 @@ const handleClick = () => {
                                   >
                                       <div class="card card-info collapsed-card shadow-sm">
                                       <div class="card-header">
-                                          <h3 style="font-weight: bold;" class="card-title">{{ area }}</h3>
+                                          <h3 style="font-weight: bold;" class="card-title" data-card-widget="collapse">{{ area }}</h3>
                                           <div class="card-tools">
                                           <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                             <i class="fas fa-plus"></i>
@@ -492,4 +481,40 @@ const handleClick = () => {
     max-width: 100%;
     height: auto;
 }
+
+
+.card-title:hover {
+        color: #007bff;      /* Bootstrap primary blue */
+        cursor: pointer;  
+    }
+
+    .card-title {
+    position: relative;
+    display: inline-block;
+    }
+
+    .card-title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 0;
+    height: 2px;
+    /* background: #007bff; */
+    transition: width 0.3s ease;
+    }
+
+    .card-title:hover::after {
+    width: 100%;
+    }
+
+
+    .card-title {
+    transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .card-title:hover {
+    transform: scale(1.05);
+    color: #0056b3;
+    }
 </style>

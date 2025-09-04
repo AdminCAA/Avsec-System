@@ -241,8 +241,8 @@ const sortedAuditAreaCategories = computed(() => {
                             {{ item.name }}
                           </Link>
                         </td>
-                        <td>{{ item.category_name }}</td>
-                        <td>{{dayjs(item.created_at).format('DD-MM-YYYY')}}</td>                        
+                        <td class="text-center">{{ item.category_name }}</td>
+                        <td class="text-center">{{dayjs(item.created_at).format('DD-MM-YYYY')}}</td>                        
                         <td>
                           <div class="d-flex justify-content-center">
                             <Link class="btn btn-info btn-sm mr-2" :href="route('audit-categories.edit', item.id)">

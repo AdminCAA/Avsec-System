@@ -116,27 +116,45 @@ const {securityEquipments} = defineProps({
     })
   }
 
-  const getStatusClass = (status)=>{
-    switch (status) {
+  // const getStatusClass = (status)=>{
+  //   switch (status) {
       
-      case 'Under Maintenance':
-        return 'bg-info text-white';
+  //     case 'Under Maintenance':
+  //       return 'bg-info text-white';
 
-      case 'Active':
-        return 'bg-success text-white';
+  //     case 'Active':
+  //       return 'bg-success text-white';
 
-      case 'Due for Maintenance':
-        return 'bg-danger text-white';
+  //     case 'Due for Maintenance':
+  //       return 'bg-danger text-white';
 
-      case 'Decommissioned':
-        return 'bg-warning text-dark';
+  //     case 'Decommissioned':
+  //       return 'bg-warning text-dark';
 
-      case 'Inactive':
-        return 'bg-dark text-white';
-      default:
-        return 'bg-light text-dark';
-    }
+  //     case 'Inactive':
+  //       return 'bg-dark text-white';
+  //     default:
+  //       return 'bg-light text-dark';
+  //   }
+  // }
+
+
+  const getStatusClass = (status) => {
+  switch (status) {
+    case 'Under Maintenance':
+      return 'status-under-maintenance';
+    case 'Active':
+      return 'status-active';
+    case 'Due for Maintenance':
+      return 'status-due-maintenance';
+    case 'Decommissioned':
+      return 'status-decommissioned';
+    case 'Inactive':
+      return 'status-inactive';
+    default:
+      return 'status-default';
   }
+}
 
 
 const sortKey = ref(null);
@@ -337,6 +355,46 @@ const sortedSecurityEquipments = computed(() => {
         text-align: center;
         background-color: #B2C6D5;  
     }
+
+
+
+    .status-under-maintenance {
+  background-color: rgba(23, 162, 184, 0.1); /* info cyan */
+  border: 1px solid #17a2b8;
+  color: #17a2b8;
+}
+
+
+.status-active {
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #389e0d;
+}
+
+.status-due-maintenance {
+  background-color: rgba(220, 53, 69, 0.1); /* danger red */
+  border: 1px solid #dc3545;
+  color: #dc3545;
+}
+
+.status-decommissioned {
+  background-color: rgba(255, 193, 7, 0.1); /* warning yellow */
+  border: 1px solid #ffc107;
+  color: #ffc107;
+}
+
+.status-inactive {
+  background-color: rgba(52, 58, 64, 0.1); /* dark gray */
+  border: 1px solid #343a40;
+  color: #343a40;
+}
+
+.status-default {
+  background-color: rgba(108, 117, 125, 0.1); /* light gray */
+  border: 1px solid #6c757d;
+  color: #6c757d;
+}
+
 </style>
 
 

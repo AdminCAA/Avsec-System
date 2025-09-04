@@ -49,9 +49,9 @@ class FollowupController extends Controller
         $selectedChecklistQuestion = SelectedChecklistQuestion::findOrFail($id);
         $selectedChecklistQuestion->followups()->create([
             'user_id' => Auth::id(),
-            'title' => $request->title,
+            'title' => trim($request->title),
             'user_name' => Auth::user()->name,
-            'followup_comments' => $request->followup_comments,
+            'followup_comments' => trim($request->followup_comments),
             'followup_date' => $request->followup_date,
         ]);
         return redirect()->route('securityconcerns.edit', $id)->with('success', 'Followup created successfully.');

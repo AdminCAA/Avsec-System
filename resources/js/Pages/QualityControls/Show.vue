@@ -58,6 +58,7 @@ function validateQuestionForm(questionId) {
   if (!form.question_response) errors.question_response = 'Response is required';
   if (!form.finding_category) errors.finding_category = 'Finding category is required';
   if (!form.date_quality_control) errors.date_quality_control = 'Date of Quality Control is required';
+  if(!form.finding_observation) errors.finding_observation = 'Finding/Observation is required';
   //if (!form.problem_cause) errors.problem_cause = 'Problem cause is required';
   if (!form.status) errors.status = 'Status is required';
   //if (!form.date_of_closure) errors.date_of_closure = 'Date of closure is required';
@@ -80,6 +81,7 @@ function validateQuestionForm(questionId) {
 
   return Object.keys(errors).length === 0;
 }
+
 
 function submitQuestionForm(questionId) {
   if (validateQuestionForm(questionId)) {
@@ -276,7 +278,7 @@ const handleFileUpload = (questionId, event) => {
                           <div v-if="area?.toLowerCase?.().includes((qualityControl?.facility?.category ?? '').toLowerCase())" class="col-md-12">
                             <div class="card card-info collapsed-card shadow-sm">
                               <div class="card-header">
-                                  <h3 style="font-weight: bold;" class="card-title">{{ area.trim() }}</h3>
+                                  <h3 style="font-weight: bold;" class="card-title" data-card-widget="collapse">{{ area.trim() }}</h3>
                                   <div class="card-tools">
                                   <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                     <i class="fas fa-plus"></i>
@@ -289,7 +291,7 @@ const handleFileUpload = (questionId, event) => {
                                     <h4>{{ question.question }}</h4>
                                       <div class="card card-success collapsed-card">
                                         <div class="card-header">
-                                          <h3 class="card-title">Checklist Question # {{ index + 1 }}</h3>
+                                          <h3 class="card-title" data-card-widget="collapse">Checklist Responses # {{ index + 1 }}</h3>
                                           <div class="card-tools">
                                             <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
                                             </button>
@@ -303,7 +305,7 @@ const handleFileUpload = (questionId, event) => {
                                           <div class="form-group col-md-6">                                                
                                             <label>Response</label>
                                             <select 
-                                              required  v-model="getForm(question.id).question_response" 
+                                              v-model="getForm(question.id).question_response" 
                                               class="form-control"             
                                               @change="validateQuestionForm(question.id)"               
                                               :class="{ 
@@ -337,7 +339,7 @@ const handleFileUpload = (questionId, event) => {
                                     <div class="row">
                                           <div class="form-group col-md-6">                                                  
                                             <label>Finding Category</label>
-                                            <select required v-model="getForm(question.id).finding_category" 
+                                            <select  v-model="getForm(question.id).finding_category" 
                                               class="form-control"    
                                               @change="validateQuestionForm(question.id)" 
                                               :class="{ 
@@ -354,7 +356,7 @@ const handleFileUpload = (questionId, event) => {
                                           <div class="form-group col-md-6">
                                           <label>Date of Quality Control</label>
                                           <input 
-                                              required 
+                                               
                                               v-model="getForm(question.id).date_quality_control"                                         
                                               type="date"
                                               class="form-control"  
@@ -372,7 +374,7 @@ const handleFileUpload = (questionId, event) => {
                                     <div class="row">
                                       <div class="form-group col-md-6">
                                         <label>Recommendations</label>
-                                        <textarea required v-model="getForm(question.id).recommendations"
+                                        <textarea  v-model="getForm(question.id).recommendations"
                                           class="form-control" rows="2" placeholder="Recommendations"
                                           
                                           @change="validateQuestionForm(question.id)"
@@ -388,7 +390,7 @@ const handleFileUpload = (questionId, event) => {
                                       <div class="form-group col-md-6">
                                           <label>Reference</label>
                                           <input 
-                                              required 
+                                              
                                               v-model="getForm(question.id).reference"                                         
                                               type="text"
                                               class="form-control"  
@@ -407,7 +409,7 @@ const handleFileUpload = (questionId, event) => {
                                     <div class="row">
                                       <div class="form-group col-md-6">                                                    
                                             <label>Proposed Follow up Action</label>
-                                            <select required v-model="getForm(question.id).proposed_follow_up_action" 
+                                            <select  v-model="getForm(question.id).proposed_follow_up_action" 
                                             class="form-control" 
                                             @change="validateQuestionForm(question.id)"                                              
                                             :class="{ 
@@ -467,7 +469,7 @@ const handleFileUpload = (questionId, event) => {
 
                                       <div class="form-group col-md-6">                                                    
                                               <label>Status</label>
-                                              <select required v-model="getForm(question.id).status" 
+                                              <select  v-model="getForm(question.id).status" 
                                               class="form-control"  
                                               @change="validateQuestionForm(question.id)"
                                               :class="{ 
@@ -484,9 +486,9 @@ const handleFileUpload = (questionId, event) => {
 
 
 
-                                  <div class="card card-info collapsed-card">
+                                  <!-- <div class="card card-info collapsed-card">
                                       <div class="card-header">
-                                          <h3 style="font-weight: bold;"  class="card-title">Corrective Action Plan</h3>
+                                          <h3 style="font-weight: bold;"  class="card-title" data-card-widget="collapse">Corrective Action Plan</h3>
                                           <div class="card-tools">
                                               <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
                                               </button>
@@ -625,7 +627,7 @@ const handleFileUpload = (questionId, event) => {
                                           </div>
                                         </div>
                                       </div>
-                                  </div>
+                                  </div> -->
                                   
                                     <div class="d-flex justify-content-end">
                                       <button :disabled="isLoading" type="submit" class="btn btn-info mr-1">
@@ -668,4 +670,42 @@ const handleFileUpload = (questionId, event) => {
   .card-success:not(.card-outline)>.card-header {
     background-color: #20c997 !important;
 }
+
+
+
+
+.card-title:hover {
+        color: #007bff;      /* Bootstrap primary blue */
+        cursor: pointer;  
+    }
+
+    .card-title {
+    position: relative;
+    display: inline-block;
+    }
+
+    .card-title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 0;
+    height: 2px;
+    /* background: #007bff; */
+    transition: width 0.3s ease;
+    }
+
+    .card-title:hover::after {
+    width: 100%;
+    }
+
+
+    .card-title {
+    transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .card-title:hover {
+    transform: scale(1.05);
+    color: #0056b3;
+    }
 </style>

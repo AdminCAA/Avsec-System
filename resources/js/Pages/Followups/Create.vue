@@ -78,14 +78,14 @@ function createFollowupControl() {
 </script>
 
 <template>
-  <Head title="Create Followup" />
+  <Head title="Create Follow-Up" />
   <AuthenticatedLayout>
     <div class="content-wrapper">    
         <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h3 class="m-0">Followup / Create</h3>
+                    <h3 class="m-0">Follow-Up / Create</h3>
                 </div>                
             </div>
         </div>

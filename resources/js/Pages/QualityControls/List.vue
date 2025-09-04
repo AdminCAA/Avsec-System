@@ -131,20 +131,35 @@ watch([startDate, endDate], () => {
       }
     })
   }
-  const getStatusClass = (status)=>{
-    switch (status) {
-      case 'Pending':
-        return 'bg-primary text-white';
-      case 'In Progress':
-        return 'bg-warning text-white';
-      case 'Completed':
-        return 'bg-success text-white';
-      case 'Overdue':
-        return 'bg-danger text-white';            
-      default:
-        return 'bg-light text-dark';
-    }
+//   const getStatusClass = (status) => {
+//   switch (status) {
+//     case 'Pending':
+//       return 'border border-primary text-primary bg-transparent';
+//     case 'In Progress':
+//       return 'border border-warning text-warning bg-transparent';
+//     case 'Completed':
+//       return 'border border-success text-success bg-transparent';
+//     case 'Overdue':
+//       return 'border border-danger text-danger bg-transparent';
+//     default:
+//       return 'border border-secondary text-secondary bg-transparent';
+//   }
+// }
+
+const getStatusClass = (status) => {
+  switch (status) {
+    case 'Pending':
+      return 'status-pending';
+    case 'In Progress':
+      return 'status-inprogress';
+    case 'Completed':
+      return 'status-completed';
+    case 'Overdue':
+      return 'status-overdue';
+    default:
+      return 'status-default';
   }
+}
 
 
   const getUserColor= (name)=> {
@@ -173,6 +188,10 @@ const sortTable = (key) => {
   }
 };
 
+const isQualityControlActive = computed((qualityControl) => {
+  return qualityControl.selected_checklist_questions?.length > 0 && qualityControl.users?.length > 0;
+});
+
 const sortedQualityControls = computed(() => {
   let sorted = [...qualityControls.data];
   if (sortKey.value) {
@@ -198,7 +217,7 @@ const sortedQualityControls = computed(() => {
   return sorted;
 });
 
-
+console.log(qualityControls);
 </script>
 
 <template>
@@ -303,7 +322,7 @@ const sortedQualityControls = computed(() => {
                       <i v-if="sortKey === 'facility.name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i> 
                     </th>
                               
-                    <th @click="sortTable('scheduled_date')" style="cursor: pointer">
+                    <th @click="sortTable('scheduled_date')" style="cursor: pointer">Start Date
                       
                       <i v-if="sortKey === 'scheduled_date'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>  
                     </th>
@@ -312,6 +331,7 @@ const sortedQualityControls = computed(() => {
                       <i v-if="sortKey === 'end_date'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>  
                     </th>                                                            
                     <th>Inspectors</th>
+                    <th>QC</th>
                     <th>Actions</th>             
                   </tr>
                   </thead>
@@ -321,36 +341,35 @@ const sortedQualityControls = computed(() => {
                     @click="selectRow(item.id)"
                   >
                     <td>{{ (qualityControls.current_page - 1) * qualityControls.per_page + index + 1 }}</td>
-                    <td>
+                    <td class="text-center">
                       <Link :href="route('quality-controls.edit', item.id)">
                         {{ item.title }}
                       </Link>
 
                     </td>
 
-                    <td>{{ item.control_type }}</td>    
+                    <td class="text-center">{{ item.control_type }}</td>    
                     <td class="text-center">      
                       <span  :class="getStatusClass(item.status)" class="badge p-2">
                         {{ item.status }}  
                       </span>                  
                                 
                     </td>                                                       
-                    <td>                        
+                    <td class="text-center">                        
                         {{ item.facility.name }}           
                     </td>
                     
-                    <td>                        
+                    <td class="text-center">                        
                         {{ dayjs(item.scheduled_date).format('DD-MM-YYYY') }}          
                     </td>
 
-                    <td>{{dayjs(item.end_date).format('DD-MM-YYYY')}}</td>
+                    <td class="text-center">{{dayjs(item.end_date).format('DD-MM-YYYY')}}</td>
                     <!-- Full names (Desktop / Large screens) -->
                       <td class="d-none d-lg-table-cell">
                         <span
                           v-for="user in item.users"
                           :key="user.id"
-                          class="px-1 py-1 mr-1 mb-1 rounded"
-                          style="background-color: #93DA97; display: inline-block; font-size: 0.8rem;"
+                          class="user-badge mr-1 mb-1"
                         >
                           {{ user.name }}
                         </span>
@@ -377,11 +396,19 @@ const sortedQualityControls = computed(() => {
                             </span>
                           </div>
                         </div>
-                      </td>                    
+                      </td>    
+                      <td class="text-center">
+                        <Link v-if="item.selected_checklist_questions?.length > 0 && item.users?.length > 0" 
+                              class="btn btn-success btn-sm mr-2"
+                              :href="route('quality-controls.show', item.id)">
+                              <i class="fas fa-binoculars"></i><span> QC</span>
+                        </Link>
+                      </td>
+             
                     <td>
-                      <div class="d-flex justify-content-center">
+                      <div class="d-flex justify-content-center">                        
                         <Link class="btn btn-info btn-sm mr-2" :href="route('quality-controls.edit', item.id)">
-                          <i class="fas fa-clipboard-list"></i><span> Details</span>
+                          <i class="fas fa-edit"></i><span> Edit</span>
                         </Link>
                         <button class="btn btn-danger btn-sm" @click="deleteQualityControl(item.id)">
                           <i class="fas fa-trash"></i> <span>Del</span>
@@ -431,7 +458,57 @@ const sortedQualityControls = computed(() => {
     .table th {
         text-align: center;
         background-color: #B2C6D5;  
-    }    
+    }  
+    
+    
+
+
+    .status-pending {
+  background-color: rgba(0, 123, 255, 0.1); /* primary blue at 10% opacity */
+  border: 1px solid #007bff;
+  color: #007bff;
+}
+
+.status-inprogress {
+  background-color: rgba(255, 193, 7, 0.1); /* warning yellow */
+  border: 1px solid #ffc107;
+  color: #ffc107;
+}
+
+
+
+.status-completed {
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #389e0d;
+}
+
+.status-overdue {
+  background-color: rgba(220, 53, 69, 0.1); /* danger red */
+  border: 1px solid #dc3545;
+  color: #dc3545;
+}
+
+.status-default {
+  background-color: rgba(108, 117, 125, 0.1); /* secondary gray */
+  border: 1px solid #6c757d;
+  color: #6c757d;
+}
+
+
+
+
+.user-badge {
+  background-color: rgba(40, 167, 69, 0.1); /* light green tint */
+  border: 1px solid #28a745;                /* Bootstrap green */
+  color: #28a745;                           /* matching text */
+  font-size: 0.8rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+
 </style>
 
 

@@ -105,6 +105,7 @@ function validateQuestionForm() {
     if (!form.question_response) errors.question_response = 'Response is required';
     if (!form.finding_category) errors.finding_category = 'Finding category is required';
     if (!form.date_quality_control) errors.date_quality_control = 'Date of Quality Control is required';
+    if(!form.finding_observation) errors.finding_observation = 'Finding/Observation is required';
     //if (!form.problem_cause) errors.problem_cause = 'Problem cause is required';
     if (!form.status) errors.status = 'Status is required';
     //if (!form.date_of_closure) errors.date_of_closure = 'Date of closure is required';
@@ -396,7 +397,7 @@ const deleteFollowup = (id)=>{
                                                 <div class="form-group col-md-6">                                                
                                                 <label>Response</label>
                                                 <select 
-                                                    required  v-model="form.question_response" 
+                                                    v-model="form.question_response" 
                                                     class="form-control"                                                                        
                                                     :class="{ 
                                                     'is-invalid': formErrors.question_response, 
@@ -427,7 +428,7 @@ const deleteFollowup = (id)=>{
                                             <div class="row">
                                                 <div class="form-group col-md-6">                                                  
                                                     <label>Finding Category</label>
-                                                    <select required v-model="form.finding_category" 
+                                                    <select  v-model="form.finding_category" 
                                                     class="form-control"                                                  
                                                     :class="{ 
                                                             'is-invalid': formErrors.finding_category, 
@@ -443,7 +444,7 @@ const deleteFollowup = (id)=>{
                                                 <div class="form-group col-md-6">
                                                     <label>Date of Quality Control</label>
                                                     <input 
-                                                    required 
+                                                     
                                                     v-model="form.date_quality_control"                                         
                                                     type="date"
                                                     class="form-control"                                                 
@@ -460,7 +461,7 @@ const deleteFollowup = (id)=>{
                                             <div class="row">
                                                 <div class="form-group col-md-6">
                                                     <label>Recommendations</label>
-                                                    <textarea required v-model="form.recommendations"
+                                                    <textarea  v-model="form.recommendations"
                                                     class="form-control" rows="2" placeholder="Recommendations"                                                                                                        
                                                     :class="{ 
                                                                 'is-invalid': formErrors.recommendations, 
@@ -491,7 +492,7 @@ const deleteFollowup = (id)=>{
                                             <div class="row">
                                                 <div class="form-group col-md-6">                                                    
                                                     <label>Proposed Follow up Action</label>
-                                                    <select required v-model="form.proposed_follow_up_action" 
+                                                    <select  v-model="form.proposed_follow_up_action" 
                                                     class="form-control"                                              
                                                     :class="{ 
                                                         'is-invalid': formErrors.proposed_follow_up_action, 
@@ -548,7 +549,7 @@ const deleteFollowup = (id)=>{
                                                 </div> 
                                                 <div class="form-group col-md-6">                                                    
                                                     <label>Status</label>
-                                                    <select required v-model="form.status" 
+                                                    <select  v-model="form.status" 
                                                     class="form-control"                                              
                                                     :class="{ 
                                                         'is-invalid': formErrors.status, 
@@ -566,7 +567,7 @@ const deleteFollowup = (id)=>{
 
                                             <div class="card card-info collapsed-card">
                                                 <div class="card-header">
-                                                    <h3 style="font-weight: bold;"  class="card-title">Corrective Action Plan</h3>
+                                                    <h3 style="font-weight: bold;" class="card-title" data-card-widget="collapse">Corrective Action Plan</h3>
                                                     <div class="card-tools">
                                                         <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
                                                         </button>
@@ -575,7 +576,6 @@ const deleteFollowup = (id)=>{
                                                 </div>
                                                 <!-- /.card-header -->
                                                 <div class="card-body">
-
                                                     <div class="row">                                                                                                                                              
                                                         <div class="form-group col-md-6">                                    
                                                             <label v-if="!question.cap_file">CAP Attachment</label>  
@@ -618,8 +618,8 @@ const deleteFollowup = (id)=>{
                                             <!-- general form elements -->
                                             <div class="card card-info collapsed-card">
                                                 <div class="card-header">
-                                                    <h3 style="font-weight: bold;"  class="card-title">
-                                                        Followups <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning ml-1"> 
+                                                    <h3 style="font-weight: bold;"  class="card-title" data-card-widget="collapse">
+                                                        Follow-Ups <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning ml-1"> 
                                                             {{followups.length}}
                                                             
                                                         </span>
@@ -632,7 +632,7 @@ const deleteFollowup = (id)=>{
                                                 
                                                 <div class="card-body">
                                                     <div class="d-flex justify-content-end mb-2">
-                                                        <Link :href="route('followups.create', question.id)" class="btn btn-primary btn-sm "><i class="fas fa-plus"></i> Add Followup</Link>                                                    
+                                                        <Link :href="route('followups.create', question.id)" class="btn btn-primary btn-sm "><i class="fas fa-plus"></i> Add Follow-Up</Link>                                                    
                                                     </div>
                                                     <div class="table-responsive">
                                                         <table   id="example2" class="table table-sm table-bordered table-hover table-striped">
@@ -652,18 +652,18 @@ const deleteFollowup = (id)=>{
                                                             @click="selectRow(followup.id)"                 
                                                             >
                                                             <td>{{  index + 1 }}</td>
-                                                            <td>{{ followup.title }}</td>
+                                                            <td class="text-center">{{ followup.title }}</td>
 
-                                                            <td>{{ followup.followup_comments }}</td>
+                                                            <td class="text-center">{{ followup.followup_comments }}</td>
                                                             
                                                                                 
-                                                            <td>{{dayjs(followup.followup_date).format('DD-MM-YYYY')}}</td>
-                                                            <td>                        
+                                                            <td class="text-center">{{dayjs(followup.followup_date).format('DD-MM-YYYY')}}</td>
+                                                            <td class="text-center">                        
                                                                 {{ followup.user_name }}          
                                                             </td>
                                                                                 
                                                             <td>
-                                                                <div class="d-flex justify-content-end">
+                                                                <div class="d-flex justify-content-center">
 
                                                                 <Link class="btn btn-info btn-sm mr-2" :href="route('followups.edit', followup.id)">
                                                                     <i class="fas fa-edit"></i> <span>Edit</span>
@@ -681,16 +681,19 @@ const deleteFollowup = (id)=>{
                                             </div>
 
                                             <!-- general form elements -->
-                                            <div class="card card-info collapsed-card">
+
+
+
+                                            <!-- <div class="card card-info collapsed-card">
                                                 <div class="card-header">
                                                     <h3 style="font-weight: bold;"  class="card-title">Operator Responses</h3>
                                                     <div class="card-tools">
                                                         <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
                                                         </button>
                                                     </div>
-                                                <!-- /.card-tools -->
+                                                
                                                 </div>
-                                                <!-- /.card-header -->
+                                                
                                                 <div class="card-body">
                                                     <div class="row">
                                                 <div class="form-group col-md-6">
@@ -763,7 +766,7 @@ const deleteFollowup = (id)=>{
                                             <div class="row">
                                                 <div class="form-group col-md-6">
                                                     <label>Proposed Completion Date</label>
-                                                    <input required                                              
+                                                    <input                                              
                                                         v-model="form.completion_date"                                         
                                                         type="date"
                                                         class="form-control"                                                      
@@ -776,7 +779,7 @@ const deleteFollowup = (id)=>{
                                                     <small v-if="formErrors.completion_date" class="text-danger">{{ formErrors.completion_date }}</small>                                                                                                      
                                                 </div>
                                                 <div class="form-group col-md-6">
-                                                    <label>Follow-up Date</label>
+                                                    <label>Follow-Up Date</label>
                                                     <input                                                     
                                                         v-model="form.follow_up_date"                                         
                                                         type="date"
@@ -791,19 +794,17 @@ const deleteFollowup = (id)=>{
                                                 
                                                 </div>
                                             </div>
-
                                             <div class="row">                                                                                                                                                                                                
                                                 <div class="form-group col-md-6">
                                                     <label>Date of Closure</label>
-                                                    <input required                                                      
+                                                    <input                                                      
                                                         v-model="form.date_of_closure"                                         
                                                         type="date"
                                                         class="form-control"                                                      
                                                         :class="{ 
                                                             'is-invalid': formErrors.date_of_closure, 
                                                             'is-valid': form.date_of_closure && !formErrors.date_of_closure 
-                                                        }"
-                                                                                                
+                                                        }"                                                                                                
                                                         placeholder="Date of Closure"
                                                     /> 
                                                     <small v-if="formErrors.date_of_closure" class="text-danger">{{ formErrors.date_of_closure }}</small>                                                
@@ -840,9 +841,11 @@ const deleteFollowup = (id)=>{
 
                                                 
                                             </div>                                                                            
-                                            </div>
-                                                <!-- /.card-body -->
-                                            </div>                                                                                       
+                                            </div>                                            
+                                            </div>    -->
+                                            
+
+                                            
                                             <div class="d-flex justify-content-end">
                                                 <button :disabled="isLoading" type="submit" class="btn btn-info mr-0">
                                                     <span v-if="isLoading"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
@@ -891,6 +894,43 @@ const deleteFollowup = (id)=>{
     .table th {
         text-align: center;
         background-color: #B2C6D5;  
+    }
+
+
+
+    .card-title:hover {
+        color: #007bff;      /* Bootstrap primary blue */
+        cursor: pointer;  
+    }
+
+    .card-title {
+    position: relative;
+    display: inline-block;
+    }
+
+    .card-title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 0;
+    height: 2px;
+    /* background: #007bff; */
+    transition: width 0.3s ease;
+    }
+
+    .card-title:hover::after {
+    width: 100%;
+    }
+
+
+    .card-title {
+    transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .card-title:hover {
+    transform: scale(1.05);
+    color: #0056b3;
     }
 
 

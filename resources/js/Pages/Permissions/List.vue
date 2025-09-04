@@ -158,7 +158,7 @@ const sortedPermissions = computed(() => {
                       <tr>
                         <th @click="sortTable('id')" style="cursor: pointer">#</th>
                         <th @click="sortTable('name')" style="cursor: pointer">
-                          Perimission Name 
+                          Permission Name 
                           <i v-if="sortKey === 'name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
                         </th>    
                         <th @click="sortTable('created_at')" style="cursor: pointer">
@@ -175,14 +175,14 @@ const sortedPermissions = computed(() => {
                       @click="selectRow(permission.id)"
                     > 
                       <td>{{ (permissions.current_page - 1) * permissions.per_page + index + 1 }}</td>
-                      <td>
+                      <td class="text-center">
                         <Link :href="route('permissions.edit', permission.id)">{{ permission.name }}
                         </Link> 
                       </td>
-                      <td>{{dayjs(permission.created_at).format('DD-MM-YYYY')}}</td>
+                      <td class="text-center">{{dayjs(permission.created_at).format('DD-MM-YYYY')}}</td>
                       
                       <td>
-                        <div class="d-flex justify-content-end">
+                        <div class="d-flex justify-content-center">
                           <Link class="btn btn-info btn-sm mr-2" :href="route('permissions.edit', permission.id)">
                             <i class="fas fa-edit"></i> <span>Edit</span>
                           </Link>

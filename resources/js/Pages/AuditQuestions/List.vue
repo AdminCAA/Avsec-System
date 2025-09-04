@@ -241,8 +241,8 @@ const sortedAuditQuestions = computed(() => {
                           {{ question.question }}
                         </Link>
                       </td>
-                      <td>{{ question.audit_area_category.name }}</td>                                                                                                  
-                      <td>{{dayjs(question.created_at).format('DD-MM-YYYY')}}</td>
+                      <td class="text-center">{{ question.audit_area_category.name }}</td>                                                                                                  
+                      <td class="text-center">{{dayjs(question.created_at).format('DD-MM-YYYY')}}</td>
                       
                       <td>
                         <div class="d-flex justify-content-center">                        

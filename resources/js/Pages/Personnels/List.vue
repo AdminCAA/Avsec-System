@@ -261,7 +261,7 @@ const sortedPersonnels = computed(() => {
                       @click="selectRow(personnel.id)"
                     >
                       <td>{{ (personnels.current_page - 1) * personnels.per_page + index + 1 }}</td>
-                      <td>
+                      <td class="text-center">
                         <div class="d-flex align-items-center">
                           <div class="d-flex align-items-center">                              
                               <img 
@@ -274,35 +274,36 @@ const sortedPersonnels = computed(() => {
                             </div>                        
                         </div>
                       </td>
-                      <td>
+                      <td class="text-center">
                         <Link :href="route('personnels.show', personnel.id)">
                           {{ personnel.name }}
                         </Link>
                       </td>
-                      <td>{{ personnel.gender }}</td>
-                      <td>                        
+                      <td class="text-center">{{ personnel.gender }}</td>
+                      <td class="text-center">                        
                           {{ personnel.email }}           
                       </td>
-                      <td>{{ personnel.nrc }}</td>
-                      <td>                        
+                      <td class="text-center">{{ personnel.nrc }}</td>
+                      <td class="text-center">                        
                           {{ personnel.phone_number }}          
                       </td>
                       <td class="text-center">
-                        <span class="badge p-2" :class="personnel.is_certified === 'Certified' ? 'bg-success' : 'bg-danger'">
+                        <span class="badge p-2"
+                              :class="personnel.is_certified === 'Certified' ? 'certified' : 'not-certified'">
                           {{ personnel.is_certified }}
                         </span>
                       </td>
 
-                      <td>{{ personnel.user_type }}</td>
-                      <td >                        
+                      <td class="text-center">{{ personnel.user_type }}</td>
+                      <td class="text-center">                        
                         <Link v-if="personnel.facility_id"  :href="route('facilities.show', personnel.facility_id)">
                           {{ personnel.facility_name }}
                         </Link>
                       </td>
 
-                      <td>{{dayjs(personnel.created_at).format('DD-MM-YYYY')}}</td>
+                      <td class="text-center">{{dayjs(personnel.created_at).format('DD-MM-YYYY')}}</td>
                       
-                      <td>
+                      <td class="text-center">
                         <div class="d-flex justify-content-end">
                           <Link class="btn btn-success btn-sm mr-2" :href="route('personnels.show', personnel.id)">
                               <i class="fas fa-clipboard-list"></i><span> Details</span>
@@ -361,6 +362,23 @@ const sortedPersonnels = computed(() => {
         text-align: center;
         background-color: #B2C6D5;  
     }
+
+
+    .certified {
+      background-color: #f6ffed;
+      border: 1px solid #b7eb8f;
+      color: #389e0d;
+    }
+
+    .not-certified {
+      background-color: rgba(220, 53, 69, 0.1); /* light red tint */
+      border: 1px solid #dc3545;
+      color: #dc3545;
+    }
+
+
+  
+
 </style>
 
 

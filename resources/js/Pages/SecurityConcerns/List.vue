@@ -262,24 +262,32 @@ const sortedQuestionsWithConcerns = computed(() => {
                                 {{ securityConcern.question}}           
                             </Link>              
                         </td>
-                        <td>
+                        <td class="text-center">
                             <Link :href="route('quality-controls.edit', securityConcern.quality_control_id)">{{ securityConcern.quality_control.title }}</Link>
                         </td>
 
-                        <td>{{ securityConcern.quality_control.control_type }}</td>
+                        <td class="text-center">{{ securityConcern.quality_control.control_type }}</td>
 
-                        <td>{{ securityConcern.audit_area_name }}</td>
+                        <td class="text-center">{{ securityConcern.audit_area_name }}</td>
                                           
                         
-                        <td>                        
-                            <span :class="securityConcern.status==='Open','bg-danger text-white'" class="badge p-2">{{ securityConcern.status }}</span>          
+                        <td class="text-center">                                                                                
+                            <span 
+                            :class="['badge p-2', 
+                                    securityConcern.status === 'Open' 
+                                      ? 'security-open' 
+                                      : securityConcern.status === 'Overdue' 
+                                        ? 'security-overdue' 
+                                        : 'security-default']">
+                            {{ securityConcern.status }}
+                          </span>
                         </td>
-                        <td>                        
+                        <td class="text-center">                        
                             {{getFindingCategory(securityConcern.finding_category) }}
                         </td>
-                        <td>{{dayjs(securityConcern.updated_at).format('DD-MM-YYYY')}}</td>                                       
-                        <td>
-                      <div class="d-flex justify-content-end">
+                        <td class="text-center">{{dayjs(securityConcern.updated_at).format('DD-MM-YYYY')}}</td>                                       
+                        <td class="text-center">
+                      <div class="d-flex justify-content-center">
                         <Link class="btn btn-success btn-sm mr-2" :href="route('securityconcerns.edit', securityConcern.id)">
                             <span><i class="fas fa-sync-alt"></i> Resolve</span>
                         </Link>
@@ -326,6 +334,25 @@ const sortedQuestionsWithConcerns = computed(() => {
     .table th {
         text-align: center;
         background-color: #B2C6D5;  
+    }
+
+
+    .security-open {
+      background-color: rgba(220, 53, 69, 0.1); /* danger red tint */
+      border: 1px solid #dc3545;
+      color: #dc3545;
+    }
+
+    .security-overdue {
+      background-color: rgba(255, 159, 64, 0.1); /* light orange tint */
+      border: 1px solid #ff9f40;
+      color: #ff9f40;
+    }
+
+    .security-default {
+      background-color: rgba(108, 117, 125, 0.1); /* gray tint */
+      border: 1px solid #6c757d;
+      color: #6c757d;
     }
 </style>
 

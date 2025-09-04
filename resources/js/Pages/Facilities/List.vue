@@ -270,22 +270,22 @@ const sortedFacilities = computed(() => {
                         :class="{ 'table table-selected': selectedRowId === facility.id }" 
                         @click="selectRow(facility.id)">
                       <td>{{ (facilities.current_page - 1) * facilities.per_page + index + 1 }}</td>
-                      <td>
+                      <td class="text-center">
                         <Link :href="route('facilities.edit', facility.id)">
                           {{ facility.name }}
                           </Link> 
                       </td>
 
-                      <td>{{ facility.category }}</td>
+                      <td class="text-center">{{ facility.category }}</td>
                                                               
-                      <td>                        
+                      <td class="text-center">                        
                           {{ facility.email }}           
                       </td>
-                      <td>                        
+                      <td class="text-center">                        
                           {{ facility.contact_number }}          
                       </td>
 
-                      <td>{{dayjs(facility.created_at).format('DD-MM-YYYY')}}</td>
+                      <td class="text-center">{{dayjs(facility.created_at).format('DD-MM-YYYY')}}</td>
                       
                       <td>
                         <div class="d-flex justify-content-center">
@@ -356,6 +356,17 @@ const sortedFacilities = computed(() => {
     }    
     .table th i {
       margin-left: 5px;
+    }
+
+    #example2 th {
+    font-size: 17px;
+    font-weight: 700;
+    color: #555657;
+    /* background-color: #f1f3f5; */
+    text-align: center;
+    vertical-align: middle;
+    padding: 12px;    
+    letter-spacing: 0.5px;
     }
 </style>
 

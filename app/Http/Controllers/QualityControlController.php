@@ -21,7 +21,7 @@ class QualityControlController extends Controller
     public function index(Request $request)
     {
         // Fetch all facilities from the database
-        $searchQuery = QualityControl::with(['facility','users'])->search($request);
+        $searchQuery = QualityControl::with(['facility','users','selectedChecklistQuestions'])->search($request);
         $qualityControls =  $searchQuery->orderBy('created_at','desc')->paginate(100);
         // Return the facilities to the view
         return Inertia::render('QualityControls/List', [
@@ -244,7 +244,7 @@ class QualityControlController extends Controller
             'question_id' => 'required|integer',
             'quality_control_id' => 'required|integer',
             'question_response' => 'required|string|in:Yes,No,Pass,Fail,Not Applicable,Not confirmed',
-            'finding_observation' => 'nullable|string',
+            'finding_observation' => 'required|string',
             'action_taken' => 'nullable|string',
             'immediate_corrective_action' => 'nullable|string',
             'recommendations' => 'nullable|string',
