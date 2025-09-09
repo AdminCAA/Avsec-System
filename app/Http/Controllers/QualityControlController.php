@@ -302,4 +302,82 @@ class QualityControlController extends Controller
         $selectedCheckliskQuestion->save();
         return redirect()->route('quality-controls.show',$request->quality_control_id)->with('success', 'Checklist updated successfully.');        
     }
+
+
+    public function listAudits(Request $request){
+        $searchQuery = QualityControl::with(['facility','users','selectedChecklistQuestions'])->search($request);
+        $qualityControls = $searchQuery->where('control_type','Audit')->orderBy('created_at','desc')->paginate(50);
+        return inertia('QualityControls/Audits',[
+            'qualityControls' => $qualityControls,
+            'search' => $request->search ?? '', 
+            'start_date' => $request->start_date ?? '',
+            'end_date' => $request->end_date ?? '',
+        ]);
+    }
+
+    public function listInspections(Request $request){
+        $searchQuery = QualityControl::with(['facility','users','selectedChecklistQuestions'])->search($request);
+        $qualityControls = $searchQuery->where('control_type','Inspection')->orderBy('created_at','desc')->paginate(50);
+        return inertia('QualityControls/Inspections',[
+            'qualityControls' => $qualityControls,
+            'search' => $request->search ?? '', 
+            'start_date' => $request->start_date ?? '',
+            'end_date' => $request->end_date ?? '',
+        ]);
+    }
+
+    public function listSecurityTests(Request $request){
+        $searchQuery = QualityControl::with(['facility','users','selectedChecklistQuestions'])->search($request);
+        $qualityControls = $searchQuery->where('control_type','Security Test')->orderBy('created_at','desc')->paginate(50);
+        return inertia('QualityControls/SecurityTest',[
+            'qualityControls' => $qualityControls,
+            'search' => $request->search ?? '', 
+            'start_date' => $request->start_date ?? '',
+            'end_date' => $request->end_date ?? '',
+        ]);
+    }
+    public function listPending(Request $request){
+        $searchQuery = QualityControl::with(['facility','users','selectedChecklistQuestions'])->search($request);
+        $qualityControls =  $searchQuery->where('status','Pending')->orderBy('created_at','desc')->paginate(50);
+        return inertia('QualityControls/Pending',[            
+            'qualityControls' => $qualityControls,
+            'search' => $request->search ?? '', 
+            'start_date' => $request->start_date ?? '',
+            'end_date' => $request->end_date ?? '',
+        ]);
+    }
+
+    public function listInProgress(Request $request){
+        $searchQuery = QualityControl::with(['facility','users','selectedChecklistQuestions'])->search($request);
+        $qualityControls =  $searchQuery->where('status','In Progress')->orderBy('created_at','desc')->paginate(50);
+        return inertia('QualityControls/InProgress',[            
+            'qualityControls' => $qualityControls,
+            'search' => $request->search ?? '', 
+            'start_date' => $request->start_date ?? '',
+            'end_date' => $request->end_date ?? '',
+        ]);
+    }
+
+    public function listCompleted(Request $request){
+        $searchQuery = QualityControl::with(['facility','users','selectedChecklistQuestions'])->search($request);
+        $qualityControls = $searchQuery->where('status','Completed')->orderBy('created_at','desc')->paginate(50);
+        return inertia('QualityControls/Completed',[
+            'qualityControls' => $qualityControls,
+            'search' => $request->search ?? '', 
+            'start_date' => $request->start_date ?? '',
+            'end_date' => $request->end_date ?? '',
+        ]);
+    }
+
+    public function listOverdue(Request $request){
+        $searchQuery = QualityControl::with(['facility','users','selectedChecklistQuestions'])->search($request);
+        $qualityControls = $searchQuery->where('status','Overdue')->orderBy('created_at','desc')->paginate(50);
+        return inertia('QualityControls/Overdue',[
+            'qualityControls' => $qualityControls,
+            'search' => $request->search ?? '', 
+            'start_date' => $request->start_date ?? '',
+            'end_date' => $request->end_date ?? '',
+        ]);
+    }    
 }
+

@@ -1,6 +1,6 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, router } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';    
+    import { Head, router,Link } from '@inertiajs/vue3';
 import { Chart } from 'highcharts-vue';
 import { ref, computed, watch } from 'vue';
 
@@ -518,9 +518,9 @@ watch([startDate, endDate], () => {
       <div class="icon">
         <i class="fas fa-clipboard-check"></i>
       </div>
-      <a href="#" class="small-box-footer">
+      <Link :href="route('quality-controls.listAudits')" class="small-box-footer">
         More info <i class="fas fa-arrow-circle-right"></i>
-      </a>
+      </Link>
     </div>
   </div>
 
@@ -534,9 +534,9 @@ watch([startDate, endDate], () => {
       <div class="icon">
         <i class="fas fa-search"></i>
       </div>
-      <a href="#" class="small-box-footer">
+      <Link :href="route('quality-controls.listInspections')" class="small-box-footer">
         More info <i class="fas fa-arrow-circle-right"></i>
-      </a>
+      </Link>
     </div>
   </div>
 
@@ -550,9 +550,9 @@ watch([startDate, endDate], () => {
       <div class="icon">
         <i class="fas fa-shield-alt"></i>
       </div>
-      <a href="#" class="small-box-footer">
+      <Link :href="route('quality-controls.listSecurityTests')" class="small-box-footer">
         More info <i class="fas fa-arrow-circle-right"></i>
-      </a>
+      </Link>
     </div>
   </div>
 
@@ -566,9 +566,9 @@ watch([startDate, endDate], () => {
       <div class="icon">
         <i class="fas fa-exclamation-triangle"></i>
       </div>
-      <a href="#" class="small-box-footer">
+      <Link :href="route('securityconcerns.index')" class="small-box-footer">
         More info <i class="fas fa-arrow-circle-right"></i>
-      </a>
+      </Link>
     </div>
   </div>
 </div>
@@ -584,9 +584,9 @@ watch([startDate, endDate], () => {
       <div class="icon">
         <i class="fas fa-hourglass-half"></i>
       </div>
-      <a href="#" class="small-box-footer">
+      <Link :href="route('quality-controls.listPending')" class="small-box-footer">
         More info <i class="fas fa-arrow-circle-right"></i>
-      </a>
+      </Link>
     </div>
   </div>
 
@@ -600,9 +600,9 @@ watch([startDate, endDate], () => {
       <div class="icon">
         <i class="fas fa-spinner"></i>
       </div>
-      <a href="#" class="small-box-footer">
+      <Link :href="route('quality-controls.listInProgress')" class="small-box-footer">
         More info <i class="fas fa-arrow-circle-right"></i>
-      </a>
+      </Link>
     </div>
   </div>
 
@@ -616,9 +616,9 @@ watch([startDate, endDate], () => {
       <div class="icon">
         <i class="fas fa-check-circle"></i>
       </div>
-      <a href="#" class="small-box-footer">
+      <Link :href="route('quality-controls.listCompleted')" class="small-box-footer">
         More info <i class="fas fa-arrow-circle-right"></i>
-      </a>
+      </Link>
     </div>
   </div>
 
@@ -632,9 +632,9 @@ watch([startDate, endDate], () => {
       <div class="icon">
         <i class="fas fa-exclamation-circle"></i>
       </div>
-      <a href="#" class="small-box-footer">
+      <Link :href="route('quality-controls.listOverdue')" class="small-box-footer">
         More info <i class="fas fa-arrow-circle-right"></i>
-      </a>
+      </Link>
     </div>
   </div>
 </div>

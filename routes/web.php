@@ -96,6 +96,17 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/quality-controls/{id}/show', [QualityControlController::class, 'show'])->name('quality-controls.show');
     Route::post('/quality-controls/{id}/saveQuestionResponse', [QualityControlController::class, 'saveQuestionResponse'])->name('quality-controls.saveQuestionResponse');
 
+    Route::get('quality-controls/audits', [QualityControlController::class, 'listAudits'])->name('quality-controls.listAudits');
+    Route::get('quality-controls/inspections', [QualityControlController::class, 'listInspections'])->name('quality-controls.listInspections');
+    Route::get('quality-controls/securityTests', [QualityControlController::class, 'listSecurityTests'])->name('quality-controls.listSecurityTests');
+    Route::get('quality-controls/pending', [QualityControlController::class, 'listPending'])->name('quality-controls.listPending');
+    Route::get('quality-controls/inprogress', [QualityControlController::class, 'listInProgress'])->name('quality-controls.listInProgress');
+    Route::get('quality-controls/completed', [QualityControlController::class, 'listCompleted'])->name('quality-controls.listCompleted');
+    Route::get('quality-controls/overdue', [QualityControlController::class, 'listOverdue'])->name('quality-controls.listOverdue');
+
+
+
+
     //Audit Question Routes
     Route::get('/audit-questions', [AuditQuestionController::class, 'index'])->name('audit-questions.index'); 
     Route::get('/audit-questions/create', [AuditQuestionController::class, 'create'])->name('audit-questions.create');
@@ -151,6 +162,7 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::post('/personnels/{id}', [PersonnelController::class, 'update'])->name('personnels.update');
     Route::get('/personnels/{id}/show', [PersonnelController::class, 'show'])->name('personnels.show');
     Route::delete('/personnels/{id}', [PersonnelController::class, 'destroy'])->name('personnels.destroy');    
+    
     //Certifcations Route
     Route::get('/personnels/{id}/certifications/create', [CertificationsController::class, 'create'])->name('certifications.create');
     Route::post('/personnels/{id}/certifications', [CertificationsController::class, 'store'])->name('certifications.store');
