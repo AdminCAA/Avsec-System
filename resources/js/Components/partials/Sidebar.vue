@@ -227,7 +227,7 @@
                       :class="{ active: currentPath.startsWith('/roles') }"
                       >
                           <i class="fas fa-chevron-circle-right nav-icon"></i>
-                      <p>Roles</p>
+                      <p>User Roles</p>
                       </Link>
                   </li>
 
@@ -236,7 +236,7 @@
                       :class="{ active: currentPath.startsWith('/permissions') }"
                       >
                           <i class="fas fa-chevron-circle-right nav-icon"></i>
-                      <p>Permissions</p>
+                      <p>User Permissions</p>
                       </Link>
                   </li>
                   </ul>
