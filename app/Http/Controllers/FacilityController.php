@@ -107,6 +107,7 @@ class FacilityController extends Controller
      */
     public function show(string $id)
     {
+        
         $facility = Facility::with(['qualityControls','users'])->findOrFail($id);    
         $usersCount = $facility->users()->count();
         $audits = $facility->qualityControls()->with('users')->where('control_type', 'Audit')->paginate(2, ['*'], 'audits_page');

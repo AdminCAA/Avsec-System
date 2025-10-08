@@ -11,6 +11,7 @@ use App\Http\Controllers\QualityControlController;
 use App\Http\Controllers\AuditQuestionController;
 use App\Http\Controllers\AuditAreaCategoryController;
 use App\Http\Controllers\CertificationsController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\QualificationsController;
 use App\Http\Controllers\SecurityConcernsController;
@@ -216,5 +217,51 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::post('/users/disable2fa/{id}', [UserController::class, 'disable2fa'])->name('users.disable2fa');
 
 });
+
+
+
+
+
+//Interface routes
+   Route::get('about-us', function () {
+        return Inertia::render('Site/AboutUs');
+    })->name('aboutPage');
+
+    Route::get('contact-us', function () {
+        return Inertia::render('Site/ContactUs');
+    })->name('contactPage');
+
+    Route::post('/contacts', [ContactController::class, 'store']);
+    Route::get('/contacts', [ContactController::class, 'fetchAllContacts']);
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //require __DIR__.'/auth.php';
