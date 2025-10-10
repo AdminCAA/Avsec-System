@@ -26,7 +26,7 @@ defineProps({
             </h2>
         </template>
 
-        <div class="py-5">
+        <div class="content-wrapper py-5">
             <div class="container">
                 <div class="row ml-4 g-4">
 
@@ -91,4 +91,8 @@ defineProps({
         </div>
     </AuthenticatedLayout>
 </template>
-
+<style>
+.content-wrapper {
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+}
+</style>

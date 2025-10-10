@@ -384,3 +384,8 @@ const handleFileUpload = (event) => {
   </div>  
     </AuthenticatedLayout>
 </template>
+<style>
+.content-wrapper {
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+}
+</style>

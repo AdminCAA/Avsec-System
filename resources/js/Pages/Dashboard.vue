@@ -1,19 +1,17 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';    
-    import { Head, router,Link } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { Head, router, Link } from '@inertiajs/vue3';
 import { Chart } from 'highcharts-vue';
 import { ref, computed, watch } from 'vue';
 
 import Exporting from 'highcharts/modules/exporting';
 import Accessibility from 'highcharts/modules/accessibility'
 
-
-
-const props = defineProps({    
-    stats: {
-        type: Object,
-        required: true
-    },
+const props = defineProps({
+  stats: {
+    type: Object,
+    required: true
+  },
 });
 
 
@@ -109,9 +107,6 @@ const pieOptions = computed(() => ({
     }
   ]
 }));
-
-
-
 
 //Operator Histogram Options
 const operatorOptions = {
@@ -219,8 +214,6 @@ const operatorOptions = {
   ]
 }
 
-
-
 const categoriesStats = computed(() =>
   props.stats.operatorStats.map(item => item.operator_name)
 );
@@ -245,17 +238,12 @@ const totalSecurityConcernsStats = computed(() =>
   props.stats.operatorStats.map(item => item.total_security)
 );
 
-
-
 // const categoriesStats = props.stats.operatorStats.map(item => item.operator_name);
-
 // const openStats = props.stats.operatorStats.map(item => item.total_open_questions)
 // const overdueStats = props.stats.operatorStats.map(item => item.total_overdue_questions)
 // const closedStats = props.stats.operatorStats.map(item => item.total_closed_questions)
 // const totalQualityControlsStats = props.stats.operatorStats.map(item => item.quality_control_count);
 // const totalSecurityConcernsStats = props.stats.operatorStats.map(item => item.total_security);
-
-
 
 const operatorStatisticOptions = computed(() => ({
   accessibility: {
@@ -422,10 +410,10 @@ const operatorStatisticOptions = computed(() => ({
   ]
 }));
 
-
-
 const startDate = ref('');
 const endDate = ref('');
+const isLoading = ref(false);
+
 
 const dashboardUrl = computed(() => {
   return route('dashboard', {
@@ -438,295 +426,576 @@ const dashboardUrl = computed(() => {
 watch([startDate, endDate], () => {
   router.visit(dashboardUrl.value, {
     preserveState: true,
-    
+
     replace: true,
   });
 });
 
+
+// const exportPdf = async () => {
+//   const chartImages = [];
+
+//   const charts = document.querySelectorAll('.highcharts-container canvas');
+//   charts.forEach((canvas) => {
+//     chartImages.push(canvas.toDataURL('image/png'));
+//   });
+
+//   console.log('Captured charts:', chartImages); // Check this in the browser console
+
+//   const response = await axios.post(route('dashboard.exportPdf'), {
+//     start_date: startDate.value,
+//     end_date: endDate.value,
+//     charts: chartImages
+//   }, { responseType: 'blob' });
+
+//   const url = window.URL.createObjectURL(new Blob([response.data]));
+//   const link = document.createElement('a');
+//   link.href = url;
+//   link.download = 'Quality_Control_Summary_Report.pdf';
+//   link.click();
+// };
+
+
+const exportPdf = async () => {
+  try {
+    isLoading.value = true; // Start loading
+
+    const chartImages = [];
+    const charts = document.querySelectorAll('.highcharts-container canvas');
+
+    charts.forEach((canvas) => {
+      chartImages.push(canvas.toDataURL('image/png'));
+    });
+
+    console.log('Captured charts:', chartImages); // Debug
+
+    const response = await axios.post(route('dashboard.exportPdf'), {
+      start_date: startDate.value,
+      end_date: endDate.value,
+      charts: chartImages
+    }, { responseType: 'blob' });
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'Quality_Control_Summary_Report.pdf';
+    link.click();
+  } catch (error) {
+    console.error(error);
+  } finally {
+    isLoading.value = false; // Stop loading
+  }
+};
 
 
 </script>
 
 
 <template>
-    <Head title="Dashboard" />
-    <AuthenticatedLayout>
-        <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h3 class="m-0">Dashboard</h3>
-          </div><!-- /.col -->
-          <!-- <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Starter Page</li>
-            </ol>
-          </div> -->
-          <!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
-    <!-- /.content-header -->
 
-    <!-- Main content -->
-    <div class="content">
-      <div class="container-fluid">      
-        <h3 class="text-center mb-4">Quality Control Statistics</h3>  
-        <div class="row">
-          <div class="col-md-9">                    
-            <div class="row g-3 align-items-end">
-  <!-- Start Date -->
-  <div class="col-md-3 col-sm-6">
-    <div class="form-group">
-      <label for="startDate" class="form-label fw-bold">Start Date</label>
-      <input
-        id="startDate"
-        type="date"
-        class="form-control form-control-sm"
-        v-model="startDate"
-      >
-    </div>
-  </div>
-
-  <!-- End Date -->
-  <div class="col-md-3 col-sm-6">
-    <div class="form-group">
-      <label for="endDate" class="form-label fw-bold">End Date</label>
-      <input
-        id="endDate"
-        type="date"
-        class="form-control form-control-sm"
-        v-model="endDate"
-      >
-    </div>
-  </div>
-</div>
-
-            </div> 
+  <Head title="Dashboard" />
+  <AuthenticatedLayout>
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <div class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h3 class="m-0">Dashboard</h3>
+            </div>
+          </div>
         </div>
-        <div class="row justify-content-center">
-  <!-- Audits -->
-  <div class="col-lg-3 col-6 mb-4">
-    <div class="small-box bg-audit text-white">
-      <div class="inner">
-        <h3>{{ props.stats.totalAudits }}</h3>
-        <p>Audits</p>
       </div>
-      <div class="icon">
-        <i class="fas fa-clipboard-check"></i>
-      </div>
-      <Link :href="route('quality-controls.listAudits')" class="small-box-footer">
-        More info <i class="fas fa-arrow-circle-right"></i>
-      </Link>
-    </div>
-  </div>
 
-  <!-- Inspections -->
-  <div class="col-lg-3 col-6 mb-4">
-    <div class="small-box bg-inspection text-white">
-      <div class="inner">
-        <h3>{{ props.stats.totalInspections }}</h3>
-        <p>Inspections</p>
-      </div>
-      <div class="icon">
-        <i class="fas fa-search"></i>
-      </div>
-      <Link :href="route('quality-controls.listInspections')" class="small-box-footer">
-        More info <i class="fas fa-arrow-circle-right"></i>
-      </Link>
-    </div>
-  </div>
+      <!-- Main content -->
+      <div class="content">
+        <div class="container-fluid">
+          <h3 class="text-center mb-4"><strong>QUALITY CONTROL STATISTICS</strong></h3>
+          <hr /><br />
+          <!-- <div class="row">
+            <div class="col-md-9">
+              <div class="row g-3 align-items-end">
+                
+                <div class="col-md-3 col-sm-6">
+                  <div class="form-group">
+                    <label for="startDate" class="form-label fw-bold">Start Date</label>
+                    <input id="startDate" type="date" class="form-control form-control-sm" v-model="startDate">
+                  </div>
+                </div>
 
-  <!-- Security Tests -->
-  <div class="col-lg-3 col-6 mb-4">
-    <div class="small-box bg-security-test text-white">
-      <div class="inner">
-        <h3>{{ props.stats.totalSecurityTests }}</h3>
-        <p>Security Tests</p>
-      </div>
-      <div class="icon">
-        <i class="fas fa-shield-alt"></i>
-      </div>
-      <Link :href="route('quality-controls.listSecurityTests')" class="small-box-footer">
-        More info <i class="fas fa-arrow-circle-right"></i>
-      </Link>
-    </div>
-  </div>
+                
+                <div class="col-md-3 col-sm-6">
+                  <div class="form-group">
+                    <label for="endDate" class="form-label fw-bold">End Date</label>
+                    <input id="endDate" type="date" class="form-control form-control-sm" v-model="endDate">
+                  </div>
+                </div>
 
-  <!-- Security Concerns -->
-  <div class="col-lg-3 col-6 mb-4">
-    <div class="small-box bg-security-concern text-white">
-      <div class="inner">
-        <h3>{{ props.stats.totalSecurityConcerns }}</h3>
-        <p>Security Concerns</p>
-      </div>
-      <div class="icon">
-        <i class="fas fa-exclamation-triangle"></i>
-      </div>
-      <Link :href="route('securityconcerns.index')" class="small-box-footer">
-        More info <i class="fas fa-arrow-circle-right"></i>
-      </Link>
-    </div>
-  </div>
-</div>
+               
+                <div class="col-md-3 col-sm-6">
+                  <button class="btn btn-danger w-100" @click="exportPdf">
+                    <i class="fas fa-file-pdf"></i> Export Summary Report PDF
+                  </button>
 
-<div class="row justify-content-center">
-  <!-- Pending -->
-  <div class="col-lg-3 col-6 mb-4">
-    <div class="small-box bg-pending text-white">
-      <div class="inner">
-        <h3>{{ props.stats.pendingQualityControls }}</h3>
-        <p>Pending</p>
-      </div>
-      <div class="icon">
-        <i class="fas fa-hourglass-half"></i>
-      </div>
-      <Link :href="route('quality-controls.listPending')" class="small-box-footer">
-        More info <i class="fas fa-arrow-circle-right"></i>
-      </Link>
-    </div>
-  </div>
+                </div>
 
-  <!-- In Progress -->
-  <div class="col-lg-3 col-6 mb-4">
-    <div class="small-box bg-inprogress text-white">
-      <div class="inner">
-        <h3>{{ props.stats.inProgressQualityControls }}</h3>
-        <p>In Progress</p>
-      </div>
-      <div class="icon">
-        <i class="fas fa-spinner"></i>
-      </div>
-      <Link :href="route('quality-controls.listInProgress')" class="small-box-footer">
-        More info <i class="fas fa-arrow-circle-right"></i>
-      </Link>
-    </div>
-  </div>
+              </div>
 
-  <!-- Completed -->
-  <div class="col-lg-3 col-6 mb-4">
-    <div class="small-box bg-completed text-white">
-      <div class="inner">
-        <h3>{{ props.stats.completedQualityControls }}</h3>
-        <p>Completed</p>
-      </div>
-      <div class="icon">
-        <i class="fas fa-check-circle"></i>
-      </div>
-      <Link :href="route('quality-controls.listCompleted')" class="small-box-footer">
-        More info <i class="fas fa-arrow-circle-right"></i>
-      </Link>
-    </div>
-  </div>
+            </div>
+          </div> -->
 
-  <!-- Overdue -->
-  <div class="col-lg-3 col-6 mb-4">
-    <div class="small-box bg-overdue text-white">
-      <div class="inner">
-        <h3>{{ props.stats.overdueQualityControls }}</h3>
-        <p>Overdue</p>
-      </div>
-      <div class="icon">
-        <i class="fas fa-exclamation-circle"></i>
-      </div>
-      <Link :href="route('quality-controls.listOverdue')" class="small-box-footer">
-        More info <i class="fas fa-arrow-circle-right"></i>
-      </Link>
-    </div>
-  </div>
-</div>
+          <!-- Date Range & Export Card -->
+          <div class="card mb-4 shadow-sm">
+            <!-- Card Header -->
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Filter & Export</h5>
+            </div>
 
+            <!-- Card Body -->
+            <div class="card-body">
+              <div class="row align-items-end">
 
+                <!-- Left side: Start and End Dates -->
+                <div class="col-md-6 d-flex gap-3">
+                  <!-- Start Date -->
+                  <div class="form-group flex-grow-1">
+                    <label for="startDate" class="form-label fw-bold">Start Date</label>
+                    <input id="startDate" type="date" class="form-control form-control-sm" v-model="startDate">
+                  </div>
 
+                  <!-- End Date -->
+                  <div class="form-group flex-grow-1">
+                    <label for="endDate" class="form-label fw-bold">End Date</label>
+                    <input id="endDate" type="date" class="form-control form-control-sm" v-model="endDate">
+                  </div>
+                </div>
+
+                <!-- Right side: Export Button -->
+                <div class="col-md-6 d-flex justify-content-end">
+                  <button class="btn"
+                    style="background-color: #393E46; color: #fff; height: 32px; font-size: 14px; padding: 0 12px;"
+                    @click="exportPdf" :disabled="isLoading">
+                    <i class="fas fa-file-pdf" style="margin-right: 6px;"></i>
+                    <span v-if="!isLoading">Export Summary Report PDF</span>
+                    <span v-else>
+                      <i class="fas fa-spinner fa-spin" style="margin-right: 6px;"></i> Generating...
+                    </span>
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="row justify-content-center">
+
+            
+            <div class="col-lg-3 col-6 mb-4">
+              <div class="small-box bg-audit text-white">
+                <div class="inner">
+                  <h3>{{ props.stats.totalAudits }}</h3>
+                  <p>Audits</p>
+                </div>
+                <div class="icon">
+                  <i class="fas fa-clipboard-check"></i>
+                </div>
+                <Link :href="route('quality-controls.listAudits')" class="small-box-footer">
+                More info <i class="fas fa-arrow-circle-right"></i>
+                </Link>
+              </div>
+            </div>
+
+            
+            <div class="col-lg-3 col-6 mb-4">
+              <div class="small-box bg-inspection text-white">
+                <div class="inner">
+                  <h3>{{ props.stats.totalInspections }}</h3>
+                  <p>Inspections</p>
+                </div>
+                <div class="icon">
+                  <i class="fas fa-search"></i>
+                </div>
+                <Link :href="route('quality-controls.listInspections')" class="small-box-footer">
+                More info <i class="fas fa-arrow-circle-right"></i>
+                </Link>
+              </div>
+            </div>
+
+            
+            <div class="col-lg-3 col-6 mb-4">
+              <div class="small-box bg-security-test text-white">
+                <div class="inner">
+                  <h3>{{ props.stats.totalSecurityTests }}</h3>
+                  <p>Security Tests</p>
+                </div>
+                <div class="icon">
+                  <i class="fas fa-shield-alt"></i>
+                </div>
+                <Link :href="route('quality-controls.listSecurityTests')" class="small-box-footer">
+                More info <i class="fas fa-arrow-circle-right"></i>
+                </Link>
+              </div>
+            </div>
+
+            
+            <div class="col-lg-3 col-6 mb-4">
+              <div class="small-box bg-security-concern text-white">
+                <div class="inner">
+                  <h3>{{ props.stats.totalSecurityConcerns }}</h3>
+                  <p>Security Concerns</p>
+                </div>
+                <div class="icon">
+                  <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <Link :href="route('securityconcerns.index')" class="small-box-footer">
+                More info <i class="fas fa-arrow-circle-right"></i>
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div class="row justify-content-center">
+
+            
+            <div class="col-lg-3 col-6 mb-4">
+              <div class="small-box bg-pending text-white">
+                <div class="inner">
+                  <h3>{{ props.stats.pendingQualityControls }}</h3>
+                  <p>Pending</p>
+                </div>
+                <div class="icon">
+                  <i class="fas fa-hourglass-half"></i>
+                </div>
+                <Link :href="route('quality-controls.listPending')" class="small-box-footer">
+                More info <i class="fas fa-arrow-circle-right"></i>
+                </Link>
+              </div>
+            </div>
+
+            
+            <div class="col-lg-3 col-6 mb-4">
+              <div class="small-box bg-inprogress text-white">
+                <div class="inner">
+                  <h3>{{ props.stats.inProgressQualityControls }}</h3>
+                  <p>In Progress</p>
+                </div>
+                <div class="icon">
+                  <i class="fas fa-spinner"></i>
+                </div>
+                <Link :href="route('quality-controls.listInProgress')" class="small-box-footer">
+                More info <i class="fas fa-arrow-circle-right"></i>
+                </Link>
+              </div>
+            </div>
+
+           
+            <div class="col-lg-3 col-6 mb-4">
+              <div class="small-box bg-completed text-white">
+                <div class="inner">
+                  <h3>{{ props.stats.completedQualityControls }}</h3>
+                  <p>Completed</p>
+                </div>
+                <div class="icon">
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <Link :href="route('quality-controls.listCompleted')" class="small-box-footer">
+                More info <i class="fas fa-arrow-circle-right"></i>
+                </Link>
+              </div>
+            </div>
+
+            
+            <div class="col-lg-3 col-6 mb-4">
+              <div class="small-box bg-overdue text-white">
+                <div class="inner">
+                  <h3>{{ props.stats.overdueQualityControls }}</h3>
+                  <p>Overdue</p>
+                </div>
+                <div class="icon">
+                  <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <Link :href="route('quality-controls.listOverdue')" class="small-box-footer">
+                More info <i class="fas fa-arrow-circle-right"></i>
+                </Link>
+              </div>
+            </div>
+          </div> -->
+
+          <div class="row justify-content-center">
+            <div class="col-12">
+              <div class="card shadow-sm mb-4">
+                <!-- Card Header -->
+                <div class="card-header bg-white">
+                  <h5 class="mb-0"><strong>Quality Control Overview</strong></h5>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body">
+                  <div class="row g-3">
+
+                    <!-- Audits -->
+                    <div class="col-lg-3 col-6">
+                      <div class="small-box bg-audit text-white">
+                        <div class="inner">
+                          <h3>{{ props.stats.totalAudits }}</h3>
+                          <p>Audits</p>
+                        </div>
+                        <div class="icon">
+                          <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <Link :href="route('quality-controls.listAudits')" class="small-box-footer">
+                        More info <i class="fas fa-arrow-circle-right"></i>
+                        </Link>
+                      </div>
+                    </div>
+
+                    <!-- Inspections -->
+                    <div class="col-lg-3 col-6">
+                      <div class="small-box bg-inspection text-white">
+                        <div class="inner">
+                          <h3>{{ props.stats.totalInspections }}</h3>
+                          <p>Inspections</p>
+                        </div>
+                        <div class="icon">
+                          <i class="fas fa-search"></i>
+                        </div>
+                        <Link :href="route('quality-controls.listInspections')" class="small-box-footer">
+                        More info <i class="fas fa-arrow-circle-right"></i>
+                        </Link>
+                      </div>
+                    </div>
+
+                    <!-- Security Tests -->
+                    <div class="col-lg-3 col-6">
+                      <div class="small-box bg-security-test text-white">
+                        <div class="inner">
+                          <h3>{{ props.stats.totalSecurityTests }}</h3>
+                          <p>Security Tests</p>
+                        </div>
+                        <div class="icon">
+                          <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <Link :href="route('quality-controls.listSecurityTests')" class="small-box-footer">
+                        More info <i class="fas fa-arrow-circle-right"></i>
+                        </Link>
+                      </div>
+                    </div>
+
+                    <!-- Security Concerns -->
+                    <div class="col-lg-3 col-6">
+                      <div class="small-box bg-security-concern text-white">
+                        <div class="inner">
+                          <h3>{{ props.stats.totalSecurityConcerns }}</h3>
+                          <p>Security Concerns</p>
+                        </div>
+                        <div class="icon">
+                          <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <Link :href="route('securityconcerns.index')" class="small-box-footer">
+                        More info <i class="fas fa-arrow-circle-right"></i>
+                        </Link>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <div class="row g-3 mt-3">
+
+                    <!-- Pending -->
+                    <div class="col-lg-3 col-6">
+                      <div class="small-box bg-pending text-white">
+                        <div class="inner">
+                          <h3>{{ props.stats.pendingQualityControls }}</h3>
+                          <p>Pending</p>
+                        </div>
+                        <div class="icon">
+                          <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <Link :href="route('quality-controls.listPending')" class="small-box-footer">
+                        More info <i class="fas fa-arrow-circle-right"></i>
+                        </Link>
+                      </div>
+                    </div>
+
+                    <!-- In Progress -->
+                    <div class="col-lg-3 col-6">
+                      <div class="small-box bg-inprogress text-white">
+                        <div class="inner">
+                          <h3>{{ props.stats.inProgressQualityControls }}</h3>
+                          <p>In Progress</p>
+                        </div>
+                        <div class="icon">
+                          <i class="fas fa-spinner"></i>
+                        </div>
+                        <Link :href="route('quality-controls.listInProgress')" class="small-box-footer">
+                        More info <i class="fas fa-arrow-circle-right"></i>
+                        </Link>
+                      </div>
+                    </div>
+
+                    <!-- Completed -->
+                    <div class="col-lg-3 col-6">
+                      <div class="small-box bg-completed text-white">
+                        <div class="inner">
+                          <h3>{{ props.stats.completedQualityControls }}</h3>
+                          <p>Completed</p>
+                        </div>
+                        <div class="icon">
+                          <i class="fas fa-check-circle"></i>
+                        </div>
+                        <Link :href="route('quality-controls.listCompleted')" class="small-box-footer">
+                        More info <i class="fas fa-arrow-circle-right"></i>
+                        </Link>
+                      </div>
+                    </div>
+
+                    <!-- Overdue -->
+                    <div class="col-lg-3 col-6">
+                      <div class="small-box bg-overdue text-white">
+                        <div class="inner">
+                          <h3>{{ props.stats.overdueQualityControls }}</h3>
+                          <p>Overdue</p>
+                        </div>
+                        <div class="icon">
+                          <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <Link :href="route('quality-controls.listOverdue')" class="small-box-footer">
+                        More info <i class="fas fa-arrow-circle-right"></i>
+                        </Link>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <!-- /.col-md-6 -->
- 
- <div class="row justify-content-center">
-        <div class="col-md-4 mb-4">
-          <div>
-            <Chart :options="pieOptions" />
-        </div>          
-        </div>
-        <div class="col-md-8 mb-4">
-          <Chart :options="operatorOptions" />         
-        </div>
-        <div class="col-md-12 mb-4">
-           <Chart :options="operatorStatisticOptions" />          
-        </div>
-      </div> 
+          <div class="row justify-content-center">
+            <div class="col-md-4 mb-4">
+              <div>
+                <Chart :options="pieOptions" />
+              </div>
+            </div>
+            <div class="col-md-8 mb-4">
+              <Chart :options="operatorOptions" />
+            </div>
+            <div class="col-md-12 mb-4">
+              <Chart :options="operatorStatisticOptions" />
+            </div>
+          </div>
 
-      </div><!-- /.container-fluid -->
+        </div><!-- /.container-fluid -->
+      </div>
+      <!-- /.content -->
     </div>
-    <!-- /.content -->
-  </div>  
-    </AuthenticatedLayout>
+  </AuthenticatedLayout>
 </template>
 <style scoped>
-  .small-box {
+
+.content-wrapper {
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+}
+
+
+.small-box {
   transition: transform 0.2s ease-in-out;
 }
+
 .small-box:hover {
   transform: translateY(-5px);
 }
 
 .small-box {
-    border-radius: 0.5rem;
-    position: relative;
-    display: block;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  }
-  .small-box:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0.3rem 0.6rem rgba(0, 0, 0, 0.25);
-  }
-  .small-box .inner {
-    padding: 1rem;
-  }
-  .small-box .icon {
-    position: absolute;
-    top: 0.5rem;
-    right: 1rem;
-    font-size: 2.5rem;
-    opacity: 0.2;
-  }
-  .small-box-footer {
-    display: block;
-    padding: 0.5rem;
-    background: rgba(0, 0, 0, 0.15);
-    text-align: center;
-    color: #fff;
-    font-weight: 500;
-    border-radius: 0 0 0.5rem 0.5rem;
-    text-decoration: none;
-  }
-  .small-box-footer:hover {
-    background: rgba(0, 0, 0, 0.25);
-  }
+  border-radius: 0.5rem;
+  position: relative;
+  display: block;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
 
-  /* Custom unique background colors */
-  .bg-audit { background-color: #007bff; }       /* Blue */
-  .bg-inspection { background-color: #28a745; }  /* Green */
-  .bg-security-test { background-color: #f39c12; } /* Amber */
-  .bg-security-concern { background-color: #dc3545; } /* Red */
+.small-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0.3rem 0.6rem rgba(0, 0, 0, 0.25);
+}
 
-  .bg-pending { background-color: #17a2b8; }      /* Cyan */
-  .bg-inprogress { background-color: #6f42c1; }   /* Purple */
-  .bg-completed { background-color: #20c997; }    /* Teal */
-  .bg-overdue { background-color: #fd7e14; }      /* Orange */
-
-
+.small-box .inner {
+  padding: 1rem;
+}
 
 .small-box .icon {
-    position: absolute;
-    top: 0.5rem;
-    right: 1rem;
-    font-size: 2.5rem;
-    opacity: 0.85;
-    color: rgba(255,255,255,0.95);
-    text-shadow: 0 0 5px rgba(0,0,0,0.3);
+  position: absolute;
+  top: 0.5rem;
+  right: 1rem;
+  font-size: 2.5rem;
+  opacity: 0.2;
+}
+
+.small-box-footer {
+  display: block;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.15);
+  text-align: center;
+  color: #fff;
+  font-weight: 500;
+  border-radius: 0 0 0.5rem 0.5rem;
+  text-decoration: none;
+}
+
+.small-box-footer:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Custom unique background colors */
+.bg-audit {
+  background-color: #007bff;
+}
+
+/* Blue */
+.bg-inspection {
+  background-color: #28a745;
+}
+
+/* Green */
+.bg-security-test {
+  background-color: #f39c12;
+}
+
+/* Amber */
+.bg-security-concern {
+  background-color: #dc3545;
+}
+
+/* Red */
+
+.bg-pending {
+  background-color: #17a2b8;
+}
+
+/* Cyan */
+.bg-inprogress {
+  background-color: #6f42c1;
+}
+
+/* Purple */
+.bg-completed {
+  background-color: #20c997;
+}
+
+/* Teal */
+.bg-overdue {
+  background-color: #fd7e14;
+}
+
+/* Orange */
+.small-box .icon {
+  position: absolute;
+  top: 0.5rem;
+  right: 1rem;
+  font-size: 2.5rem;
+  opacity: 0.85;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 </style>

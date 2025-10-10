@@ -175,4 +175,8 @@ function updateFollowupControl() {
 </template>
 <style>
 
+.content-wrapper {
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+}
+
 </style>

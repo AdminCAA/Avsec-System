@@ -1,287 +1,362 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
+import AppFooter from '@/Components/AppFooter.vue';
+import { ref } from 'vue';
 
 defineProps({
-    canLogin: {
-        type: Boolean,
-    },
-    canRegister: {
-        type: Boolean,
-    },
-    laravelVersion: {
-        type: String,
-        required: true,
-    },
-    phpVersion: {
-        type: String,
-        required: true,
-    },
+  canLogin: {
+    type: Boolean,
+  },
+  canRegister: {
+    type: Boolean,
+  },
+  laravelVersion: {
+    type: String,
+    required: true,
+  },
+  phpVersion: {
+    type: String,
+    required: true,
+  },
 });
 
-function handleImageError() {
-    document.getElementById('screenshot-container')?.classList.add('!hidden');
-    document.getElementById('docs-card')?.classList.add('!row-span-1');
-    document.getElementById('docs-card-content')?.classList.add('!flex-row');
-    document.getElementById('background')?.classList.add('!hidden');
-}
+const isMobileMenuOpen = ref(false);
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+};
 </script>
+
 <template>
-    
-    <div class="welcome-container">
-        <Head title="Welcome" />
-      <header>
-        <div class="logo">
-            <img src="/assets/caa-logo.png" alt="AVSEC System Logo" style="width: 60px; height: auto;">
-            <span>Zambia Civil Aviation Authority</span>
-        </div>
-        <div class="auth">
-            <nav v-if="canLogin" class="-mx-3 flex flex-1 justify-end">
-              <Link
-                v-if="$page.props.auth.user"
-                :href="route('dashboard')"
-                class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
-              >
-                Dashboard
-              </Link>
+
+  <Head title="Home" />
+  <div class="welcome-container">
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="logo">
+        <img src="/assets/caa-logo.png" alt="CAA Logo" class="logo-img" />
+        Civil Aviation Authority
+      </div>
+
+      <!-- Hamburger Button for Mobile -->
+      <button class="hamburger" @click="toggleMobileMenu">
+        <span :class="{ 'line': true, 'line1': true, 'active': isMobileMenuOpen }"></span>
+        <span :class="{ 'line': true, 'line2': true, 'active': isMobileMenuOpen }"></span>
+        <span :class="{ 'line': true, 'line3': true, 'active': isMobileMenuOpen }"></span>
+      </button>
+
+      <!-- Nav Links -->
+      <ul :class="['nav-links', { 'mobile-open': isMobileMenuOpen }]">
+        <li>
+          <Link :href="route('welcome')" class="active">Home</Link>
+        </li>
+        <!-- <li>
+          <Link :href="route('aboutPage')">About us</Link>
+        </li> -->
+        <li>
+          <a href="https://www.caa.co.zm/about-us" target="_blank" rel="noopener noreferrer">
+            About Us
+          </a>
+        </li>
+
+
+        <template v-if="canLogin">
+          <li v-if="$page.props.auth?.user">
+            <Link :href="route('dashboard')">Dashboard</Link>
+          </li>
+          <template v-else>
+            <li>
+              <Link :href="route('login')">Login</Link>
+            </li>
+            <li v-if="canRegister">
+              <Link :href="route('register')">Register</Link>
+            </li>
+          </template>
+        </template>
+
+        <!-- <li>
+          <Link :href="route('contactPage')" class="contact-btn spaced-link">
+          Contact us
+          </Link>
+        </li> -->
+         <li>
+          <a href="https://www.caa.co.zm/contact-us" target="_blank" rel="noopener noreferrer" class="contact-btn spaced-link">
+            Contact Us
+          </a>
+        </li>
+
         
-              <template v-else>
-                <Link
-                  :href="route('login')"
-                  
-                  class="btn btn-info px-3 py-1 mr-2"
-                ><i class="nav-icon fas fa-sign-in-alt"></i>
-                    Sign in
-                </Link>
-        
-                <Link
-                  v-if="canRegister"
-                  :href="route('register')"
-                    class="btn btn-info px-3 py-1"
-                ><i class="nav-icon fas fa-user-plus"></i>
-                
-                  Register
-                </Link>
-              </template>
-            </nav>
-          </div>
-      </header>
-      <section class="hero">
-        <div class="hero-content">
-          <h1>
-            <span class="slide-in word1">AVIATION SECURITY</span> <br>
-            <span class="slide-in word2">INFORMATION MANAGEMENT</span> <br>
-            <span class="slide-in word3">SYSTEM</span>
-          </h1>
+
+      </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <img src="/assets/background.jpg" alt="Aviation security infomation" class="hero-bg" />
+
+      <div class="hero-content">
+        <h1>Aviation Security Information Management System (ASIMS)</h1>
+        <p>
+          ASIMS is a system that manages, monitors and report security quality controls in
+          order to enhance security compliance & surveillance.
+        </p>
+        <div class="hero-buttons">
+          <button class="primary-btn">Learn More</button>
+          <!-- <button class="secondary-btn">Learn More</button> -->
         </div>
-      </section>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    name: "Welcome",
-  };
-  </script>
-  
-  <style scoped>
-  /* General Styles */
-  .welcome-container {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-image: url('/assets/full_1.jpg'); /* Background image path */
-    background-size: cover; /* Makes the image cover the entire container */
-    background-position: center; /* Centers the image */
-    color: white;
-    min-height: 100vh;
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer -->
+  <AppFooter />
+</template>
+
+<style scoped>
+/* Container */
+.welcome-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #000;
+  color: #fff;
+  /* font-family: "Arial", sans-serif; */
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+  /* Updated font */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar */
+.navbar {
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 20px 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+/* Logo */
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-img {
+  height: 40px;
+  width: auto;
+}
+
+/* Nav links */
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.nav-links li a,
+.nav-links li :deep(a) {
+  text-decoration: none;
+  color: #fff;
+  font-size: 16px;
+  transition: color 0.3s;
+}
+
+.nav-links li a:hover,
+.nav-links li :deep(a:hover) {
+  color: #ddd;
+}
+
+.nav-links li a.active {
+  border: 1px solid #fff;
+  padding: 6px 15px;
+  border-radius: 20px;
+}
+
+.contact-btn {
+  background: #3f3e3e;
+  color: #000;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s ease;
+}
+
+.contact-btn:hover {
+  background: #b4b2b2;
+}
+
+/* Hamburger Menu */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 25px;
+  height: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 20;
+}
+
+.hamburger .line {
+  height: 3px;
+  width: 100%;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+
+.hamburger .line1.active {
+  transform: rotate(45deg) translateY(7px);
+}
+
+.hamburger .line2.active {
+  opacity: 0;
+}
+
+.hamburger .line3.active {
+  transform: rotate(-45deg) translateY(-7px);
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .hamburger {
     display: flex;
+  }
+
+  .nav-links {
+    position: absolute;
+    top: 80px;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.95);
     flex-direction: column;
-}
-  /* Header */
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 50px;
-  }
-  
-
-  .logo {
-    font-size: 20px;
-    font-weight: bold;
-    display: flex;
-    color: rgba(245, 245, 245, 0.833);
-    align-items: center; /* Vertically align the logo and text */
-}
-
-.logo img {
-    margin-right: 10px; /* Optional: Adds space between the logo and the text */
-}
-  
-  nav ul {
-    list-style: none;
-    padding: 0;
-    display: flex;
-  }
-  
-  nav ul li {
-    margin: 0 15px;
-  }
-  
-  nav ul li a {
-    text-decoration: none;
-    color: #bbb;
-    font-size: 14px;
-  }
-  
-  nav ul li a.active {
-    color: white;
-  }
-  
-  .auth {
-    display: flex;
-    align-items: center;
-  }
-  
-  .auth a {
-    color: white;
-    text-decoration: none;
-    margin-right: 20px;
-  }
-  
-  .get-started {
-    background: #2eca73;
-    border: none;
-    padding: 8px 15px;
-    color: white;
-    border-radius: 20px;
-    font-size: 14px;
-    cursor: pointer;
+    gap: 20px;
+    padding: 20px;
+    display: none;
   }
 
- /* Hero Section */
+  .nav-links.mobile-open {
+    display: flex;
+  }
+
+  .nav-links li a,
+  .nav-links li :deep(a) {
+    font-size: 18px;
+  }
+
+  .contact-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Hero Section */
 .hero {
-    display: flex;
-    justify-content: center; /* Moves content to the right */
-    align-items: center;
-    height: 80vh;     
-    color: white;
-  }
-  
-  /* Hero Content */
-  .hero-content {
-    text-align: right; /* Align text to the right */
-  }
-  
-  /* Slide-in animation for each word */
-  .slide-in {
-    font-size: 50px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    display: inline-block;
-    animation: slideIn 1s ease-out forwards infinite;
-  }
-  
-  /* Staggered Animations with Delay */
-  .word1 {
-    animation-delay: 0.3s;
-    animation-duration: 15s; /* Repeat every 15s */
-  }
-  .word2 {
-    animation-delay: 0.6s;
-    animation-duration: 15s;
-  }
-  .word3 {
-    animation-delay: 0.9s;
-    animation-duration: 15s;
-  }
-  
-  /* Keyframes for sliding effect */
-  @keyframes slideIn {
-    0% {
-      opacity: 0;
-      transform: translateX(100%);
-    }
-    10% {
-      opacity: 1;
-      transform: translateX(0);
-    }
-    90% {
-      opacity: 1;
-      transform: translateX(0);
-    }
-    100% {
-      opacity: 0;
-      transform: translateX(-100%);
-    }
-  }
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
 
-  .hero-content {
-    max-width: 800px; /* Limits text width */
-    text-align: right;
-  }
-  
-  .hero h1 {
-    font-size: 50px;
-    letter-spacing: 10px;
-    text-align: center;
-    color: rgba(245, 245, 245, 0.833);
-  }
-  
-  .text-box {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin: 20px 0;
-  }
-  
-  .create-things {
-    border: 2px solid white;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    font-weight: bold;
-    font-size: 20px;
-  }
-  
-  .white-text {
-    color:white;
-  }
-  
-  .amazing {
-    border: 3px solid maroon;
-    color: maroon;
-    font-weight: bold;
-    font-size: 20px;
-    padding: 15px;
-    margin-left: 10px;
-  }
-  
-  .description {
-    font-size: 14px;
-    color: #ddd;
-    line-height: 1.6;
-  }
-  
-  .see-work {
-    background: none;
-    border: 2px solid white;
-    padding: 10px 20px;
-    color: white;
-    cursor: pointer;
-    margin-top: 20px;
-  }
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 0;
+  filter: brightness(0.6);
+}
 
-    button:not(:disabled) {
-        cursor: pointer;
-        border-radius: 1.5rem;
-       
-        background-color: #6d7af3;
-    }
-    button:hover {
-        background-color: #2E5077;
-        color: white;
-    }
-  </style>
-  
+.hero-content {
+  position: relative;
+  z-index: 1;
+  padding: 0 50px;
+  max-width: 700px;
+}
+
+.hero-content h1 {
+  font-size: 48px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.hero-content p {
+  font-size: 18px;
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.primary-btn,
+.secondary-btn {
+  padding: 12px 25px;
+  border-radius: 25px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.primary-btn {
+  background: #fff;
+  color: #000;
+}
+
+.secondary-btn {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+.spaced-link {
+  margin-left: 40px;
+  /* Adjust the spacing as needed */
+}
+
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-80%);
+  }
+  15% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  70% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(80%);
+  }
+}
+
+.hero-content h1,
+.hero-content p {
+  animation: slideIn 10s ease-in-out infinite;
+}
+
+/* Slight delay for paragraph for a flowing effect */
+.hero-content p {
+  animation-delay: 1s;
+}
+
+
+</style>

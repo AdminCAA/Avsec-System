@@ -252,6 +252,11 @@ watch([startDate, endDate], () => {
     </AuthenticatedLayout>
 </template>
 <style>
+
+.content-wrapper {
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+}
+
   .table .table-selected {
     background-color: #bebebe !important; /* or any other color */
     color: white !important; /* or any other color */
