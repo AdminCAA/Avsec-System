@@ -1,4 +1,4 @@
-<script setup>
+<script setup> 
 import { ref, watch } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
@@ -37,7 +37,6 @@ watch(() => form.password, (value) => {
 </script>
 
 <template>
-
   <Head title="Login" />
   <div class="login-wrapper">
     <div class="login-container">
@@ -58,11 +57,25 @@ watch(() => form.password, (value) => {
           <input v-model="form.password" type="password" placeholder="Password" class="input-field" />
           <div v-if="passwordError" class="error">{{ passwordError }}</div>
 
-          <!-- Forgot Password Link -->
-          <Link v-if="canResetPassword" :href="route('password.request')"
-            class="mb-3 text-sm text-gray-600 underline hover:text-gray-900">
-          Forgot your password?
-          </Link>
+          <!-- Remember Me + Forgot Password Row -->
+          <div class="remember-forgot-row">
+            <label class="remember-label">
+              <input
+                type="checkbox"
+                v-model="form.remember"
+                class="remember-checkbox"
+              />
+              Remember Me
+            </label>
+
+            <Link
+              v-if="canResetPassword"
+              :href="route('password.request')"
+              class="forgot-link"
+            >
+              Forgot your password?
+            </Link>
+          </div>
 
           <button type="submit" class="btn-primary" :disabled="form.processing">
             <span v-if="form.processing"><i class="fas fa-spinner fa-spin"></i> Wait..</span>
@@ -75,7 +88,7 @@ watch(() => form.password, (value) => {
           <Link :href="route('register')">Register</Link>
         </p>
 
-        <div class="bottom-row">
+        <!-- <div class="bottom-row">
           <div class="avatars">
             <img src="/assets/user1.jpg" alt="user1" />
             <img src="/assets/user2.jpg" alt="user2" />
@@ -83,12 +96,12 @@ watch(() => form.password, (value) => {
             <span>Join with 20k+ Users!</span>
           </div>
           <button class="arrow-btn">➜</button>
-        </div>
+        </div> -->
       </div>
 
       <!-- RIGHT SIDE -->
       <div class="right-panel">
-        <h2>Aviation Security Information Management System (ASIMS).</h2>
+        <h2>Aviation <br/> Security Information Management System (ASIMS).</h2>
         <img src="/assets/register-2.jpg" class="illustration" alt="Aviation Security" />
 
         <!-- Register Info -->
@@ -96,7 +109,7 @@ watch(() => form.password, (value) => {
           <h3>New Here?</h3>
           <p>
             Register an account to access ASIMS. Once registered, you can securely log in,
-            manage your profile, and gain access to aviation security information and tools.
+            manage your profile, and gain access to Aviation Security Information.
           </p>
           <Link :href="route('register')" class="btn-register">Register Now</Link>
         </div>
@@ -132,7 +145,6 @@ html {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   font-family: 'Poppins', 'Segoe UI', sans-serif;
-  /* font-family: 'Inter', sans-serif; */
 }
 
 /* LEFT PANEL */
@@ -190,6 +202,39 @@ html {
   margin-bottom: 10px;
 }
 
+/* Remember + Forgot row */
+.remember-forgot-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.remember-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #333;
+}
+
+.remember-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.forgot-link {
+  font-size: 13px;
+  color: #005fa3;
+  text-decoration: underline;
+  transition: 0.2s;
+}
+
+.forgot-link:hover {
+  color: #003e6b;
+}
+
 .btn-primary {
   background: #000;
   color: #fff;
@@ -239,30 +284,17 @@ html {
   position: relative;
 }
 
-.right-panel h2,
-.right-panel .cta {
+.right-panel h2 {
   position: absolute;
+  top: 40px;
   z-index: 2;
   color: #fff;
   text-align: center;
   padding: 20px;
-}
-
-.right-panel h2 {
-  top: 40px;
   font-size: 28px;
-  margin-bottom: 20px;
-  width: 80%;          /* takes 80% of right panel width */
-  margin-left: auto;
-  margin-right: auto;
+  width: 80%;
+  margin: auto;
   line-height: 1.4;
-}
-
-.right-panel .cta {
-  bottom: 150px;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 80%;
 }
 
 .illustration {
@@ -324,7 +356,6 @@ html {
   }
 
   .right-panel h2,
-  .right-panel .cta,
   .register-info {
     position: static;
     transform: none;

@@ -1,64 +1,5 @@
-<!-- <template>    
- 
-  <footer class="main-footer">    
-    <span>Copyright &copy; 2025 <a href="https://www.caa.co.zm">Zambia Civil Aviation Authority</a>.</span> All rights reserved.
-  </footer>
-</template>
-<script>
-    export default {
-        
-    }
-</script> -->
-
-
 <template>
     <footer class="footer">
-        <div class="footer-container">
-            <!-- Logo + Description -->
-            <!-- <div class="footer-column logo-column">
-        <div class="logo">
-          <img src="/assets/caa-logo.png" alt="CAA Logo" />
-          <span>CIVIL AVIATION AUTHOURITY</span>
-        </div>
-
-        <p class="description">
-  Our system empowers aviation authorities to transform raw security data into clear, actionable insights — making air travel safer, smarter, and more secure across Zambia.
-</p>
-
-        <div class="social-icons">
-          <a href="#"><i class="fab fa-x-twitter"></i></a>
-          <a href="#"><i class="fab fa-instagram"></i></a>
-          <a href="#"><i class="fab fa-linkedin-in"></i></a>
-          <a href="#"><i class="fab fa-github"></i></a>
-        </div>
-      </div> -->
-
-            <!-- Navigation Links -->
-            <!-- <div class="footer-column">
-        <h3>About</h3>
-        <ul>
-          <li><a href="#">About Us</a></li>
-         
-        </ul>
-      </div> -->
-
-            <!-- <div class="footer-column">
-        <h3>Resources</h3>
-        <ul>
-          <li><a href="#">Documentation</a></li>
-         
-        </ul>
-      </div> -->
-
-            <!-- <div class="footer-column">
-        <h3>Contact</h3>
-        <ul>
-          <li><a href="#">Contact Us</a></li>
-         
-        </ul>
-      </div> -->
-        </div>
-
         <!-- Bottom Footer -->
         <div class="footer-bottom">
             <p>© 2025 Zambia Civil Aviation Authority. All rights reserved.</p>
@@ -80,13 +21,9 @@ export default {
 <style scoped>
 .footer {
     background-color: #f3f4f6;
-    /* Light gray */
     color: #4b5563;
-    /* Gray text */
     border-top: 1px solid #e5e7eb;
-    padding: 40px 20px;
-    font-family: 'Poppins', 'Segoe UI', sans-serif; /* Updated font */
-    /* font-family: sans-serif; */
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
 }
 
 .footer-container {

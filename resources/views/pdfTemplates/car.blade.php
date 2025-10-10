@@ -4,7 +4,8 @@
     <title>Corrective Action Request</title>   
     <style>
         body {
-          font-family: sans-serif;
+          /* font-family: sans-serif; */
+          font-family: 'Poppins', 'Segoe UI', sans-serif;
           font-size: 14px;
         }
         

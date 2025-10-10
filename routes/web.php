@@ -216,13 +216,35 @@ Route::middleware(['auth','verified'])->group(function () {
     //Two Factor Authentication
     Route::post('/users/disable2fa/{id}', [UserController::class, 'disable2fa'])->name('users.disable2fa');
 
+
+
+
+    // Export PDF Route
+    Route::post('/dashboard/export-pdf', [DashboardController::class, 'exportPdf'])->name('dashboard.exportPdf');
+   // Route::get('/facilities/{id}/export', [FacilityController::class, 'exportFacilitiesPdf'])->name('facilities.export');
+
+Route::get('/facilities/{id}/download-pdf', [FacilityController::class, 'downloadPdf'])->name('facilities.downloadPdf');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 });
 
 
 
 
 
-//Interface routes
+   //Interface routes
    Route::get('about-us', function () {
         return Inertia::render('Site/AboutUs');
     })->name('aboutPage');

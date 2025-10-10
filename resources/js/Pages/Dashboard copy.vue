@@ -502,16 +502,24 @@ const exportPdf = async () => {
           <div class="row mb-2">
             <div class="col-sm-6">
               <h3 class="m-0">Dashboard</h3>
-            </div>
-          </div>
-        </div>
+            </div><!-- /.col -->
+            <!-- <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Starter Page</li>
+            </ol>
+          </div> -->
+            <!-- /.col -->
+          </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
       </div>
+      <!-- /.content-header -->
 
       <!-- Main content -->
       <div class="content">
         <div class="container-fluid">
-          <h3 class="text-center mb-4"><strong>QUALITY CONTROL STATISTICS</strong></h3>
-          <hr /><br />
+          <h3 class="text-center mb-4">Quality Control Statistics</h3>
+          <hr/><br/>
           <!-- <div class="row">
             <div class="col-md-9">
               <div class="row g-3 align-items-end">
@@ -544,52 +552,41 @@ const exportPdf = async () => {
             </div>
           </div> -->
 
-          <!-- Date Range & Export Card -->
-          <div class="card mb-4 shadow-sm">
-            <!-- Card Header -->
-            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-              <h5 class="mb-0">Filter & Export</h5>
-            </div>
+          <div class="row align-items-end">
+            <!-- Left side: Start and End Dates -->
+            <div class="col-md-6 d-flex gap-3">
+              <!-- Start Date -->
+              <div class="form-group flex-grow-1">
+                <label for="startDate" class="form-label fw-bold">Start Date</label>
+                <input id="startDate" type="date" class="form-control form-control-sm" v-model="startDate">
+              </div>
 
-            <!-- Card Body -->
-            <div class="card-body">
-              <div class="row align-items-end">
-
-                <!-- Left side: Start and End Dates -->
-                <div class="col-md-6 d-flex gap-3">
-                  <!-- Start Date -->
-                  <div class="form-group flex-grow-1">
-                    <label for="startDate" class="form-label fw-bold">Start Date</label>
-                    <input id="startDate" type="date" class="form-control form-control-sm" v-model="startDate">
-                  </div>
-
-                  <!-- End Date -->
-                  <div class="form-group flex-grow-1">
-                    <label for="endDate" class="form-label fw-bold">End Date</label>
-                    <input id="endDate" type="date" class="form-control form-control-sm" v-model="endDate">
-                  </div>
-                </div>
-
-                <!-- Right side: Export Button -->
-                <div class="col-md-6 d-flex justify-content-end">
-                  <button class="btn"
-                    style="background-color: #393E46; color: #fff; height: 32px; font-size: 14px; padding: 0 12px;"
-                    @click="exportPdf" :disabled="isLoading">
-                    <i class="fas fa-file-pdf" style="margin-right: 6px;"></i>
-                    <span v-if="!isLoading">Export Summary Report PDF</span>
-                    <span v-else>
-                      <i class="fas fa-spinner fa-spin" style="margin-right: 6px;"></i> Generating...
-                    </span>
-                  </button>
-                </div>
-
+              <!-- End Date -->
+              <div class="form-group flex-grow-1">
+                <label for="endDate" class="form-label fw-bold">End Date</label>
+                <input id="endDate" type="date" class="form-control form-control-sm" v-model="endDate">
               </div>
             </div>
+
+            <!-- Right side: Export Button -->
+            <div class="col-md-6 d-flex justify-content-end" style="padding-bottom: 15px;">
+              <button class="btn"
+                style="background-color: #393E46; color: #fff; height: 32px; font-size: 14px; padding: 0 12px;"
+                @click="exportPdf" :disabled="isLoading">
+                <i class="fas fa-file-pdf" style="margin-right: 6px;"></i>
+                <span v-if="!isLoading">Export Summary Report PDF</span>
+                <span v-else>
+                  <i class="fas fa-spinner fa-spin" style="margin-right: 6px;"></i> Generating...
+                </span>
+              </button>
+            </div>
+
           </div>
 
-          <!-- <div class="row justify-content-center">
 
-            
+          <div class="row justify-content-center">
+
+            <!-- Audits -->
             <div class="col-lg-3 col-6 mb-4">
               <div class="small-box bg-audit text-white">
                 <div class="inner">
@@ -605,7 +602,7 @@ const exportPdf = async () => {
               </div>
             </div>
 
-            
+            <!-- Inspections -->
             <div class="col-lg-3 col-6 mb-4">
               <div class="small-box bg-inspection text-white">
                 <div class="inner">
@@ -621,7 +618,7 @@ const exportPdf = async () => {
               </div>
             </div>
 
-            
+            <!-- Security Tests -->
             <div class="col-lg-3 col-6 mb-4">
               <div class="small-box bg-security-test text-white">
                 <div class="inner">
@@ -637,7 +634,7 @@ const exportPdf = async () => {
               </div>
             </div>
 
-            
+            <!-- Security Concerns -->
             <div class="col-lg-3 col-6 mb-4">
               <div class="small-box bg-security-concern text-white">
                 <div class="inner">
@@ -656,7 +653,7 @@ const exportPdf = async () => {
 
           <div class="row justify-content-center">
 
-            
+            <!-- Pending -->
             <div class="col-lg-3 col-6 mb-4">
               <div class="small-box bg-pending text-white">
                 <div class="inner">
@@ -672,7 +669,7 @@ const exportPdf = async () => {
               </div>
             </div>
 
-            
+            <!-- In Progress -->
             <div class="col-lg-3 col-6 mb-4">
               <div class="small-box bg-inprogress text-white">
                 <div class="inner">
@@ -688,7 +685,7 @@ const exportPdf = async () => {
               </div>
             </div>
 
-           
+            <!-- Completed -->
             <div class="col-lg-3 col-6 mb-4">
               <div class="small-box bg-completed text-white">
                 <div class="inner">
@@ -704,7 +701,7 @@ const exportPdf = async () => {
               </div>
             </div>
 
-            
+            <!-- Overdue -->
             <div class="col-lg-3 col-6 mb-4">
               <div class="small-box bg-overdue text-white">
                 <div class="inner">
@@ -717,156 +714,6 @@ const exportPdf = async () => {
                 <Link :href="route('quality-controls.listOverdue')" class="small-box-footer">
                 More info <i class="fas fa-arrow-circle-right"></i>
                 </Link>
-              </div>
-            </div>
-          </div> -->
-
-          <div class="row justify-content-center">
-            <div class="col-12">
-              <div class="card shadow-sm mb-4">
-                <!-- Card Header -->
-                <div class="card-header bg-white">
-                  <h5 class="mb-0"><strong>Quality Control Overview</strong></h5>
-                </div>
-
-                <!-- Card Body -->
-                <div class="card-body">
-                  <div class="row g-3">
-
-                    <!-- Audits -->
-                    <div class="col-lg-3 col-6">
-                      <div class="small-box bg-audit text-white">
-                        <div class="inner">
-                          <h3>{{ props.stats.totalAudits }}</h3>
-                          <p>Audits</p>
-                        </div>
-                        <div class="icon">
-                          <i class="fas fa-clipboard-check"></i>
-                        </div>
-                        <Link :href="route('quality-controls.listAudits')" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
-                        </Link>
-                      </div>
-                    </div>
-
-                    <!-- Inspections -->
-                    <div class="col-lg-3 col-6">
-                      <div class="small-box bg-inspection text-white">
-                        <div class="inner">
-                          <h3>{{ props.stats.totalInspections }}</h3>
-                          <p>Inspections</p>
-                        </div>
-                        <div class="icon">
-                          <i class="fas fa-search"></i>
-                        </div>
-                        <Link :href="route('quality-controls.listInspections')" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
-                        </Link>
-                      </div>
-                    </div>
-
-                    <!-- Security Tests -->
-                    <div class="col-lg-3 col-6">
-                      <div class="small-box bg-security-test text-white">
-                        <div class="inner">
-                          <h3>{{ props.stats.totalSecurityTests }}</h3>
-                          <p>Security Tests</p>
-                        </div>
-                        <div class="icon">
-                          <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <Link :href="route('quality-controls.listSecurityTests')" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
-                        </Link>
-                      </div>
-                    </div>
-
-                    <!-- Security Concerns -->
-                    <div class="col-lg-3 col-6">
-                      <div class="small-box bg-security-concern text-white">
-                        <div class="inner">
-                          <h3>{{ props.stats.totalSecurityConcerns }}</h3>
-                          <p>Security Concerns</p>
-                        </div>
-                        <div class="icon">
-                          <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <Link :href="route('securityconcerns.index')" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
-                        </Link>
-                      </div>
-                    </div>
-
-                  </div>
-
-                  <div class="row g-3 mt-3">
-
-                    <!-- Pending -->
-                    <div class="col-lg-3 col-6">
-                      <div class="small-box bg-pending text-white">
-                        <div class="inner">
-                          <h3>{{ props.stats.pendingQualityControls }}</h3>
-                          <p>Pending</p>
-                        </div>
-                        <div class="icon">
-                          <i class="fas fa-hourglass-half"></i>
-                        </div>
-                        <Link :href="route('quality-controls.listPending')" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
-                        </Link>
-                      </div>
-                    </div>
-
-                    <!-- In Progress -->
-                    <div class="col-lg-3 col-6">
-                      <div class="small-box bg-inprogress text-white">
-                        <div class="inner">
-                          <h3>{{ props.stats.inProgressQualityControls }}</h3>
-                          <p>In Progress</p>
-                        </div>
-                        <div class="icon">
-                          <i class="fas fa-spinner"></i>
-                        </div>
-                        <Link :href="route('quality-controls.listInProgress')" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
-                        </Link>
-                      </div>
-                    </div>
-
-                    <!-- Completed -->
-                    <div class="col-lg-3 col-6">
-                      <div class="small-box bg-completed text-white">
-                        <div class="inner">
-                          <h3>{{ props.stats.completedQualityControls }}</h3>
-                          <p>Completed</p>
-                        </div>
-                        <div class="icon">
-                          <i class="fas fa-check-circle"></i>
-                        </div>
-                        <Link :href="route('quality-controls.listCompleted')" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
-                        </Link>
-                      </div>
-                    </div>
-
-                    <!-- Overdue -->
-                    <div class="col-lg-3 col-6">
-                      <div class="small-box bg-overdue text-white">
-                        <div class="inner">
-                          <h3>{{ props.stats.overdueQualityControls }}</h3>
-                          <p>Overdue</p>
-                        </div>
-                        <div class="icon">
-                          <i class="fas fa-exclamation-circle"></i>
-                        </div>
-                        <Link :href="route('quality-controls.listOverdue')" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
-                        </Link>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -893,12 +740,6 @@ const exportPdf = async () => {
   </AuthenticatedLayout>
 </template>
 <style scoped>
-
-.content-wrapper {
-  font-family: 'Poppins', 'Segoe UI', sans-serif;
-}
-
-
 .small-box {
   transition: transform 0.2s ease-in-out;
 }

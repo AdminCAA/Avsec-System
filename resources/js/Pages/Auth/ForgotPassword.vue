@@ -58,7 +58,7 @@ watch(() => form.email, (value) => {
             <!-- RIGHT SIDE -->
             <div class="right-panel">
                 <h2>Password Recovery</h2>
-                <img src="/assets/verify.jpeg" class="illustration" alt="Password Reset" />
+                <img src="/assets/register-2.jpg" class="illustration" alt="Password Reset" />
 
                 <div class="register-info">
                     <h3>Forgot Your Password?</h3>

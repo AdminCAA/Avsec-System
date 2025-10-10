@@ -18,7 +18,7 @@ export default {
     <div class="about-us-page">
         <!-- Hero Section -->
         <section class="hero">
-            <img class="hero-image" src="/assets/sec-2.jpg" alt="About Us" />
+            <img class="hero-image" src="/assets/register-2.jpg" alt="About Us" />
             <div class="hero-content">
                 <h2>About Us</h2>
                 <p>

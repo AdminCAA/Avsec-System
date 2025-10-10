@@ -4,20 +4,19 @@
     <title>Quality Control Report</title>    
     <style>
         body {
-          font-family: sans-serif;
+          font-family: 'Poppins', 'Segoe UI', sans-serif;
           font-size: 14px;
         }
         
-        /* Ensure no gaps and margins between cells */
         table {
           width: 100%;
-          border-collapse: collapse; /* Important to remove spacing between borders */
+          border-collapse: collapse;
         }
         
         th, td {
           border: 1px solid #000;
-          padding: 6px;   /* Change to 0 if you want no space inside cells */
-          margin: 0;      /* Removes any outer margin (though rarely applied to td) */
+          padding: 6px;  
+          margin: 0; 
         }
         
         h2, h3 {
@@ -76,10 +75,10 @@
         <h4>LIST OF ZCAA DOCUMENTS RELATED TO THE AVIATION SECURITY OVERSIGHT</h4>
         <ul>
             <li>NCASP 	-  National Civil Aviation Security Programme</li>
-            <li>NCASTP 	– National Civil Aviation Security Training Programme</li>
-            <li>NCASQCP	– National Civil Aviation Security Quality Control Programme</li>
-            <li>ZCARs 	– Zambia Civil Aviation Requirements Part 20</li>
-            <li>ASIM 	– Aviation Security Inspector’s Manual</li>
+            <li>NCASTP 	- National Civil Aviation Security Training Programme</li>
+            <li>NCASQCP	- National Civil Aviation Security Quality Control Programme</li>
+            <li>ZCARs 	- Zambia Civil Aviation Requirements Part 20</li>
+            <li>ASIM 	- Aviation Security Inspectors Manual</li>
         </ul>
 
         <div style="page-break-before: always;"></div>
@@ -114,11 +113,11 @@
                                 <td>{{ $question->recommendations ?? 'N/A' }}</td>                                
                                 <td
                                     @if ($question->status === 'Open')
-                                        style="background-color: #f8d7da; color: #721c24;"  {{-- Red --}}
+                                        style="background-color: #f8d7da; color: #721c24;"  
                                     @elseif ($question->status === 'Closed')
-                                        style="background-color: #d4edda; color: #155724;"  {{-- Green --}}
+                                        style="background-color: #d4edda; color: #155724;"  
                                     @else
-                                        style="background-color: #fff3cd; color: #856404;"  {{-- Yellow --}}
+                                        style="background-color: #fff3cd; color: #856404;"  
                                     @endif
                                 >
                                     @if ($question->status === 'Open')
@@ -131,11 +130,11 @@
                                 </td>
                                 <td
                                 @if ($question->finding_category === 'Compliant')
-                                    style="background-color: #d4edda; color: #155724;"  {{-- Green --}}
+                                    style="background-color: #d4edda; color: #155724;"  
                                 @elseif ($question->finding_category === 'Not Compliant(Minor)')
-                                    style="background-color: #fff3cd; color: #856404;"  {{-- Yellow --}}
+                                    style="background-color: #fff3cd; color: #856404;" 
                                 @elseif ($question->finding_category === 'Not Compliant(Serious)')
-                                    style="background-color: #f8d7da; color: #721c24;"  {{-- Red --}}
+                                    style="background-color: #f8d7da; color: #721c24;"  
                                 @endif
                             >
                                 @if ($question->finding_category === 'Compliant')

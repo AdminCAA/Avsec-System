@@ -49,9 +49,15 @@ const toggleMobileMenu = () => {
         <li>
           <Link :href="route('welcome')" class="active">Home</Link>
         </li>
-        <li>
+        <!-- <li>
           <Link :href="route('aboutPage')">About us</Link>
+        </li> -->
+        <li>
+          <a href="https://www.caa.co.zm/about-us" target="_blank" rel="noopener noreferrer">
+            About Us
+          </a>
         </li>
+
 
         <template v-if="canLogin">
           <li v-if="$page.props.auth?.user">
@@ -67,11 +73,19 @@ const toggleMobileMenu = () => {
           </template>
         </template>
 
-        <li>
+        <!-- <li>
           <Link :href="route('contactPage')" class="contact-btn spaced-link">
           Contact us
           </Link>
+        </li> -->
+         <li>
+          <a href="https://www.caa.co.zm/contact-us" target="_blank" rel="noopener noreferrer" class="contact-btn spaced-link">
+            Contact Us
+          </a>
         </li>
+
+        
+
       </ul>
     </nav>
 
@@ -82,12 +96,12 @@ const toggleMobileMenu = () => {
       <div class="hero-content">
         <h1>Aviation Security Information Management System (ASIMS)</h1>
         <p>
-          ASIMS is a system that manages, monitors, and reports aviation security activities
-          to enhance safety and compliance.
+          ASIMS is a system that manages, monitors and report security quality controls in
+          order to enhance security compliance & surveillance.
         </p>
         <div class="hero-buttons">
-          <button class="primary-btn">Explore our solutions</button>
-          <button class="secondary-btn">Learn More</button>
+          <button class="primary-btn">Learn More</button>
+          <!-- <button class="secondary-btn">Learn More</button> -->
         </div>
       </div>
     </section>
@@ -343,37 +357,6 @@ const toggleMobileMenu = () => {
 .hero-content p {
   animation-delay: 1s;
 }
-
-
-/* @keyframes slideIn {
-  0% {
-    opacity: 0;
-    transform: translateX(80%);
-  }
-  15% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  70% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(-80%);
-  }
-}
-
-.hero-content h1,
-.hero-content p {
-  animation: slideIn 10s ease-in-out infinite;
-}
-
-
-.hero-content p {
-  animation-delay: 1s;
-} */
-
 
 
 </style>

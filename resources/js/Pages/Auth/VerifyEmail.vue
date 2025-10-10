@@ -64,8 +64,8 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
 
       <!-- RIGHT PANEL -->
       <div class="right-panel">
-        <h2>Aviation Security Information Management System (ASIMS).</h2>
-        <img src="/assets/verify.jpeg" class="illustration" alt="Email Verification" />
+        <h2>Aviation <br/> Security Information Management System (ASIMS).</h2>
+        <img src="/assets/register-2.jpg" class="illustration" alt="Email Verification" />
 
         <div class="register-info">
           <h3>Need Help?</h3>

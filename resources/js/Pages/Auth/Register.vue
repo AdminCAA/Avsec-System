@@ -89,7 +89,7 @@ watch(() => form.password_confirmation, (value) => {
           <Link :href="route('login')">Login</Link>
         </p>
 
-        <div class="bottom-row">
+        <!-- <div class="bottom-row">
           <div class="avatars">
             <img src="/assets/user1.jpg" alt="user1" />
             <img src="/assets/user2.jpg" alt="user2" />
@@ -97,19 +97,19 @@ watch(() => form.password_confirmation, (value) => {
             <span>Join with 20k+ Users!</span>
           </div>
            <button class="arrow-btn">➜</button>
-        </div>
+        </div> -->
       </div>
 
       <!-- RIGHT PANEL -->
       <div class="right-panel">
-        <h2>Aviation Security Information Management System (ASIMS).</h2>
+        <h2>Aviation <br/> Security Information Management System (ASIMS).</h2>
         <img src="/assets/register-2.jpg" class="illustration" alt="Register" />
         
         <div class="register-info">
           <h3>New Here?</h3>
           <p>
             Register an account to access ASIMS. Once registered, you can securely log in, 
-            manage your profile, and gain access to aviation security information and tools.
+            manage your profile, and gain access to Aviation Security Information.
           </p>
           <Link :href="route('login')" class="btn-register">Back to Login</Link>
         </div>
