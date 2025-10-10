@@ -1,11 +1,9 @@
 <script setup>
-import GuestLayout from '@/Layouts/GuestLayout.vue';
-import { Head,Link, useForm } from '@inertiajs/vue3';
+import { ref, watch } from 'vue';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 
 defineProps({
-    status: {
-        type: String,
-    },
+    status: { type: String },
 });
 
 const form = useForm({
@@ -15,98 +13,248 @@ const form = useForm({
 const submit = () => {
     form.post(route('password.email'));
 };
+
+// Error
+const emailError = ref('');
+
+watch(() => form.email, (value) => {
+    emailError.value = '';
+    if (!value) emailError.value = 'Email is required.';
+    else if (!/^\S+@\S+\.\S+$/.test(value)) emailError.value = 'Enter a valid email address.';
+});
 </script>
 
 <template>
-    <GuestLayout>
-        <Head title="Forgot Password" />
-        <div class="register-box mt-10">  
-  
-  <div class="card card-info">
-      <div class="card-header">
-          <h2 class="card-title">Forgot Password</h2>
-      </div>
-      <div class="card-body register-card-body">     
-        <div class="mb-4 text-sm text-gray-600">
-            <p>Forgot your password? No problem. Just let us know your email
-            address and we will email you a password reset link that will allow
-            you to choose a new one.</p>
-        </div>
 
-        <div v-if="status" class="mb-3 small fw-medium text-success">
-            {{ status }}
-        </div>
+    <Head title="Forgot Password" />
+    <div class="login-wrapper">
+        <div class="login-container">
+            <!-- LEFT SIDE -->
+            <div class="left-panel">
+                <div class="header-section">
+                    <img src="/assets/caa-logo.png" alt="CAA Logo" class="caa-logo" />
+                    <h2 class="welcome-title">Forgot Password</h2>
+                    <p class="subtitle">
+                        Enter your email address and we will send you a link to reset your password.
+                    </p>
+                </div>
 
-        <form @submit.prevent="submit">
-            <div class="input-group mb-3">               
-                <input
-                    id="email"
-                    type="email"
-                    class="form-control"
-                    v-model="form.email"
-                    name="email"
-                    :class="{ 'is-invalid': form.errors.email }"
-                    placeholder="Email"
-                    required
-                    autofocus
-                    autocomplete="username"
-                />
-                <div class="input-group-append">
-                    <div class="input-group-text">
-                        <span class="fas fa-envelope"></span>
+                <form @submit.prevent="submit" class="login-form">
+                    <input v-model="form.email" type="email" placeholder="Email" class="input-field" />
+                    <div v-if="emailError" class="error">{{ emailError }}</div>
+                    <div v-if="form.errors.email" class="error">{{ form.errors.email }}</div>
+
+                    <button type="submit" class="btn-primary" :disabled="form.processing">
+                        <span v-if="form.processing"><i class="fas fa-spinner fa-spin"></i> Sending...</span>
+                        <span v-else>Email Password Reset Link</span>
+                    </button>
+
+                    <div v-if="status" class="success-message">
+                        {{ status }}
                     </div>
-                </div>
-                <div style="width:100%" v-if="form.errors.email" class="text-danger text-sm mb-3">
-                    {{ form.errors.email }}
-                </div>
+                </form>
             </div>
 
-            <div class="row">
-                <div class="col-2"></div>
-            <div class="col-10 d-flex ">
-                <button
-                    type="submit"
-                    class="btn btn-info btn-block ml-auto mr-2"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
-                >
-                <span v-if="form.processing">
-                        <i class="fas fa-spinner fa-spin"></i> Wait..
-                    </span>
-                    <span v-else>
-                        Email Password Reset Link
-                    </span>                      
-                </button>
-                <Link :href="route('welcome')" class="btn btn-default float-right">
-                    Cancel
-                </Link>  
+            <!-- RIGHT SIDE -->
+            <div class="right-panel">
+                <h2>Password Recovery</h2>
+                <img src="/assets/register-2.jpg" class="illustration" alt="Password Reset" />
+
+                <div class="register-info">
+                    <h3>Forgot Your Password?</h3>
+                    <p>
+                        No worries! Enter your email, and we will send you a link
+                        to reset your password and regain access to your ASIMS account securely.
+                    </p>
+
+                    <Link :href="route('login')" class="btn-register">Back to Login</Link>
+                </div>
             </div>
-            </div>
-            
-        </form>
         </div>
     </div>
-    </div>
-    </GuestLayout>
 </template>
+
 <style scoped>
-    .register-box {
-        width: auto !important;
-        margin-top: 50px;        
-        border-radius: 10px; 
-        overflow: hidden; 
+/* Reuse same styles as login.vue */
+.login-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: #f0f2f5;
+    padding: 40px;
+}
+
+.login-container {
+    display: flex;
+    width: 80%;
+    min-height: 70vh;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+}
+
+.left-panel {
+    flex: 1;
+    background: #fff;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.header-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.caa-logo {
+    width: 120px;
+    height: auto;
+    margin-bottom: 15px;
+}
+
+.welcome-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #666;
+    max-width: 310px;
+    text-align: center;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-field {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 15px;
+}
+
+.error {
+    font-size: 13px;
+    color: red;
+    margin-bottom: 10px;
+}
+
+.success-message {
+    font-size: 13px;
+    color: green;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.btn-primary {
+    background: #000;
+    color: #fff;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.right-panel {
+    flex: 1;
+    background: #e9f5f9;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.right-panel h2 {
+    position: absolute;
+    top: 40px;
+    font-size: 28px;
+    color: #fff;
+    text-align: center;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.4;
+    z-index: 2;
+}
+
+.illustration {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.register-info {
+    position: absolute;
+    bottom: 40px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 80%;
+}
+
+.register-info h3 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.register-info p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.btn-register {
+    display: inline-block;
+    background-color: #000;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.btn-register:hover {
+    background-color: #005fa3;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .login-container {
+        flex-direction: column;
+        width: 95%;
+        height: auto;
     }
 
-    label:not(.form-check-label):not(.custom-file-label) {
-        font-weight: 400 !important;
+    .left-panel,
+    .right-panel {
+        flex: none;
+        width: 100%;
+        min-height: auto;
+        padding: 20px;
     }
 
-    .btn-block {
-        display: block;
-        width: 60% !important;
+    .right-panel h2,
+    .register-info {
+        position: static;
+        transform: none;
+        margin-top: 20px;
     }
 
-    input.is-invalid {
-        border-color: #dc3545;
+    .illustration {
+        height: 250px;
     }
+}
 </style>

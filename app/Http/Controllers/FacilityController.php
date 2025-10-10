@@ -115,6 +115,7 @@ class FacilityController extends Controller implements HasMiddleware
      */
     public function show(string $id)
     {
+        
         $facility = Facility::with(['qualityControls','users'])->findOrFail($id);    
         $usersCount = $facility->users()->count();
         $audits = $facility->qualityControls()->with('users')->where('control_type', 'Audit')->paginate(2, ['*'], 'audits_page');
@@ -249,6 +250,59 @@ class FacilityController extends Controller implements HasMiddleware
         ]);
         return $pdf->download('operators.pdf');        
     }
+
+
+    // public function downloadPdf($id)
+    // {
+    //     $facility = Facility::with(['qualityControls', 'users'])->findOrFail($id);
+
+    //     $qualityControls = $facility->qualityControls;
+
+    //     $qualityControlCounts = [
+    //         'audits' => $facility->qualityControls->where('control_type', 'Audit')->count(),
+    //         'inspections' => $facility->qualityControls->where('control_type', 'Inspection')->count(),
+    //         'securityTests' => $facility->qualityControls->where('control_type', 'Security Test')->count(),
+    //     ];
+
+    //     $usersCount = $facility->users()->count();
+
+    //     $pdf = Pdf::loadView('pdfTemplates.facility_quality_controls', [
+    //         'facility' => $facility,
+    //         'qualityControls' => $qualityControls,
+    //         'qualityControlCounts' => $qualityControlCounts,
+    //         'usersCount' => $usersCount
+    //     ]);
+
+    //     return $pdf->download($facility->name . '_quality_controls.pdf');
+    // }
+
+    public function downloadPdf($id)
+    {
+        $facility = Facility::with(['qualityControls', 'users'])->findOrFail($id);
+
+        $qualityControls = $facility->qualityControls;
+
+        $qualityControlCounts = [
+            'audits' => $facility->qualityControls->where('control_type', 'Audit')->count(),
+            'inspections' => $facility->qualityControls->where('control_type', 'Inspection')->count(),
+            'securityTests' => $facility->qualityControls->where('control_type', 'Security Test')->count(),
+        ];
+
+        $usersCount = $facility->users()->count();
+
+        $pdf = Pdf::loadView('pdfTemplates.facility_quality_controls', [
+            'facility' => $facility,
+            'qualityControls' => $qualityControls,
+            'qualityControlCounts' => $qualityControlCounts,
+            'usersCount' => $usersCount,
+        ])->setPaper('a4', 'landscape'); // Set to landscape
+
+        return $pdf->download($facility->name . '_quality_controls.pdf');
+    }
+
+
+
+
 
 
 

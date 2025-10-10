@@ -84,13 +84,12 @@ watch(() => form.audit_area_category_id, (value) => {
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h3 class="m-0">Audit Question / Create</h3>
+                    <h3 class="m-0"><strong>Audit Question / Create</strong></h3>
                 </div>                
             </div>
         </div>
         </div>
    
-
     <div class="content">
       <div class="container-fluid">
         <div class="d-flex justify-content-center align-items-center min-vh-60  bg-light">
@@ -162,5 +161,9 @@ watch(() => form.audit_area_category_id, (value) => {
   </AuthenticatedLayout>
 </template>
 <style>
+
+.content-wrapper {
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+}
 
 </style>

@@ -402,6 +402,11 @@ const deleteCertificate = (id)=>{
   </AuthenticatedLayout>
 </template>
 <style>
+
+.content-wrapper {
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+}
+
   .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
    color: #fff !important;
     background-color: #17a2b8 !important;

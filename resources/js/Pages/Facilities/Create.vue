@@ -10,7 +10,7 @@ const props = defineProps({
   categories: {
     type: Array,
     required: true
-  }, 
+  },
   departments: {
     type: Object,
     required: true
@@ -27,8 +27,6 @@ const form = useForm({
   contact_number: '',
   email: '',
 });
-
-
 
 const isLoading = ref(false);
 const formErrors = ref({});
@@ -74,8 +72,8 @@ watch(() => form.name, (value) => {
   formErrors.value.name = !value?.trim()
     ? 'Name is required.'
     : value.length < 3
-    ? 'Name must be at least 3 characters.'
-    : '';
+      ? 'Name must be at least 3 characters.'
+      : '';
 });
 
 watch(() => form.email, (value) => {
@@ -89,146 +87,136 @@ watch(() => form.email, (value) => {
 </script>
 
 <template>
+
   <Head title="Create Operator" />
   <AuthenticatedLayout>
-    <div class="content-wrapper">    
-        <div class="content-header">
+    <div class="content-wrapper">
+      <div class="content-header">
         <div class="container-fluid">
-            <div class="row mb-2">
+          <div class="row mb-2">
             <div class="col-sm-6">
-                <h3 class="m-0">Operator / Create</h3>
+              <h3 class="m-0"><strong>Operator / Create</strong></h3>
             </div>
             <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><Link class="btn btn-info" :href="route('facilities.index')"><i class="fas fa-arrow-left"></i> Back</Link></li>
-                </ol>
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">
+                  <Link class="btn btn-info" :href="route('facilities.index')"><i class="fas fa-arrow-left"></i> Back
+                  </Link>
+                </li>
+              </ol>
             </div>
-            </div>
+          </div>
         </div>
-        </div>
-   
+      </div>
 
-    <div class="content">
-      <div class="container-fluid">
-        <div class="d-flex justify-content-center align-items-center min-vh-60  bg-light">
+      <div class="content">
+        <div class="container-fluid">
+          <div class="d-flex justify-content-center align-items-center min-vh-60  bg-light">
             <div class="row w-100 justify-content-center">
-                <div class="col-md-10 mb-4">                    
-                    <!-- general form elements -->
-                    <div class="card card-info">
-                        <div class="card-header">
-                            <h3 class="card-title">Create Operator</h3>
+              <div class="col-md-10 mb-4">
+
+                <div class="card card-info">
+                  <div class="card-header">
+                    <h3 class="card-title">Create Operator</h3>
+                  </div>
+                  <form @submit.prevent="createFacility">
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="form-group col-md-6">
+                          <label>Name</label>
+                          <input required v-model="form.name" type="text" class="form-control"
+                            :class="{ 'is-invalid': formErrors.name, 'is-valid': form.name && !formErrors.name }"
+                            placeholder="Enter Facility Name">
+                          <InputError :message="formErrors.name" class="mt-1" />
                         </div>
-                        <!-- form start -->                        
-                        <form @submit.prevent="createFacility">
-                            <div class="card-body">
-                              <!-- Name -->
-                               <!-- Row 1: Name & Category -->
-                              <div class="row">
-                                <div class="form-group col-md-6">
-                                  <label>Name</label>
-                                  <input required
-                                    v-model="form.name" 
-                                    type="text" 
-                                    class="form-control"
-                                    :class="{ 'is-invalid': formErrors.name, 'is-valid': form.name && !formErrors.name }"
-                                    placeholder="Enter Facility Name">
-                                  <InputError :message="formErrors.name" class="mt-1" />
-                                </div>
 
-                                <div class="form-group col-md-6">
-                                  <label>Category</label>
-                                  <select required v-model="form.category" class="form-control"
-                                    :class="{ 'is-invalid': formErrors.category, 'is-valid': form.category && !formErrors.category }"
-                                  >
-                                    <option value="">-- Select Category --</option>
-                                    <option v-for="option in props.categories" :key="option" :value="option">{{ option }}</option>
-                                  </select>
-                                  <InputError :message="formErrors.category" class="mt-1" />
-                                </div>
-                              </div>
+                        <div class="form-group col-md-6">
+                          <label>Category</label>
+                          <select required v-model="form.category" class="form-control"
+                            :class="{ 'is-invalid': formErrors.category, 'is-valid': form.category && !formErrors.category }">
+                            <option value="">-- Select Category --</option>
+                            <option v-for="option in props.categories" :key="option" :value="option">{{ option }}
+                            </option>
+                          </select>
+                          <InputError :message="formErrors.category" class="mt-1" />
+                        </div>
+                      </div>
 
-                             
-                              <!-- Row 2: Description -->
-                              <div class="row">
-                                <div class="form-group col-md-6">
-                                    <label>Target Department</label>
-                                    <select required v-model="form.department_id" class="form-control"
-                                        :class="{ 'is-invalid': formErrors.department_id, 'is-valid': form.department_id && !formErrors.department_id }"
-                                    >
-                                        <option value="">-- Target Department --</option>
-                                        <option v-for="item in props.departments" :key="item" :value="item.id">{{ item.name }}</option>
-                                    </select>
-                                    <InputError :message="formErrors.status" class="mt-1" />
-                                    </div>
-                                   
+                      <!-- Row 2: Description -->
+                      <div class="row">
+                        <div class="form-group col-md-6">
+                          <label>Target Department</label>
+                          <select required v-model="form.department_id" class="form-control"
+                            :class="{ 'is-invalid': formErrors.department_id, 'is-valid': form.department_id && !formErrors.department_id }">
+                            <option value="">-- Target Department --</option>
+                            <option v-for="item in props.departments" :key="item" :value="item.id">{{ item.name }}
+                            </option>
+                          </select>
+                          <InputError :message="formErrors.status" class="mt-1" />
+                        </div>
 
-                                <div class="form-group col-md-6">
-                                  <label>Description</label>
-                                  <textarea v-model="form.description" class="form-control" rows="2" placeholder="Optional"></textarea>
-                                </div>
-                              </div>                                                      
 
-                               <!-- Row 3: Location & Address -->
-                              <div class="row">
-                                <div class="form-group col-md-6">
-                                  <label>Location</label>
-                                  <input 
-                                    v-model="form.location" 
-                                    type="text" 
-                                    class="form-control" 
-                                    placeholder="Location">
-                                </div>
+                        <div class="form-group col-md-6">
+                          <label>Description</label>
+                          <textarea v-model="form.description" class="form-control" rows="2"
+                            placeholder="Optional"></textarea>
+                        </div>
+                      </div>
 
-                                <div class="form-group col-md-6">
-                                  <label>Address</label>
-                                  <input 
-                                    v-model="form.address" 
-                                    type="text" 
-                                    class="form-control" 
-                                    placeholder="Physical Address">
-                                </div>
-                              </div>
+                      <!-- Row 3: Location & Address -->
+                      <div class="row">
+                        <div class="form-group col-md-6">
+                          <label>Location</label>
+                          <input v-model="form.location" type="text" class="form-control" placeholder="Location">
+                        </div>
 
-                              
-                              <!-- Row 4: Contact & Email -->
-                              <div class="row">
-                                <div class="form-group col-md-6">
-                                  <label>Email</label>
-                                  <input 
-                                    v-model="form.email" 
-                                    type="email" 
-                                    class="form-control"
-                                    :class="{ 'is-invalid': formErrors.email, 'is-valid': form.email && !formErrors.email }"
-                                    placeholder="example@domain.com">
-                                  <InputError :message="formErrors.email" class="mt-1" />
-                                </div>
+                        <div class="form-group col-md-6">
+                          <label>Address</label>
+                          <input v-model="form.address" type="text" class="form-control" placeholder="Physical Address">
+                        </div>
+                      </div>
 
-                                <div class="form-group col-md-6">
-                                  <label>Contact Number</label>
-                                  <input v-model="form.contact_number" type="text" class="form-control" placeholder="Phone Number">
-                                </div>                                
-                              </div>
-                            </div>
+                      <!-- Row 4: Contact & Email -->
+                      <div class="row">
+                        <div class="form-group col-md-6">
+                          <label>Email</label>
+                          <input v-model="form.email" type="email" class="form-control"
+                            :class="{ 'is-invalid': formErrors.email, 'is-valid': form.email && !formErrors.email }"
+                            placeholder="example@domain.com">
+                          <InputError :message="formErrors.email" class="mt-1" />
+                        </div>
 
-                            <div class="card-footer d-flex justify-content-end">
-                              <button :disabled="isLoading" type="submit" class="btn btn-info mr-2">
-                                <span v-if="isLoading"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
-                                <span v-else><i class="fas fa-save"></i> Submit</span>
-                              </button>
-                              <Link :href="route('facilities.index')" class="btn btn-secondary">
-                                <i class="fas fa-times-circle"></i> Cancel
-                              </Link>
-                            </div>
-                          </form>
+                        <div class="form-group col-md-6">
+                          <label>Contact Number</label>
+                          <input v-model="form.contact_number" type="text" class="form-control"
+                            placeholder="Phone Number">
+                        </div>
+                      </div>
                     </div>
-                </div>
-            </div>
-    </div>
 
-       
+                    <div class="card-footer d-flex justify-content-end">
+                      <button :disabled="isLoading" type="submit" class="btn btn-info mr-2">
+                        <span v-if="isLoading"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
+                        <span v-else><i class="fas fa-save"></i> Submit</span>
+                      </button>
+                      <Link :href="route('facilities.index')" class="btn btn-secondary">
+                      <i class="fas fa-times-circle"></i> Cancel
+                      </Link>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    
-  </div>  
   </AuthenticatedLayout>
 </template>
+
+<style>
+
+.content-wrapper {
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+}
+</style>

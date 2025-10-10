@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\Facility;
 use App\Models\QualityControl;
 use App\Models\SelectedChecklistQuestion;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 
@@ -173,4 +175,27 @@ class DashboardController extends Controller implements HasMiddleware
             'operatorStats'=> $result, // Quality control stats for each operator            
         ]; 
     }
+
+    public function exportPdf(Request $request)
+    {
+        $charts = $request->input('charts');
+        Log::info('Received charts count:', [is_array($charts) ? count($charts) : 'not array']);
+
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+
+        $stats = $this->getDashboardStats($startDate, $endDate);
+
+        $pdf = Pdf::loadView('pdfTemplates.dashboard-summary', [
+            'stats' => $stats,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'charts' => $charts,
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download('Dashboard_Summary_' . now()->format('Y-m-d') . '.pdf');
+    }
+
+
+
 }

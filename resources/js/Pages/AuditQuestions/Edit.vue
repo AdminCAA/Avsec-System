@@ -88,7 +88,7 @@ watch(() => form.audit_area_category_id, (value) => {
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h3 class="m-0">Audit Question / Edit</h3>
+                        <h3 class="m-0"><strong>Audit Question / Edit</strong></h3>
                     </div>                
                 </div>
             </div>
@@ -168,4 +168,7 @@ watch(() => form.audit_area_category_id, (value) => {
 </template>
 <style>
 
+.content-wrapper {
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+}
 </style>
