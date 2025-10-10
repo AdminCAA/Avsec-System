@@ -352,7 +352,7 @@ const deleteFollowup = (id)=>{
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-12">
-                    <h4><Link :href="route('facilities.show',qualityControl.facility.id)">{{ qualityControl.facility.name }} </Link> / <Link :href="route('quality-controls.edit',qualityControl.id)">{{ qualityControl.title }} - {{  qualityControl.control_type }} </Link></h4>                    
+                    <h4><Link :href="route('facilities.show',qualityControl.facility.id)">{{ qualityControl.facility.name }} </Link> / <Link :href="route('quality-controls.edit',qualityControl.id)">{{ qualityControl.title }} - {{  qualityControl.control_type }} </Link> / <Link :href="route('quality-controls.show',qualityControl.id)">Checklist</Link></h4>                    
                 </div>                
             </div>
         </div>

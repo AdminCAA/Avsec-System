@@ -9,9 +9,20 @@ use App\Models\Qualification;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class QualificationsController extends Controller
+
+
+class QualificationsController extends Controller implements HasMiddleware
 {
+    
+    public static function middleware():array {
+        return [
+            new Middleware('permission:manage qualifications', only: ['index','create','store','edit','update','destroy']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

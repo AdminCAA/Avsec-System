@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link, useForm, router } from '@inertiajs/vue3';
+import { Head,usePage, Link, useForm, router } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 import dayjs from 'dayjs';
 import Swal from 'sweetalert2';
@@ -29,6 +29,15 @@ const {facilities,statuses, securityEquipment ,maintainanceSchedules} = definePr
     required:true
   }
 });
+
+const page = usePage()
+  const roles = page.props.auth.user.roles;
+  const hasRoles = (roles) => {
+    const userRoles = page.props.auth.user?.roles ?? []
+    // If a single role is passed as a string, wrap it in an array
+    const requiredRoles = Array.isArray(roles) ? roles : [roles]
+    return requiredRoles.some(role => userRoles.includes(role))
+  }
 
 const selectedRowId = ref(null);
   
@@ -346,10 +355,10 @@ function editSecurityEquipment() {
                     <td>
                       <div class="d-flex justify-content-end">
                        
-                        <!-- <Link class="btn btn-info btn-sm mr-2" :href="route('facilities.edit', schedule.id)">
-                          <i class="fas fa-edit"></i> <span>Edit</span>
-                        </Link> -->
-                        <button class="btn btn-danger btn-sm" @click="deleteMaintenaceSchedule(schedule.id)">
+                        <Link class="btn btn-info btn-sm mr-2" :href="route('facilities.edit', schedule.id)">
+                          <i class="fas fa-edit"></i> <span>XX</span>
+                        </Link>
+                        <button v-if="hasRoles(['Super Admin'])" class="btn btn-danger btn-sm" @click="deleteMaintenaceSchedule(schedule.id)">
                           <i class="fas fa-trash"></i> <span></span>
                         </button>
                       </div>

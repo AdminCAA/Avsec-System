@@ -8,8 +8,17 @@ use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use App\Models\Training;
 
-class TrainingController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class TrainingController extends Controller implements HasMiddleware
 {
+    public static function middleware():array {
+        return [
+            new Middleware('permission:manage trainings', only: ['index','create','store','edit','update','destroy']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

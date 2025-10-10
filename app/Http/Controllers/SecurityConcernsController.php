@@ -10,17 +10,38 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 
-class SecurityConcernsController extends Controller
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Support\Facades\Auth;
+
+class SecurityConcernsController extends Controller implements HasMiddleware
 {
+    public static function middleware():array {
+        return [
+            new Middleware('permission:manage security concerns', only: ['index','edit','update','destroy','generateCar','securityConcernsCount']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
+        $user = Auth::user();
         // Fetch all security concerns from the database
         $searchQuery = SelectedChecklistQuestion::with('qualityControl')->search($request);
         $questionsWithConcerns = $searchQuery->orderBy('updated_at','DESC')->whereIn('status',['Open','Overdue'])->paginate(50);
 
+        if ($user->hasAnyRole(['Administrator', 'AVSEC Administrator', 'Super Admin'])) {
+            // Show all security concerns
+        }else{
+            $questionsWithConcerns = $searchQuery->whereHas('qualityControl.users', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->whereIn('status',['Open','Overdue'])
+            ->orderBy('updated_at','DESC')
+            ->paginate(50);
+        }
         return Inertia::render('SecurityConcerns/List', [
             'questionsWithConcerns' => $questionsWithConcerns,   
             'search' => $request->search ?? '',    
@@ -153,8 +174,17 @@ class SecurityConcernsController extends Controller
 
     public function securityConcernsCount()
     {
+        $user = Auth::user();
         // Count the number of security concerns
         $count = SelectedChecklistQuestion::whereIn('status', ['Open', 'Overdue'])->count();
+        // If the user is not an admin, count only their assigned concerns
+        if (!$user->hasAnyRole(['Administrator', 'AVSEC Administrator', 'Super Admin'])) {
+            $count = SelectedChecklistQuestion::whereIn('status', ['Open', 'Overdue'])
+                ->whereHas('qualityControl.users', function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                })
+                ->count();
+        }
         return response()->json(['count' => $count]);
     }
     /**
@@ -167,8 +197,7 @@ class SecurityConcernsController extends Controller
 
     public function generateCar(string $id)
     {
-        // Find the selected checklist question by ID        
-        
+        // Find the selected checklist question by ID                
         $question = SelectedChecklistQuestion::findOrFail($id);        
         $qualityControl = $question->qualityControl;                
         $facility = $qualityControl->facility ?? null;

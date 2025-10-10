@@ -11,9 +11,17 @@ const {securityEquipments} = defineProps({
     securityEquipments: {
           type: Object,
           required: true
-      },    
+    },    
   });
 
+  const page = usePage()
+  const roles = page.props.auth.user.roles;
+  const hasRoles = (roles) => {
+    const userRoles = page.props.auth.user?.roles ?? []
+    // If a single role is passed as a string, wrap it in an array
+    const requiredRoles = Array.isArray(roles) ? roles : [roles]
+    return requiredRoles.some(role => userRoles.includes(role))
+  }
   const selectedRowId = ref(null);
   
   const selectRow = (id) => {
@@ -307,7 +315,7 @@ const sortedSecurityEquipments = computed(() => {
                         <Link class="btn btn-info btn-sm mr-2" :href="route('security-equipments.edit', equipment.id)">
                           <i class="fas fa-edit"></i> <span>Edit</span>
                         </Link>
-                        <button class="btn btn-danger btn-sm" @click="deleteSecurityEquipment(equipment.id)">
+                        <button v-if="hasRoles(['Super Admin'])" class="btn btn-danger btn-sm" @click="deleteSecurityEquipment(equipment.id)">
                           <i class="fas fa-trash"></i> <span>Del</span>
                         </button>
                       </div>

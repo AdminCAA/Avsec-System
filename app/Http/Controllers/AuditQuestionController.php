@@ -8,8 +8,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\AuditQuestion;
 
-class AuditQuestionController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class AuditQuestionController extends Controller implements HasMiddleware
 {
+    /**
+     * Define middleware for the controller.
+     */
+    public static function middleware(): array {
+        return [
+            new Middleware('permission:manage checklist questions', only: ['index','create','store','edit','update','destroy']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

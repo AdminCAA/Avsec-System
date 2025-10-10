@@ -161,11 +161,11 @@ const sortedRoles = computed(() => {
                         <i v-if="sortKey === 'name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
                     </th>
                     <th>Permissions</th>                    
-                    <th @click="sortTable('created_at')" style="cursor: pointer">
+                    <th @click="sortTable('created_at')" style="cursor: pointer;width: 100px;">
                       Created
                       <i v-if="sortKey === 'created_at'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
                     </th>
-                    <th>Actions</th>                    
+                    <th style="width: 150px;">Actions</th>                    
                   </tr>
                   </thead>
                   <tbody>
@@ -190,11 +190,11 @@ const sortedRoles = computed(() => {
                     
                     <td >
                       <div class="d-flex justify-content-center">
-                        <Link class="btn btn-info btn-sm mr-2" :href="route('roles.edit', role.id)">
+                        <Link class="btn btn-info btn-sm mr-1" :href="route('roles.edit', role.id)">
                           <i class="fas fa-edit"></i> <span>Edit</span>
                         </Link>
                         <button class="btn btn-danger btn-sm" @click="deleteRole(role.id)">
-                          <i class="fas fa-trash"></i> <span>Delete</span>
+                          <i class="fas fa-trash"></i> <span>Del</span>
                         </button>
                       </div>
                     </td>                    

@@ -10,8 +10,17 @@ use App\Models\SelectedChecklistQuestion;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-class FollowupController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class FollowupController extends Controller implements HasMiddleware
 {
+    public static function middleware():array {
+        return [
+            new Middleware('permission:manage quality control followups', only: ['index','create','store','edit','update','destroy']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

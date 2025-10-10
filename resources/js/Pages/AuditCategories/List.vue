@@ -15,6 +15,15 @@ const {auditAreaCategories} = defineProps({
       }
   });
 
+  const page = usePage()
+  const roles = page.props.auth.user.roles;
+  const hasRoles = (roles) => {
+    const userRoles = page.props.auth.user?.roles ?? []
+    // If a single role is passed as a string, wrap it in an array
+    const requiredRoles = Array.isArray(roles) ? roles : [roles]
+    return requiredRoles.some(role => userRoles.includes(role))
+  }
+
   const selectedRowId = ref(null);
   const selectRow = (id) => {
     selectedRowId.value = id;
@@ -248,7 +257,7 @@ const sortedAuditAreaCategories = computed(() => {
                             <Link class="btn btn-info btn-sm mr-2" :href="route('audit-categories.edit', item.id)">
                               <i class="fas fa-edit"></i> <span>Edit</span>
                             </Link>
-                            <button class="btn btn-danger btn-sm" @click="deleteAuditCategory(item.id)">
+                            <button v-if="hasRoles(['Super Admin'])" class="btn btn-danger btn-sm" @click="deleteAuditCategory(item.id)">
                               <i class="fas fa-trash"></i> <span>Del</span>
                             </button>
                           </div>

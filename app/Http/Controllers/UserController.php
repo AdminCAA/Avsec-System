@@ -10,19 +10,26 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
-class UserController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class UserController extends Controller implements HasMiddleware
 {
-    /**
-     * Display a listing of the resource.
-     */
+    
+
+    public static function middleware():array {
+        return [
+            new Middleware('permission:manage users', only: ['index','create','store','edit','update','destroy','disable2fa']),
+        ];
+    }
+
+
     public function index(Request $request)
     {
         //
-        $searchQuery = User::search($request);        
+        $searchQuery = User::with('roles')->search($request);      
         $users =  $searchQuery->orderBy('created_at', 'desc')->paginate(50);
         $roles = Role::orderBy('name', 'asc')->get();
         return inertia('Users/List', [
@@ -60,6 +67,7 @@ class UserController extends Controller
             'nrc'=>'required|string|max:20',
             'gender'=> 'required|string|max:6',
             'designation' => 'nullable|string|max:100',	
+            'user_type' => 'nullable|string|max:50',
             'phone_number' => 'nullable|string|max:20',
             'password' => ['required','string','confirmed', Password::min(8)
                 ->mixedCase()
@@ -79,6 +87,7 @@ class UserController extends Controller
                 'nrc' => $request->nrc,
                 'gender'=>$request->gender,
                 'designation' => $request->designation,
+                'user_type' => $request->user_type,
                 'phone_number' => $request->phone_number,
                 'department_id' => $department ? $department->id : null, 
                 'department_name' => $department ? $department->name : null,
@@ -150,6 +159,7 @@ class UserController extends Controller
             'nrc'=>'required|string|max:20',
             'gender'=> 'required|string|max:6',
             'designation' => 'nullable|string|max:100',	
+            'user_type' => 'nullable|string|max:50',
             'phone_number' => 'nullable|string|max:20',
             'password' => ['nullable','string','confirmed', Password::min(8)
                 ->mixedCase()
@@ -167,6 +177,7 @@ class UserController extends Controller
             $user->nrc = $request->nrc;
             $user->gender = $request->gender;
             $user->designation = $request->designation;
+            $user->user_type = $request->user_type;
             $user->phone_number = $request->phone_number;            
             // Handle portrait upload if provided
             if ($request->hasFile('portrait')) {

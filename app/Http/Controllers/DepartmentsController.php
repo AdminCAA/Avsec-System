@@ -8,8 +8,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Department; 
 
-class DepartmentsController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class DepartmentsController extends Controller implements HasMiddleware
 {
+    public static function middleware():array {
+        return [
+            new Middleware('permission:manage departments', only: ['index','create','store','edit','update','destroy']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

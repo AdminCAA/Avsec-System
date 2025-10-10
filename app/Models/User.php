@@ -45,7 +45,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'Screener',
         'Supervisor',
         'Trainer',
-        'Inspector',        
+        'CAA Staff', 
+        'Non CAA Staff',       
     ];
 
     public const UserStatuses = [

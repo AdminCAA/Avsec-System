@@ -11,10 +11,18 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class FacilityController extends Controller
+
+class FacilityController extends Controller implements HasMiddleware
 {
-       
+    public static function middleware():array {
+        return [
+            new Middleware('permission:manage operators', only: ['index','create','store','edit','update','show','destroy','downloadOperatorsPDF']),
+        ];
+    }
+    
     public function index(Request $request)
     {        
         

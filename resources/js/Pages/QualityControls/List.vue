@@ -14,8 +14,16 @@ const {qualityControls} = defineProps({
       },    
   });
 
-  const selectedRowId = ref(null);
+  const page = usePage()
+  const roles = page.props.auth.user.roles;
+  const hasRoles = (roles) => {
+    const userRoles = page.props.auth.user?.roles ?? []
+    // If a single role is passed as a string, wrap it in an array
+    const requiredRoles = Array.isArray(roles) ? roles : [roles]
+    return requiredRoles.some(role => userRoles.includes(role))
+  }
 
+  const selectedRowId = ref(null);
   
   const selectRow = (id) => {
     selectedRowId.value = id;
@@ -217,7 +225,6 @@ const sortedQualityControls = computed(() => {
   return sorted;
 });
 
-console.log(qualityControls);
 </script>
 
 <template>
@@ -322,17 +329,17 @@ console.log(qualityControls);
                       <i v-if="sortKey === 'facility.name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i> 
                     </th>
                               
-                    <th @click="sortTable('scheduled_date')" style="cursor: pointer">Start Date
+                    <th @click="sortTable('scheduled_date')" style="cursor: pointer;width: 100px;">Start
                       
                       <i v-if="sortKey === 'scheduled_date'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>  
                     </th>
-                    <th @click="sortTable('end_date')" style="cursor: pointer">
-                      End Date
+                    <th @click="sortTable('end_date')" style="cursor: pointer; width: 100px;">
+                      End
                       <i v-if="sortKey === 'end_date'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>  
                     </th>                                                            
                     <th>Inspectors</th>
-                    <th>QC</th>
-                    <th>Actions</th>             
+                    <th style="width:110px">Checklist</th>
+                    <th style="width:140px">Actions</th>             
                   </tr>
                   </thead>
                   <tbody>
@@ -401,16 +408,16 @@ console.log(qualityControls);
                         <Link v-if="item.selected_checklist_questions?.length > 0 && item.users?.length > 0" 
                               class="btn btn-success btn-sm mr-2"
                               :href="route('quality-controls.show', item.id)">
-                              <i class="fas fa-binoculars"></i><span> QC</span>
+                              <i class="far fa-check-square"></i><span> Checklist</span>
                         </Link>
                       </td>
              
                     <td>
                       <div class="d-flex justify-content-center">                        
-                        <Link class="btn btn-info btn-sm mr-2" :href="route('quality-controls.edit', item.id)">
+                        <Link class="btn btn-info btn-sm mr-1" :href="route('quality-controls.edit', item.id)">
                           <i class="fas fa-edit"></i><span> Edit</span>
                         </Link>
-                        <button class="btn btn-danger btn-sm" @click="deleteQualityControl(item.id)">
+                        <button v-if="hasRoles(['Super Admin'])" class="btn btn-danger btn-sm" @click="deleteQualityControl(item.id)">
                           <i class="fas fa-trash"></i> <span>Del</span>
                         </button>
                       </div>

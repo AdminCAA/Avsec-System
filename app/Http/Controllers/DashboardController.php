@@ -9,11 +9,21 @@ use App\Models\QualityControl;
 use App\Models\SelectedChecklistQuestion;
 use Carbon\Carbon;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
-use function Pest\Laravel\json;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class DashboardController extends Controller
+
+class DashboardController extends Controller implements HasMiddleware
 {
+    public static function middleware():array {
+        return [
+            new Middleware('permission:view admin dashboard', only: ['index']),
+            //new Middleware('permission:view admin dashboard', only: ['index']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -36,7 +46,7 @@ class DashboardController extends Controller
      */
 
     public function getDashboardStats($startDate = null, $endDate = null){
-
+        $user = Auth::user();
         $startDate = $startDate ? Carbon::parse($startDate)->startOfDay() : null;
         $endDate   = $endDate ? Carbon::parse($endDate)->endOfDay() : null;
 
@@ -106,8 +116,17 @@ class DashboardController extends Controller
             ];
         });
                
-
+        $userId = Auth::id();
         $selectedChecklistQuestions = SelectedChecklistQuestion::whereHas('qualityControl', $dateFilter)->get();
+        if ($user->hasAnyRole(['Administrator', 'AVSEC Administrator', 'Super Admin'])) {
+            
+        }else{
+            $selectedChecklistQuestions = SelectedChecklistQuestion::
+                whereHas('qualityControl.users', function ($query) use ($user) {
+                    $query->where('users.id', $user->id);
+                })->whereHas('qualityControl', $dateFilter)->get();                
+        }
+        
         $openSecurityConcerns = $selectedChecklistQuestions->where('status', 'Open')->count();
         $overdueSecurityConcerns = $selectedChecklistQuestions->where('status', 'Overdue')->count();
         $closedSecurityConcerns = $selectedChecklistQuestions->where('status', 'Closed')->count();
@@ -115,6 +134,14 @@ class DashboardController extends Controller
         $totalSecurityConcerns = $selectedChecklistQuestions->whereIn('status', ['Open', 'Overdue'])->count();
         // Get all quality controls
         $qualityControls = QualityControl::where($dateFilter)->get();
+        if ($user->hasAnyRole(['Administrator', 'AVSEC Administrator', 'Super Admin'])) {
+
+        }else{
+            $qualityControls = QualityControl::where($dateFilter)
+                ->whereHas('users', function ($query) use ($user) {
+                    $query->where('users.id', $user->id);
+                })->get();
+        }
                 
         $audits = $qualityControls->where('control_type', 'Audit')->count();
         $inspections = $qualityControls->where('control_type', 'Inspection')->count();

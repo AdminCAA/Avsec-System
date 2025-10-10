@@ -8,8 +8,17 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class QualityControlReportController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class QualityControlReportController extends Controller implements HasMiddleware
 {
+    public static function middleware():array {
+        return [
+            new Middleware('permission:generate quality control reports', only: ['index','generateQualityControlReport']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

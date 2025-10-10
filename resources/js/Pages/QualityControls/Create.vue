@@ -62,7 +62,10 @@ function createQualityControl() {
         showConfirmButton: false
       });
       setTimeout(() => {
-        router.visit(route('quality-controls.index'));
+        router.visit(route('quality-controls.index'), {
+                preserveScroll: true,
+                replace: true
+            });
       }, 1500);
     })
     .catch(error => {        

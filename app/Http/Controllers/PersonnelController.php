@@ -15,8 +15,18 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
-class PersonnelController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class PersonnelController extends Controller implements HasMiddleware
 {
+    
+    public static function middleware():array {
+        return [
+            new Middleware('permission:manage personnel records', only: ['index','create','store','edit','update','destroy']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

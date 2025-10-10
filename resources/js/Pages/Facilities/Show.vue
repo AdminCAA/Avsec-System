@@ -10,7 +10,7 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 import InputError from '@/Components/InputError.vue';
 import dayjs from 'dayjs';
 
-const {facility , qualityControlCounts,audits,inspections,securityTests,usersCount,operatorStats } = defineProps({
+const {facility , qualityControlCounts,audits,inspections,securityTests,documentReviews,usersCount,operatorStats } = defineProps({
   facility: {
     type: Object,
     required: true
@@ -22,6 +22,7 @@ const {facility , qualityControlCounts,audits,inspections,securityTests,usersCou
   audits: {type: Object, required:true},
   inspections:{type: Object, required:true},
   securityTests: {type: Object, required:true},
+  documentReviews: {type: Object, required:true},
   usersCount:{type: Number, required:true},  
 });
 
@@ -29,7 +30,7 @@ const {facility , qualityControlCounts,audits,inspections,securityTests,usersCou
 const isLoading = ref(false);
 const formErrors = ref({});
 const qc = facility.quality_controls || [] ;
-const controlTypes = ['Audit','Inspection','Security Test']
+const controlTypes = ['Audit','Inspection','Security Test', 'Document Review']
 const activeTab = ref('Audit');
 const filteredQualityControls = computed(() => {
   return qc.filter(qc => qc.control_type === activeTab.value);
@@ -40,6 +41,7 @@ const paginatedControls = computed(() => {
     case 'Audit': return audits;
     case 'Inspection': return inspections;
     case 'Security Test': return securityTests;
+    case 'Document Review': return documentReviews;
     default: return [];
   }
 });
@@ -261,6 +263,7 @@ const operatorStatisticOptions = {
                   <li class="list-group-item">                  
                     <h5>Security Tests <span class="float-right badge bg-warning">{{qualityControlCounts.securityTests}}</span></h5>
                   </li>
+                  
                   <li class="list-group-item">                 
                     <h5>Certified Personnels <span class="float-right badge bg-danger">{{usersCount}}</span></h5>
                   </li>

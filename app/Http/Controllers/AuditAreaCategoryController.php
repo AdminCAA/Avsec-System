@@ -7,11 +7,20 @@ use Illuminate\Http\Request;
 use App\Models\AuditAreaCategory;
 use Illuminate\Support\Facades\Validator;
 
-class AuditAreaCategoryController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+
+class AuditAreaCategoryController extends Controller implements HasMiddleware
 {
     /**
      * Display a listing of the resource.
      */
+    public static function middleware():array {
+        return [
+            new Middleware('permission:manage quality control areas', only: ['index','create','store','edit','update','show','destroy']),
+        ];
+    }
     public function index(Request $request)
     {
         // Fetch all audit area categories from the database

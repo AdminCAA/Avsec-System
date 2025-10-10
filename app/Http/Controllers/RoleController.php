@@ -8,8 +8,18 @@ use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
-class RoleController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class RoleController extends Controller implements HasMiddleware
 {
+    
+    public static function middleware():array {
+        return [
+            new Middleware('permission:manage roles', only: ['index','create','store','edit','update','destroy']),
+        ];
+    }
+    
     /**
      * Display a listing of the resource.
      */

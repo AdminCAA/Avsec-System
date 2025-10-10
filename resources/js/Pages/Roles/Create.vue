@@ -136,6 +136,7 @@ function createRole() {
                                         v-model="form.name"
                                         type="name" 
                                         class="form-control" id="name" 
+                                        autofocus
                                         :class="{
                                             'is-invalid': formErrors.name,
                                             'is-valid': form.name && !formErrors.name

@@ -156,16 +156,16 @@ const sortedPermissions = computed(() => {
                   <table v-if="permissions.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
                     <thead>
                       <tr>
-                        <th @click="sortTable('id')" style="cursor: pointer">#</th>
+                        <th  @click="sortTable('id')" style="cursor: pointer;width:23px">#</th>
                         <th @click="sortTable('name')" style="cursor: pointer">
                           Permission Name 
                           <i v-if="sortKey === 'name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
                         </th>    
-                        <th @click="sortTable('created_at')" style="cursor: pointer">
+                        <th @click="sortTable('created_at')" style="cursor: pointer; width:100px">
                           Created
                           <i v-if="sortKey === 'created_at'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
                         </th>
-                        <th>Actions</th>
+                        <th style="width: 150px;">Actions</th>
                       </tr>
                     </thead>
 

@@ -10,8 +10,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
-class SecurityEquipmentController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+
+class SecurityEquipmentController extends Controller implements HasMiddleware
 {
+    public static function middleware():array {
+        return [
+            new Middleware('permission:manage security equipments', only: ['index','create','store','edit','update','show','destroy','createSchedule','storeSchedule','deleteMaintenanceSchedule']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

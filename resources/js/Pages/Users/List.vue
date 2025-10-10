@@ -18,6 +18,7 @@ const {users, roles} = defineProps({
       }
   });
 
+  console.log(users);
   const selectedRowId = ref(null);
   const selectRow = (id) => {
     selectedRowId.value = id;
@@ -267,7 +268,7 @@ const {users, roles} = defineProps({
                   <thead>
                   <tr>
                     <th  style="cursor: pointer">#</th>
-                    <th> Avatar</th>
+                    <th style="width: 50px;">Avatar</th>
                     <th @click="sortTable('name')" style="cursor: pointer">
                       Name 
                       <i v-if="sortKey === 'name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
@@ -285,7 +286,7 @@ const {users, roles} = defineProps({
                         Created
                         <i v-if="sortKey === 'created_at'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
                     </th>                   
-                    <th>Actions</th>                    
+                    <th style="width:160px;">Actions</th>                    
                   </tr>
                   </thead>
                   <tbody>
@@ -333,10 +334,10 @@ const {users, roles} = defineProps({
                           <i class="fas fa-edit"></i> <span>Edit</span>
                         </Link>
 
-                        <button v-if="user.two_factor_enabled"  class="btn btn-warning btn-sm mr-2" @click="disableUser2FA(user.id)">
+                        <!-- <button v-if="user.two_factor_enabled"  class="btn btn-warning btn-sm mr-2" @click="disableUser2FA(user.id)">
                           <i class="fas fa-ban"></i> <span>Disable 2FA</span>
                         </button>
-                        
+                         -->
 
                         <button class="btn btn-danger btn-sm" @click="deleteUser(user.id)">
                           <i class="fas fa-trash"></i> <span>Del</span>

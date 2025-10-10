@@ -14,14 +14,43 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Auth;
 
-class QualityControlController extends Controller
+class QualityControlController extends Controller implements HasMiddleware
 {
+    
+    public static function middleware():array {
+        return [
+            new Middleware('permission:manage quality controls', 
+            only: [
+                'index','create','store','edit','update','show','destroy',
+                'saveQuestionResponse',
+                'listAudits','listInspections',
+                'listSecurityTests','listPending',
+                'listInProgress','listCompleted',
+                'listOverdue'
+            ]),
+        ];
+    }
+
     //
     public function index(Request $request)
     {
+        $user = Auth::user();
         // Fetch all facilities from the database
         $searchQuery = QualityControl::with(['facility','users','selectedChecklistQuestions'])->search($request);
+        
+        if ($user->hasAnyRole(['Administrator', 'AVSEC Administrator', 'Super Admin'])) {
+            // Admin can see all quality controls            
+        }else {
+           // For non-admins (e.g., AVSEC Inspectors), show only QualityControls linked via the pivot table
+            $searchQuery->whereHas('users', function ($query) use ($user) {
+                $query->where('users.id', $user->id);
+            });
+        }
+
         $qualityControls =  $searchQuery->orderBy('created_at','desc')->paginate(100);
         // Return the facilities to the view
         return Inertia::render('QualityControls/List', [
@@ -54,7 +83,7 @@ class QualityControlController extends Controller
         //Get the users that have user_type of Inspector
         $qualityControl = QualityControl::with('facility')->findOrFail($id);   
         //Get all users with user_type of Inspector
-        $users = User::where('user_type', 'Inspector')->select('id', 'name', 'portrait')->get();
+        $users = User::where('user_type', 'CAA Staff')->select('id','name','portrait')->get();
         //Get the users that have been assigned to this quality control
         $hasAssignedUsers = $qualityControl->users->pluck('id'); 
         $departments = Department::all(); 
@@ -114,8 +143,7 @@ class QualityControlController extends Controller
 
             if (!empty($request->selectedCheckListQuestions)) {
                 foreach ($request->selectedCheckListQuestions as $questionId) {
-                    $questionItem = AuditQuestion::find($questionId);
-                    
+                    $questionItem = AuditQuestion::find($questionId);                    
                     if ($questionItem) {
                         // Check if this checklist question already exists for this QC
                         $alreadyExists = SelectedChecklistQuestion::where('quality_control_id', $qualityControl->id)

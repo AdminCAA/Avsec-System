@@ -131,6 +131,7 @@ const  updatePermission = () => {
                                     <input  
                                         v-model="form.name"
                                         type="name" 
+                                        autofocus
                                         class="form-control" id="name" 
                                         :class="{
                                             'is-invalid': formErrors.name,

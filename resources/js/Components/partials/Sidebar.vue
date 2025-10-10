@@ -25,23 +25,33 @@
       <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
-              with font-awesome or any other icon font library -->
-
-              <li class="nav-item">
+              with font-awesome or any other icon font library -->             
+              <li v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator'])" class="nav-item">
                   <Link :href="route('dashboard')" 
                       class="nav-link"
                       :class="{ active: currentPath.startsWith('/dashboard') }"
-                  >
-                      
+                  >                      
                       <!-- <i class="nav-icon fas fa-chart-bar"></i> -->
                       <i class="nav-icon fas fa-tachometer-alt"></i>
                       <p>
-                          Dashboard                                                                
+                          Admin Dashboard                                                                
+                      </p>
+                  </Link>
+              </li><li v-else="hasRoles(['AVSEC Inspector'])" class="nav-item">
+                  <Link :href="route('dashboard')" 
+                      class="nav-link"
+                      :class="{ active: currentPath.startsWith('/dashboard') }"
+                  >                      
+                      <!-- <i class="nav-icon fas fa-chart-bar"></i> -->
+                      <i class="nav-icon fas fa-tachometer-alt"></i>
+                      <p>
+                          Inspector Dashboard                                                                
                       </p>
                   </Link>
               </li>
+
           
-              <li class="nav-item">
+              <li v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator','AVSEC Inspector'])" class="nav-item">
                   <Link :href="route('facilities.index')" 
                     class="nav-link"
                     :class="{ active: currentPath.startsWith('/facilities') }">
@@ -52,7 +62,7 @@
                   </Link>
               </li>
 
-              <li class="nav-item">
+              <li v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator','AVSEC Inspector'])" class="nav-item">
                   <Link :href="route('quality-controls.index')" 
                     class="nav-link"
                     :class="{ active: currentPath.startsWith('/quality-controls') }">
@@ -63,7 +73,7 @@
                   </Link>
               </li>
               
-              <li class="nav-item">
+              <li v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator','AVSEC Inspector'])" class="nav-item">
                   <Link :href="route('securityconcerns.index')" 
                     class="nav-link"
                     :class="{ active: currentPath.startsWith('/securityconcerns') }">
@@ -75,32 +85,29 @@
                 </Link>
               </li>
 
-              <li class="nav-item">
+              <li v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator','AVSEC Inspector'])" class="nav-item">
                   <Link :href="route('audit-questions.index')" class="nav-link"
                   :class="{ active: currentPath.startsWith('/audit-questions') }"
                   >
                     <i class="nav-icon fas fa-question-circle"></i>
                   <p>
-                      Checklist Questions                 
-                                   
+                      Checklist Questions                                                    
                   </p>
                 </Link>
               </li>
 
-              <li class="nav-item">
+              <li v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator','AVSEC Inspector'])" class="nav-item">
                   <Link :href="route('audit-categories.index')" class="nav-link"
                   :class="{ active: currentPath.startsWith('/audit-categories') }"
                   >                  
                     <i class="nav-icon fas fa-server"></i>
                   <p>
-                     Control Target Areas
+                     Quality Control Areas
                   </p>
                 </Link>
               </li>
-
              
-
-              <li class="nav-item">
+              <li v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator','AVSEC Inspector'])" class="nav-item">
                 <Link :href="route('security-equipments.index')" class="nav-link"
                   :class="{ active: currentPath.startsWith('/security-equipments') }"
                   >
@@ -111,7 +118,7 @@
                   </Link>
               </li>
 
-              <li class="nav-item">
+              <li v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator','AVSEC Inspector'])" class="nav-item">
                   <a href="#" class="nav-link">
                   <i class="nav-icon fas fa-user-graduate"></i>
                   <p>
@@ -139,7 +146,7 @@
                   </ul>
               </li>
 
-              <li class="nav-item">
+              <li v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator','AVSEC Inspector'])" class="nav-item">
                   <a href="#" class="nav-link">
                   <i class="nav-icon fas fa-user-graduate"></i>
                   <p>
@@ -168,7 +175,7 @@
               </li>
              
                                         
-              <li class="nav-item">
+              <li v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator','AVSEC Inspector'])" class="nav-item">
                   <a href="#" class="nav-link">
                       <i class="nav-icon fas fa-toolbox"></i>
                   <p>
@@ -176,9 +183,8 @@
                   </p>
                   </a>
               </li>
-
-
-              <li class="nav-item">
+              
+              <li v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator','AVSEC Inspector'])" class="nav-item">
                     <Link :href="route('departments.index')" class="nav-link"
                         :class="{ active: currentPath.startsWith('/departments') }">
                         <i class="nav-icon fas fa-warehouse"></i> <p>Target Departments</p>
@@ -186,7 +192,7 @@
               </li>              
 
 
-              <li class="nav-item">
+              <li v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator','AVSEC Inspector'])" class="nav-item">
                   <a href="#" class="nav-link">
                     <i class="nav-icon fas fa-chart-pie"></i> 
                   <p>Reports <i class="right fas fa-angle-left"></i>
@@ -204,8 +210,8 @@
                   
                   </ul>
               </li>
-
-              <li class="nav-item">
+              
+              <li  v-if="hasRoles(['Administrator','Super Admin'])" class="nav-item">
                   <a href="#" class="nav-link">
                   <i class="nav-icon fas fa-users-cog"></i>
                   <p>
@@ -241,6 +247,7 @@
                   </li>
                   </ul>
               </li>
+                
               <li class="nav-item">
                   <Link  :href="route('logout')" 
                         class="nav-link" as="button"
@@ -269,12 +276,26 @@
     import { usePage } from '@inertiajs/vue3';
     import { useRoute } from 'vue-router';
     import axios from 'axios';
+
+
 defineProps({
     currentUser: {
         type: Object,
         required: true
     }
 });
+const page = usePage()
+const roles = page.props.auth.user.roles;
+
+console.log('User Roles:', roles);
+
+// Function to check if the user has a specific role
+const hasRoles = (roles) => {
+    const userRoles = page.props.auth.user?.roles ?? []
+    // If a single role is passed as a string, wrap it in an array
+    const requiredRoles = Array.isArray(roles) ? roles : [roles]
+    return requiredRoles.some(role => userRoles.includes(role))
+}
 
 const logoImage = '/assets/caa-logo.png';
 const avatar = '/assets/avatar.png';

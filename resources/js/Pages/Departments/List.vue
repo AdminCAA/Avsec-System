@@ -14,6 +14,15 @@ const {departments} = defineProps({
       },    
   });
 
+  const page = usePage()
+  const roles = page.props.auth.user.roles;
+  const hasRoles = (roles) => {
+    const userRoles = page.props.auth.user?.roles ?? []
+    // If a single role is passed as a string, wrap it in an array
+    const requiredRoles = Array.isArray(roles) ? roles : [roles]
+    return requiredRoles.some(role => userRoles.includes(role))
+  }
+
   const selectedRowId = ref(null);
 
   
@@ -170,7 +179,7 @@ watch([startDate, endDate], () => {
                     <th>Name</th>
                     <th>Created</th>
                     <th>Modified</th>                     
-                    <th>Actions</th>             
+                    <th style="width: 160px;">Actions</th>             
                   </tr>
                   </thead>
                   <tbody>
@@ -216,7 +225,7 @@ watch([startDate, endDate], () => {
                         <Link class="btn btn-info btn-sm mr-2" :href="route('departments.edit', item.id)">
                           <i class="fas fa-edit"></i><span> Edit</span>
                         </Link>
-                        <button class="btn btn-danger btn-sm" @click="deleteDepartment(item.id)">
+                        <button v-if="hasRoles(['Super Admin'])"  class="btn btn-danger btn-sm" @click="deleteDepartment(item.id)">
                           <i class="fas fa-trash"></i> <span>Del</span>
                         </button>
                       </div>

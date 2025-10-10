@@ -11,8 +11,18 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
-class CertificationsController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class CertificationsController extends Controller implements HasMiddleware
 {
+    
+    public static function middleware():array {
+        return [
+            new Middleware('permission:manage certifications', only: ['index','create','store','edit','update','destroy']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

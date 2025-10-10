@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import { ref,watch } from 'vue';
+import { router } from '@inertiajs/vue3';
 
 const form = useForm({
     name:""
@@ -50,7 +51,10 @@ function createPermission() {
 
         //redirect to the permissions index page
         setTimeout(() => {
-            window.location.href = route('permissions.index');
+            router.visit(route('permissions.index'), {
+                preserveScroll: true,
+                replace: true
+            });             
         }, 1000);        
     })
     .catch(error => {    
@@ -125,6 +129,7 @@ function createPermission() {
                                             'is-invalid': formErrors.name,
                                             'is-valid': form.name && !formErrors.name
                                         }"
+                                        autofocus
                                         required max="255" 
                                         placeholder="Enter Name">
                                         <InputError :message="formErrors.name || form.errors.name" class="mt-2" />

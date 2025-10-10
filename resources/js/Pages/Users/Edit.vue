@@ -31,17 +31,17 @@ const props =defineProps({
 
 
 const formErrors = ref({
-  name: '',
-  nrc:'',
-  gender:'',
-  phone_number:'',
+    name: '',
+    nrc:'',
+    gender:'',
+    phone_number:'',
     designation:'',
     portrait: '',
-
-  email: '',
-  department_id:'',
-  password: '',
-  confirm_password: ''
+    user_type:"",
+    email: '',
+    department_id:'',
+    password: '',
+    confirm_password: ''
 });
 
 
@@ -50,6 +50,7 @@ const form = useForm({
     email: props.user.email,
     nrc:props.user.nrc,
     gender: props.user.gender,
+    user_type:props.user.user_type,
     phone_number: props.user.phone_number,
     designation: props.user.designation,
     portrait: null,
@@ -73,6 +74,7 @@ function updateUser() {
     formData.append('email', form.email);
     formData.append('nrc', form.nrc);
     formData.append('gender',form.gender);
+    formData.append('user_type', form.user_type);
     formData.append('department_id', form.department_id);
     formData.append('designation', form.designation);
     formData.append('phone_number', form.phone_number);   
@@ -140,8 +142,7 @@ function updateUser() {
             errorMessage.value = error.response.data.error;
         } else {
             errorMessage.value = "An unexpected error occurred.";
-        }
-        
+        }        
     }).finally(() => {
         isLoading.value = false;
     });
@@ -238,6 +239,9 @@ watch(()=>form.gender,()=>{
 
 const genderOptions = [
     'Male','Female'
+]
+const userCategoryOptions = [
+    'CAA Staff','Non CAA Staff'
 ]
 
 // Handle file upload for portrait
@@ -408,7 +412,21 @@ watch(() => form.nrc, (value) => {
                                             </div>
                                     </div>    
 
-                                    <div class="form-group col-md-6">
+                                    <div class="form-group col-md-3">
+                                        <label>User Category</label>
+                                        <select required v-model="form.user_type" class="form-control"
+                                            :class="{ 'is-invalid': formErrors.user_type, 'is-valid': form.user_type && !formErrors.user_type }">
+                                            <option value="">-- Select User Category --</option>
+                                            <option v-for="item in userCategoryOptions" :key="item" :value="item">{{ item }}</option>
+                                        </select>
+                                        <InputError :message="formErrors.user_type" class="mt-1" />                                        
+                                        <div v-if="form.user_type && !formErrors.user_type" class="valid-feedback d-block">
+                                            User Category looks good!
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group col-md-3">
                                         <label for="designation">Job Position</label>
                                         <input  
                                             v-model="form.designation"
