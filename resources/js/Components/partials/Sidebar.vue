@@ -37,7 +37,8 @@
                           Admin Dashboard                                                                
                       </p>
                   </Link>
-              </li><li v-else="hasRoles(['AVSEC Inspector'])" class="nav-item">
+              </li>
+              <li v-else-if="hasRoles(['AVSEC Inspector'])" class="nav-item">
                   <Link :href="route('dashboard')" 
                       class="nav-link"
                       :class="{ active: currentPath.startsWith('/dashboard') }"
@@ -46,6 +47,19 @@
                       <i class="nav-icon fas fa-tachometer-alt"></i>
                       <p>
                           Inspector Dashboard                                                                
+                      </p>
+                  </Link>
+              </li>
+
+              <li v-else="hasRoles(['Guest User'])" class="nav-item">
+                  <Link :href="route('dashboard')" 
+                      class="nav-link"
+                      :class="{ active: currentPath.startsWith('/dashboard') }"
+                  >                      
+                      <!-- <i class="nav-icon fas fa-chart-bar"></i> -->
+                      <i class="nav-icon fas fa-tachometer-alt"></i>
+                      <p>
+                          Guest Dashboard                                                                
                       </p>
                   </Link>
               </li>

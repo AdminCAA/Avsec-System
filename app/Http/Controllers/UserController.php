@@ -11,6 +11,8 @@ use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\notifyNewuser;
 
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -201,6 +203,10 @@ class UserController extends Controller implements HasMiddleware
             if(!empty($request->roles)){
                 // Check if the role exists
                 $user->syncRoles($request->roles);
+                if($user){
+                    //Send email to the user
+                    Mail::to($user->email)->send(new \App\Mail\notifyNewuser($user));
+                }
             }else{
                 // If no role is selected, assign the default role
                 $user->syncRoles([]);
