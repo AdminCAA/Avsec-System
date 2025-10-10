@@ -6,41 +6,10 @@ import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 import { ref, computed, watch } from 'vue';
 
-<<<<<<< HEAD
-const {trainings} = defineProps({
-      trainings: {
-          type: Object,
-          required: true
-      }
-  });
-
-  const page = usePage()
-  const roles = page.props.auth.user.roles;
-  const hasRoles = (roles) => {
-    const userRoles = page.props.auth.user?.roles ?? []
-    // If a single role is passed as a string, wrap it in an array
-    const requiredRoles = Array.isArray(roles) ? roles : [roles]
-    return requiredRoles.some(role => userRoles.includes(role))
-  }
-
-  const selectedRowId = ref(null);
-  const selectRow = (id) => {
-    selectedRowId.value = id;
-  };
-
-  let pageNumber = ref(1);  
-  let search = ref(usePage().props.search);
-  const updatePageNumber = (link)=>{
-        pageNumber.value = link.url.split('=')[1];            
-        router.visit("/trainings?page=" +  pageNumber.value, {
-            preserveScroll:true,
-        });    
-=======
 const { trainings } = defineProps({
   trainings: {
     type: Object,
     required: true
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
   }
 });
 
@@ -225,41 +194,6 @@ const sortedTrainings = computed(() => {
                             </button>
                           </div>
                         </div>
-<<<<<<< HEAD
-                  </div>
-                 </div>
-                <table v-if="trainings.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
-                  <thead>
-                  <tr>
-                    <th>#</th>
-                    <th @click="sortTable('title')" style="cursor: pointer">
-                        Training Title 
-                        <i v-if="sortKey === 'title'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
-                    </th>                             
-                    <th>Created</th>
-                    <th>Actions</th>                    
-                  </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(training, index) in sortedTrainings" :key="training.id"
-                    :class="{ 'table table-selected': selectedRowId === training.id }" 
-                    @click="selectRow(training.id)">
-                    <td>{{ (trainings.current_page - 1) * trainings.per_page + index + 1 }}</td>
-                    <td>
-                      <Link :href="route('trainings.edit', training.id)">{{ training.title }}</Link>
-                    </td>
-                    <td style="text-align: center;">{{dayjs(training.created_at).format('DD-MM-YYYY')}}</td>
-                    
-                    <td>
-                      <div class="d-flex justify-content-center">
-                        <Link class="btn btn-info btn-sm mr-2" :href="route('trainings.edit', training.id)">
-                          <i class="fas fa-edit"></i> <span>Edit</span>
-                        </Link>
-                        <button v-if="hasRoles(['Super Admin'])" class="btn btn-danger btn-sm" @click="deleteTraining(training.id)">
-                          <i class="fas fa-trash"></i> <span>Del</span>
-                        </button>
-=======
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
                       </div>
                     </div>
                   </div>

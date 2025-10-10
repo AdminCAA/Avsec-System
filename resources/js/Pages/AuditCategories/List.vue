@@ -7,55 +7,10 @@ import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 import { ref, computed, watch } from 'vue';
 
-<<<<<<< HEAD
-const {auditAreaCategories} = defineProps({
-    auditAreaCategories: {
-          type: Object,
-          required: true
-      }
-  });
-
-  const page = usePage()
-  const roles = page.props.auth.user.roles;
-  const hasRoles = (roles) => {
-    const userRoles = page.props.auth.user?.roles ?? []
-    // If a single role is passed as a string, wrap it in an array
-    const requiredRoles = Array.isArray(roles) ? roles : [roles]
-    return requiredRoles.some(role => userRoles.includes(role))
-  }
-
-  const selectedRowId = ref(null);
-  const selectRow = (id) => {
-    selectedRowId.value = id;
-  };
-
-  let pageNumber = ref(1);  
-  
-  let search = ref(usePage().props.search);
-
-  let qcAreaUrl = computed(()=>{
-        let url = new URL(route('audit-categories.index'));
-        url.searchParams.append('page', pageNumber.value);
-        if(search.value){
-            url.searchParams.append('search', search.value);
-        }
-        // if(class_id.value){
-        //     url.searchParams.append('class_id', class_id.value);
-        // }
-        return url;
-  });
-
-  const updatePageNumber = (link)=>{
-        pageNumber.value = link.url.split('=')[1];            
-        router.visit("/audit-categories?page=" +  pageNumber.value, {
-            preserveScroll:true,
-        });    
-=======
 const { auditAreaCategories } = defineProps({
   auditAreaCategories: {
     type: Object,
     required: true
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
   }
 });
 
@@ -237,69 +192,11 @@ const sortedAuditAreaCategories = computed(() => {
                     <div class="col-md-3">
                       <div class="form-group">
                         <div class="input-group input-group-sm">
-<<<<<<< HEAD
-                            <input 
-                                type="search" 
-                                class="form-control form-control-lg" 
-                                placeholder="Search for Quality Control Area" 
-                                v-model="search">
-                            <div class="input-group-append">
-                                <button type="submit" class="btn btn-lg btn-default">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                  </div>
-                  
-                 </div>
-                 <div class="table-responsive">
-                  <table v-if="auditAreaCategories.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
-                    <thead>
-                    <tr>
-                      <th>#</th>
-                      <th @click="sortTable('name')" style="cursor: pointer">
-                        Area Name
-                        <i v-if="sortKey === 'name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
-                      </th>
-                      <th @click="sortTable('category_name')" style="cursor: pointer">
-                        Target Operator
-                        <i v-if="sortKey === 'category_name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i> 
-                      </th>
-                      <th @click="sortTable('created_at')" style="cursor: pointer">
-                        Created
-                        <i v-if="sortKey === 'created_at'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>  
-                      </th>                      
-                      <th>Actions</th>                    
-                    </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(item, index) in sortedAuditAreaCategories" :key="item.id"
-                        :class="{ 'table table-selected': selectedRowId === item.id }" 
-                        @click="selectRow(item.id)"
-                      >
-                        <td>{{ (auditAreaCategories.current_page - 1) * auditAreaCategories.per_page + index + 1 }}</td>
-                        <td>
-                          <Link  :href="route('audit-categories.edit', item.id)">
-                            {{ item.name }}
-                          </Link>
-                        </td>
-                        <td class="text-center">{{ item.category_name }}</td>
-                        <td class="text-center">{{dayjs(item.created_at).format('DD-MM-YYYY')}}</td>                        
-                        <td>
-                          <div class="d-flex justify-content-center">
-                            <Link class="btn btn-info btn-sm mr-2" :href="route('audit-categories.edit', item.id)">
-                              <i class="fas fa-edit"></i> <span>Edit</span>
-                            </Link>
-                            <button v-if="hasRoles(['Super Admin'])" class="btn btn-danger btn-sm" @click="deleteAuditCategory(item.id)">
-                              <i class="fas fa-trash"></i> <span>Del</span>
-=======
                           <input type="search" class="form-control form-control-lg"
                             placeholder="Search for Quality Control Area" v-model="search">
                           <div class="input-group-append">
                             <button type="submit" class="btn btn-lg btn-default">
                               <i class="fa fa-search"></i>
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
                             </button>
                           </div>
                         </div>

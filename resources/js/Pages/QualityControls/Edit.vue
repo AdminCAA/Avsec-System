@@ -240,7 +240,6 @@ const handleClick = () => {
         <div class="container-fluid">
           <div class="d-flex justify-content-center align-items-center min-vh-60  bg-light">
             <div class="row w-100 justify-content-center">
-<<<<<<< HEAD
                 <div class="col-md-12 mb-4">                         
                     <!-- general form elements -->
                     <div class="card card-info">
@@ -469,194 +468,94 @@ const handleClick = () => {
                                     </div>                                  
                                   </div> 
                               </div>  
-=======
-              <div class="col-md-12 mb-4">
-                <!-- general form elements -->
-                <div class="card card-info">
-                  <div class="card-header">
-                    <h3 class="card-title">Edit Quality Control</h3>
-                  </div>
-                  <!-- form start -->
-                  <form @submit.prevent="editQualityControl">
-                    <div class="card-body">
-                      <!-- Name -->
-                      <!-- Row 1: Name & Category -->
-                      <div class="row">
-                        <div class="form-group col-md-6">
-                          <label>Title</label>
-                          <input required v-model="form.title" type="text" class="form-control"
-                            :class="{ 'is-invalid': formErrors.title, 'is-valid': form.title && !formErrors.title }"
-                            placeholder="Enter Title">
-                          <InputError :message="formErrors.title" class="mt-1" />
-                        </div>
 
-                        <div class="form-group col-md-6">
-                          <label>Control Type</label>
-                          <select required v-model="form.control_type" class="form-control"
-                            :class="{ 'is-invalid': formErrors.control_type, 'is-valid': form.control_type && !formErrors.control_type }">
-                            <option value="">-- Select Control Type --</option>
-                            <option v-for="item in qualityControlTypes" :key="item" :value="item">{{ item }}</option>
-                          </select>
-                          <InputError :message="formErrors.control_type" class="mt-1" />
-                        </div>
-                      </div>
-
-
-                      <div class="row">
-                        <div class="form-group col-md-6">
-                          <label>Target Operator</label>
-                          <v-select v-model="form.facility_id" :options="facilities" :reduce="facility => facility.id"
-                            label="name" placeholder="-- Select Operator --" :class="{
-                              'is-invalid': formErrors.facility_id,
-                              'is-valid': form.facility_id && !formErrors.facility_id
-                            }" />
-                          <InputError :message="formErrors.facility_id" class="mt-1" />
-                        </div>
-                        <div class="form-group col-md-6">
-                          <label>Departments</label>
-                          <select required v-model="form.department_id" class="form-control"
-                            :class="{ 'is-invalid': formErrors.department_id, 'is-valid': form.department_id && !formErrors.department_id }">
-                            <option value="">-- Area Department --</option>
-                            <option v-for="item in departments" :key="item" :value="item.id">{{ item.name }}</option>
-                          </select>
-                          <InputError :message="formErrors.status" class="mt-1" />
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="form-group col-md-6">
-                          <label>Start Date</label>
-                          <input required v-model="form.scheduled_date" type="date" class="form-control" :class="{
-                            'is-invalid': formErrors.scheduled_date,
-                            'is-valid': form.scheduled_date && !formErrors.scheduled_date
-                          }" placeholder="Start Date" />
-                          <InputError :message="formErrors.scheduled_date" class="mt-1" />
-                        </div>
-
-                        <div class="form-group col-md-6">
-                          <label>End Date</label>
-                          <input required v-model="form.end_date" type="date" class="form-control" :class="{
-                            'is-invalid': formErrors.end_date,
-                            'is-valid': form.end_date && !formErrors.end_date
-                          }" placeholder="End Date" />
-                          <InputError :message="formErrors.end_date" class="mt-1" />
-                        </div>
-                      </div>
-
-                      <!-- Row 2: Description -->
-                      <div class="row">
-                        <div class="form-group col-md-6">
-                          <label>Status</label>
-                          <select required v-model="form.status" class="form-control"
-                            :class="{ 'is-invalid': formErrors.status, 'is-valid': form.status && !formErrors.status }">
-                            <option value="">-- Select Status --</option>
-                            <option v-for="item in statusOptions" :key="item" :value="item.value">{{ item.label }}
-                            </option>
-                          </select>
-                          <InputError :message="formErrors.status" class="mt-1" />
-                        </div>
-
-                        <div class="form-group col-md-6">
-                          <label>Description</label>
-                          <textarea v-model="form.description" class="form-control" rows="2"
-                            placeholder="Optional"></textarea>
-                        </div>
-                      </div>
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
-
-                      <div class="col-sm-6">
-                        <h3 class="mb-2"><strong>Responsible Inspectors</strong></h3>
-                      </div>
-                      <div class="row">
-                        <div class="col-sm-12">
-                          <div class="card card-info card-outline">
-                            <div class="card-header">
-                              <h5 class="card-title"><strong>Assign Inspectors</strong></h5>
-                            </div>
-                            <div v-if="users.length > 0" class="form-group d-flex flex-wrap card-body">
-                              <div class="custom-control custom-checkbox mr-3 mb-2" v-for="(user, index) in users"
-                                :key="user.id">
-                                <input class="custom-control-input" :id="'user-' + user.id" type="checkbox"
-                                  v-model="selectedUsers" :value="user.id">
-                                <label :for="'user-' + user.id" class="custom-control-label">
-                                  <Link :href="route('personnels.show', user.id)" class="d-flex align-items-center">
-                                  <!-- User Avatar -->
-                                  <span class="badge px-1 mr-2"
-                                    style="border-radius:10px; background-color:whitesmoke ;">
-                                    <img class="profile-user-img img-fluid img-circle"
-                                      :src="user.portrait ? `/storage/${user.portrait}` : '/storage/portraits/avatar.png'"
-                                      alt="User profile picture">
-                                    {{ user.name }}
-                                  </span>
-
-                                  </Link>
-                                </label>
+                              <div class="col-sm-6">
+                                <h3 class="mb-2"><strong>Responsible Inspectors</strong></h3>
                               </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                              <div class="row">
+                                <div class="col-sm-12">
+                                  <div class="card card-info card-outline">
+                                    <div class="card-header">
+                                      <h5 class="card-title"><strong>Assign Inspectors</strong></h5>
+                                    </div>
+                                    <div v-if="users.length > 0" class="form-group d-flex flex-wrap card-body">
+                                      <div class="custom-control custom-checkbox mr-3 mb-2" v-for="(user, index) in users"
+                                        :key="user.id">
+                                        <input class="custom-control-input" :id="'user-' + user.id" type="checkbox"
+                                          v-model="selectedUsers" :value="user.id">
+                                        <label :for="'user-' + user.id" class="custom-control-label">
+                                          <Link :href="route('personnels.show', user.id)" class="d-flex align-items-center">
+                                          <!-- User Avatar -->
+                                          <span class="badge px-1 mr-2"
+                                            style="border-radius:10px; background-color:whitesmoke ;">
+                                            <img class="profile-user-img img-fluid img-circle"
+                                              :src="user.portrait ? `/storage/${user.portrait}` : '/storage/portraits/avatar.png'"
+                                              alt="User profile picture">
+                                            {{ user.name }}
+                                          </span>
 
-                      <div class="col-sm-6">
-                        <h3 class="mb-2"><strong>Select Quality Control Checklist Questions</strong></h3>
-                      </div>
-                      <div class="row">
-                        <div class="col-md-12" v-for="(questions, area) in groupedAuditQuestions" :key="area">
-                          <div
-                            v-if="area?.toLowerCase?.().includes((qualityControl?.facility?.category ?? '').toLowerCase())"
-                            class="col-md-12">
-                            <div class="card card-info collapsed-card shadow-sm">
-                              <div class="card-header">
-                                <h3 style="font-weight: bold;" class="card-title" data-card-widget="collapse">{{ area }}
-                                </h3>
-                                <div class="card-tools">
-                                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-plus"></i>
-                                  </button>
+                                          </Link>
+                                        </label>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
 
-                              <div v-for="question in questions" :key="question.id" class="card-body">
-                                <div class="custom-control custom-checkbox mr-3 mb-2">
-                                  <input class="custom-control-input" :id="'question-' + question.id" type="checkbox"
-                                    v-model="selectedCheckListQuestions" :value="question.id" />
-                                  <label :for="'question-' + question.id" class="custom-control-label">
-                                    {{ question.question }}
-                                  </label>
+                              <div class="col-sm-6">
+                                <h3 class="mb-2"><strong>Select Quality Control Checklist Questions</strong></h3>
+                              </div>
+                              <div class="row">
+                                <div class="col-md-12" v-for="(questions, area) in groupedAuditQuestions" :key="area">
+                                  <div v-if="area?.toLowerCase?.().includes((qualityControl?.facility?.category ?? '').toLowerCase())"
+                                    class="col-md-12">
+                                    <div class="card card-info collapsed-card shadow-sm">
+                                      <div class="card-header">
+                                        <h3 style="font-weight: bold;" class="card-title" data-card-widget="collapse">{{ area }}
+                                        </h3>
+                                        <div class="card-tools">
+                                          <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                            <i class="fas fa-plus"></i>
+                                          </button>
+                                        </div>
+                                      </div>
+
+                                      <div v-for="question in questions" :key="question.id" class="card-body">
+                                        <div class="custom-control custom-checkbox mr-3 mb-2">
+                                          <input class="custom-control-input" :id="'question-' + question.id" type="checkbox"
+                                            v-model="selectedCheckListQuestions" :value="question.id" />
+                                          <label :for="'question-' + question.id" class="custom-control-label">
+                                            {{ question.question }}
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-<<<<<<< HEAD
-                        </form>
-=======
+                            
+                        
+                    
+                          <div class="card-footer d-flex justify-content-end">
+                            <button :disabled="isLoading" type="submit" class="btn btn-info mr-2">
+                              <span v-if="isLoading"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
+                              <span v-else><i class="fas fa-save"></i> Save</span>
+                            </button>
+                            <Link :href="route('quality-controls.index')" class="btn btn-secondary">
+                            <i class="fas fa-times-circle"></i> Cancel
+                            </Link>
                           </div>
                         </div>
-                      </div>
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
-                    </div>
-                    <div class="card-footer d-flex justify-content-end">
-                      <button :disabled="isLoading" type="submit" class="btn btn-info mr-2">
-                        <span v-if="isLoading"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
-                        <span v-else><i class="fas fa-save"></i> Save</span>
-                      </button>
-                      <Link :href="route('quality-controls.index')" class="btn btn-secondary">
-                      <i class="fas fa-times-circle"></i> Cancel
-                      </Link>
-                    </div>
                   </form>
+
                 </div>
               </div>
             </div>
-<<<<<<< HEAD
         </div>
 
        
-=======
-          </div>
-        </div>
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
       </div>
-
+      </div>
     </div>
   </AuthenticatedLayout>
 </template>

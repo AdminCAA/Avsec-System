@@ -41,18 +41,10 @@ const form = useForm({
     nrc: "",
     phone_number: "",
     department_id: "",
-<<<<<<< HEAD
-    user_type:"",
-    designation:"",
-    password:"",
-    confirm_password:"",
-    portrait:""
-=======
     designation: "",
     password: "",
     confirm_password: "",
     portrait: ""
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
 });
 
 const isLoading = ref(false);
@@ -68,12 +60,7 @@ function createUser() {
     formData.append('name', form.name);
     formData.append('email', form.email);
     formData.append('nrc', form.nrc);
-<<<<<<< HEAD
-    formData.append('gender',form.gender);
-    formData.append('user_type',form.user_type);
-=======
     formData.append('gender', form.gender);
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
     formData.append('department_id', form.department_id);
     formData.append('designation', form.designation);
     formData.append('phone_number', form.phone_number);
@@ -246,242 +233,6 @@ watch(() => form.nrc, (value) => {
 
     <Head title="User-Create" />
     <AuthenticatedLayout>
-<<<<<<< HEAD
-    <div class="content-wrapper">    
-        <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h3 class="m-0">User / Create</h3>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><Link class="btn btn-info" :href="route('users.index')"><i class="fas fa-arrow-left"></i> Back</Link></li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </div>   
-
-        <div class="content">
-        <div class="container-fluid">
-            <div class="d-flex justify-content-center align-items-center min-vh-60  bg-light">
-                <div class="row w-100 justify-content-center">
-                    <div class="col-md-12">                    
-                        <!-- general form elements -->
-                        <div class="card card-info">
-                            <div class="card-header">
-                                <h3 class="card-title">Create User</h3>
-                            </div>
-                            
-                            <form @submit.prevent="createUser" method="post" enctype="multipart/form-data">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="form-group col-md-6">
-                                            <label for="name">Names</label>
-                                            <input  
-                                                v-model="form.name"
-                                                type="text" 
-                                                class="form-control"  
-                                                id="name"
-                                                :class="{
-                                                    'is-invalid': formErrors.name,
-                                                    'is-valid': form.name && !formErrors.name
-                                                }"
-                                                required maxlength="255" 
-                                                placeholder="Enter Name">
-                                                <InputError :message="formErrors.name || form.errors.name" class="mt-2" />
-                                                <div v-if="form.name && !formErrors.name" class="valid-feedback d-block">
-                                                    Name looks good!
-                                                </div>
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="name">Email</label>
-                                            <input  
-                                                v-model="form.email"
-                                                type="email" 
-                                                class="form-control" id="email" 
-                                                :class="{
-                                                    'is-invalid': formErrors.email,
-                                                    'is-valid': form.email && !formErrors.email
-                                                }"
-                                                required max="255" 
-                                                placeholder="Enter Email">
-                                                <InputError :message="formErrors.email || form.errors.email" class="mt-2" />
-                                                <div v-if="form.email && !formErrors.email" class="valid-feedback d-block">
-                                                    Email looks good!
-                                                </div>
-                                        </div>
-
-                                    </div>
-                                    <div class="row">
-                                        <div class="form-group col-md-6">
-                                            <label for="nrc">NRC</label>
-                                            <input  
-                                                v-model="form.nrc"
-                                                type="text" 
-                                                name="nrc"
-                                                id="nrc" 
-                                                class="form-control" 
-                                                :class="{
-                                                    'is-invalid': formErrors.nrc,
-                                                    'is-valid': form.nrc && !formErrors.nrc
-                                                }"
-                                                required 
-                                                maxlength="12"	 
-                                                placeholder="Enter NRC"
-                                            >                                            
-                                            <!-- Error Display -->
-                                            <InputError :message="formErrors.nrc" class="mt-2" />                                            
-                                            <!-- Success Feedback -->
-                                            <div v-if="form.nrc && !formErrors.nrc" class="valid-feedback d-block">
-                                                NRC looks good!
-                                            </div>
-                                        </div>
-    
-                                        <div class="form-group col-md-6">
-                                            <label>Gender</label>
-                                            <select required v-model="form.gender" class="form-control"
-                                                :class="{ 'is-invalid': formErrors.gender, 'is-valid': form.gender && !formErrors.gender }"
-                                            >
-                                                <option value="">-- Select Gender --</option>
-                                                <option v-for="item in genderOptions" :key="item" :value="item">{{ item }}</option>
-                                            </select>
-                                            <InputError :message="formErrors.gender" class="mt-1" />                                        
-                                            <div v-if="form.gender && !formErrors.gender" class="valid-feedback d-block">
-                                                Gender looks good!
-                                            </div>
-                                        </div>                                                                                                                                        
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="form-group col-md-6">
-                                            <label>Phone Number</label>
-                                            <input 
-                                                v-model="form.phone_number" 
-                                                type="text" 
-                                                required max="15"
-                                                class="form-control"
-                                                :class="{ 'is-invalid': formErrors.phone_number, 'is-valid': form.phone_number && !formErrors.phone_number }"
-                                                placeholder="Enter Phone Number">
-                                                <InputError :message="formErrors.phone_number" class="mt-1" />
-                                                <div v-if="form.phone_number && !formErrors.phone_number" class="valid-feedback d-block">
-                                                    Phone number looks good!
-                                                </div>
-                                        </div>    
-
-                                        <div class="form-group col-md-3">
-                                            <label>User Category</label>
-                                            <select required v-model="form.user_type" class="form-control"
-                                                :class="{ 'is-invalid': formErrors.user_type, 'is-valid': form.user_type && !formErrors.user_type }">
-                                                <option value="">-- Select User Category --</option>
-                                                <option v-for="item in userCategoryOptions" :key="item" :value="item">{{ item }}</option>
-                                            </select>
-                                            <InputError :message="formErrors.user_type" class="mt-1" />                                        
-                                            <div v-if="form.user_type && !formErrors.user_type" class="valid-feedback d-block">
-                                                User Category looks good!
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group col-md-3">
-                                            <label for="designation">Job Position</label>
-                                            <input  
-                                                v-model="form.designation"
-                                                type="text" 
-                                                class="form-control"  
-                                                id="designation"
-                                                :class="{
-                                                    'is-invalid': formErrors.designation,
-                                                    'is-valid': form.designation && !formErrors.designation
-                                                }"
-                                                required maxlength="255" 
-                                                placeholder="Enter Designation">
-                                                <InputError :message="formErrors.designation || form.errors.designation" class="mt-2" />
-                                                <div v-if="form.designation && !formErrors.designation" class="valid-feedback d-block">
-                                                    Job Position looks good!
-                                                </div>
-                                        </div>                                                                                
-                                    </div>                            
-                                
-                                    <div class="row"> 
-                                        <div class="form-group col-md-6"> 
-                                            <div class="form-group">
-                                                <label>Department</label>
-                                                <select required v-model="form.department_id" class="form-control"
-                                                    :class="{ 'is-invalid': formErrors.department_id, 'is-valid': form.department_id && !formErrors.department_id }"
-                                                >
-                                                    <option value="">-- Department --</option>
-                                                    <option v-for="item in props.departments" :key="item" :value="item.id">{{ item.name }}</option>
-                                                </select>
-                                                <div v-if="form.department_id && !formErrors.department_id" class="valid-feedback d-block">
-                                                    Department looks good!
-                                                </div>
-                                                <InputError :message="formErrors.department_id" class="mt-1" />
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="form-group col-md-6">                                    
-                                            <label>Portrait</label>                                        
-                                            <div class="input-group">
-                                                <div class="custom-file">
-                                                    <input 
-                                                        type="file"                                                     
-                                                        accept="image/*"   
-                                                        @change="handleFileUpload"
-                                                        class="custom-file-input" 
-                                                        id="exampleInputFile"
-                                                        :class="{ 'is-invalid': formErrors.portrait, 'is-valid': form.portrait && !formErrors.portrait }"
-                                                    >
-                                                    <label class="custom-file-label" for="exampleInputFile">
-                                                        {{ fileName || 'Choose file' }}
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div v-if="form.portrait && !formErrors.portrait" class="valid-feedback d-block">
-                                                    Portait looks good!
-                                                </div>
-                                            <InputError :message="formErrors.portrait" class="mt-1" />                                        
-                                        </div>  
-                                    </div>   
-                                                                                                                                
-                                    <div class="row">
-                                        <div class="form-group col-md-6">
-                                            <label for="name">Password</label>
-                                                <input  
-                                                    v-model="form.password"
-                                                    type="password" 
-                                                    class="form-control" id="password" 
-                                                    required max="255" 
-                                                    :class="{
-                                                        'is-invalid': formErrors.password,
-                                                        'is-valid': form.password && !formErrors.password
-                                                    }"
-                                                    placeholder="Enter Password">
-                                                    <InputError :message="formErrors.password || form.errors.password" class="mt-2" />
-                                                
-                                                <!-- Success message -->
-                                                <div v-if="form.password && !formErrors.password" class="valid-feedback d-block">
-                                                    Strong password!
-                                                </div>
-                                        </div>
-
-                                        <div class="form-group col-md-6">
-                                            <label for="name">Confirm Password</label>
-                                            <input  
-                                                v-model="form.confirm_password"
-                                                type="password" 
-                                                class="form-control" id="paswword_confirmation" 
-                                                required max="255" 
-                                                :class="{
-                                                    'is-invalid': formErrors.confirm_password,
-                                                    'is-valid': form.confirm_password && !formErrors.confirm_password
-                                                }"
-                                                placeholder="Confirm Password">
-                                                <InputError :message="formErrors.confirm_password || form.errors.confirm_password" class="mt-2" />
-                                                <div v-if="form.confirm_password && !formErrors.confirm_password" class="valid-feedback d-block">
-                                                    Password confirmation looks good!
-                                                </div>
-=======
         <div class="content-wrapper">
             <div class="content-header">
                 <div class="container-fluid">
@@ -802,7 +553,6 @@ watch(() => form.nrc, (value) => {
                                         
                                         <div v-if="form.password && !formErrors.password" class="valid-feedback d-block">
                                             Strong password!
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
                                         </div>
                                     </div>
 
@@ -852,16 +602,6 @@ watch(() => form.nrc, (value) => {
                                     </div>
                                 </form>                                                   
                             </div>
-<<<<<<< HEAD
-                        </div>
-                    </div>
-        </div>
-
-        
-        </div>
-        </div>    
-  </div>  
-=======
                                                                    
 
                             <div class="card-footer">
@@ -895,7 +635,6 @@ watch(() => form.nrc, (value) => {
             </div>
 
         </div>
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
     </AuthenticatedLayout>
 </template>
 

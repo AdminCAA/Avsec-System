@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link, useForm, router } from '@inertiajs/vue3';
+import { Head, Link, useForm, router } from '@inertiajs/vue3'
 import { ref, watch, computed } from 'vue';
 import { Chart } from 'highcharts-vue';
 import Exporting from 'highcharts/modules/exporting';
@@ -10,11 +10,7 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 import InputError from '@/Components/InputError.vue';
 import dayjs from 'dayjs';
 
-<<<<<<< HEAD
-const {facility , qualityControlCounts,audits,inspections,securityTests,documentReviews,usersCount,operatorStats } = defineProps({
-=======
 const { facility, qualityControlCounts, audits, inspections, securityTests, usersCount, operatorStats } = defineProps({
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
   facility: {
     type: Object,
     required: true
@@ -23,30 +19,17 @@ const { facility, qualityControlCounts, audits, inspections, securityTests, user
     type: Object,
     required: true
   },
-<<<<<<< HEAD
-  audits: {type: Object, required:true},
-  inspections:{type: Object, required:true},
-  securityTests: {type: Object, required:true},
-  documentReviews: {type: Object, required:true},
-  usersCount:{type: Number, required:true},  
-=======
   audits: { type: Object, required: true },
   inspections: { type: Object, required: true },
   securityTests: { type: Object, required: true },
   usersCount: { type: Number, required: true },
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
 });
 
 
 const isLoading = ref(false);
 const formErrors = ref({});
-<<<<<<< HEAD
-const qc = facility.quality_controls || [] ;
-const controlTypes = ['Audit','Inspection','Security Test', 'Document Review']
-=======
 const qc = facility.quality_controls || [];
 const controlTypes = ['Audit', 'Inspection', 'Security Test']
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
 const activeTab = ref('Audit');
 const filteredQualityControls = computed(() => {
   return qc.filter(qc => qc.control_type === activeTab.value);
@@ -285,55 +268,6 @@ const exportPdf = async () => {
                 </li>
               </ol>
             </div>
-<<<<<<< HEAD
-            </div>
-        </div>
-        </div>
-   
-
-    <div class="content">
-      <div class="container-fluid">
-        <div class="d-flex justify-content-center align-items-center min-vh-60  bg-light">
-            <div class="row w-100 justify-content-center">
-                
-              
-          <div class="col-md-4">
-
-            <!-- Profile Image -->
-            <div class="card card-info card-outline">
-              <div class="card-body box-profile">                
-                <h3 class="profile-username text-center">{{facility.name}}</h3>
-                <p class="text-muted text-center">Category:  {{facility.category}}</p>
-                <p class="text-muted text-center">Email:  {{facility.email}}</p>
-                <p class="text-muted text-center">Contact:  {{facility.contact_number}}</p>
-
-                <ul class="list-group list-group-unbordered mb-3">
-                  <li class="list-group-item">                    
-                    <h5>Audits <span class="float-right badge bg-primary">{{qualityControlCounts.audits}}</span></h5>
-                  </li>
-                  <li class="list-group-item">                   
-                    <h5>Inspections <span class="float-right badge bg-success">{{qualityControlCounts.inspections}}</span></h5>
-                  </li>
-                  <li class="list-group-item">                  
-                    <h5>Security Tests <span class="float-right badge bg-warning">{{qualityControlCounts.securityTests}}</span></h5>
-                  </li>
-                  
-                  <li class="list-group-item">                 
-                    <h5>Certified Personnels <span class="float-right badge bg-danger">{{usersCount}}</span></h5>
-                  </li>
-                </ul>               
-              </div>
-              <!-- /.card-body -->
-
-
-              <div class="col-sm-12 mb-4">
-                <Chart :options="operatorStatisticOptions" />          
-              </div> 
-            </div>
-            <!-- /.card -->
-
-=======
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
           </div>
         </div>
       </div>
@@ -478,4 +412,13 @@ const exportPdf = async () => {
   max-width: 100%;
   height: auto;
 }
+
+  .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    color: #fff !important;
+    background-color: #17a2b8 !important;
+    
+  }
+ 
+
+
 </style>

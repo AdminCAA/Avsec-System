@@ -345,17 +345,6 @@ const deleteFollowup = (id) => {
 </script>
 
 <template>
-<<<<<<< HEAD
-  <Head title="Update Checklist Question"/>
-  <AuthenticatedLayout>
-    <div class="content-wrapper">    
-      <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-12">
-                    <h4><Link :href="route('facilities.show',qualityControl.facility.id)">{{ qualityControl.facility.name }} </Link> / <Link :href="route('quality-controls.edit',qualityControl.id)">{{ qualityControl.title }} - {{  qualityControl.control_type }} </Link> / <Link :href="route('quality-controls.show',qualityControl.id)">Checklist</Link></h4>                    
-                </div>                
-=======
 
     <Head title="Update Checklist Question" />
     <AuthenticatedLayout>
@@ -374,7 +363,6 @@ const deleteFollowup = (id) => {
                         </div>
                     </div>
                 </div>
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
             </div>
 
             <div class="content">

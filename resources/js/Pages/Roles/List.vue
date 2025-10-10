@@ -122,40 +122,6 @@ const sortedRoles = computed(() => {
 
 <template>
 
-<<<<<<< HEAD
-    <!-- Main content -->
-    <div class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-12">
-            <div class="card">
-              
-              <!-- /.card-header -->
-              <div class="card-body">
-                <table v-if="roles.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
-                  <thead>
-                  <tr>
-                    <th @click="sortTable('id')" style="cursor: pointer">#</th>
-                    <th @click="sortTable('name')" style="cursor: pointer">
-                      Role Name 
-                        <i v-if="sortKey === 'name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
-                    </th>
-                    <th>Permissions</th>                    
-                    <th @click="sortTable('created_at')" style="cursor: pointer;width: 100px;">
-                      Created
-                      <i v-if="sortKey === 'created_at'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
-                    </th>
-                    <th style="width: 150px;">Actions</th>                    
-                  </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(role, index) in sortedRoles" :key="role.id"
-                      :class="{ 'table table-selected': selectedRowId === role.id }" 
-                      @click="selectRow(role.id)">
-                    <td>{{ (roles.current_page - 1) * roles.per_page + index + 1 }}</td>
-                    <td class="text-center">
-                      <Link :href="route('roles.edit', role.id)">{{ role.name }}</Link></td>
-=======
   <Head title="Roles" />
   <AuthenticatedLayout>
     <div class="content-wrapper">
@@ -171,7 +137,6 @@ const sortedRoles = computed(() => {
                 <li class="breadcrumb-item">
                   <Link class="btn btn-info" :href="route('roles.create')"><i class="fas fa-plus"></i> Create</Link>
                 </li>
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
 
               </ol>
             </div><!-- /.col -->
@@ -251,25 +216,6 @@ const sortedRoles = computed(() => {
                     <p class="text-center">Please create a role to get started.</p>
                   </div>
 
-<<<<<<< HEAD
-                    <td class="text-center">{{dayjs(role.created_at).format('DD-MM-YYYY')}}</td>
-                    
-                    <td >
-                      <div class="d-flex justify-content-center">
-                        <Link class="btn btn-info btn-sm mr-1" :href="route('roles.edit', role.id)">
-                          <i class="fas fa-edit"></i> <span>Edit</span>
-                        </Link>
-                        <button class="btn btn-danger btn-sm" @click="deleteRole(role.id)">
-                          <i class="fas fa-trash"></i> <span>Del</span>
-                        </button>
-                      </div>
-                    </td>                    
-                  </tr>
- 
-                  </tbody>                
-                </table>
-=======
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
 
                 </div>
                 <!-- /.card-body -->

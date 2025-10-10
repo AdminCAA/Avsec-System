@@ -12,7 +12,6 @@ const { facilities } = defineProps({
   },
 });
 
-<<<<<<< HEAD
   const page = usePage()
   const roles = page.props.auth.user.roles;
   const hasRoles = (roles) => {
@@ -27,59 +26,15 @@ const { facilities } = defineProps({
   const selectRow = (id) => {
     selectedRowId.value = id;
   };
-=======
-const selectedRowId = ref(null);
-const selectRow = (id) => {
-  selectedRowId.value = id;
-};
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
 
 let pageNumber = ref(1);
 let search = ref(usePage().props.search);
 
-<<<<<<< HEAD
-
-
-  let facilitiesUrl = computed(()=>{
-        let url = new URL(route('facilities.index'));
-        url.searchParams.append('page', pageNumber.value);
-        if(search.value){
-            url.searchParams.append('search', search.value);
-        }
-        // if(class_id.value){
-        //     url.searchParams.append('class_id', class_id.value);
-        // }
-        return url;
-  });
-
-  watch(()=>facilitiesUrl.value, (newUrl)=>{
-    router.visit(newUrl,{
-        preserveScroll: true,
-        preserveState: true,
-        replace: true
-    });
-})
-
-    watch(()=>search.value, (newvalue)=>{
-        if(newvalue){
-        pageNumber.value = 1;
-        } 
-    })
-
-   
-
-  const updatePageNumber = (link)=>{
-        pageNumber.value = link.url.split('=')[1];            
-        router.visit("/facilities?page=" +  pageNumber.value, {
-            preserveScroll:true,
-        });    
-=======
 let facilitiesUrl = computed(() => {
   let url = new URL(route('facilities.index'));
   url.searchParams.append('page', pageNumber.value);
   if (search.value) {
     url.searchParams.append('search', search.value);
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
   }
 
   return url;
@@ -234,123 +189,6 @@ const sortedFacilities = computed(() => {
 
 <template>
 
-<<<<<<< HEAD
-    <!-- Main content -->
-    <div class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-12">
-            <div class="card">              
-              <!-- /.card-header -->
-              <div class="card-body">
-
-                <div class="row mb-3">
-                  <div class="col-md-3">
-                    <div class="form-group">
-                        <div class="input-group input-group-sm">
-                            <input 
-                                type="search" 
-                                class="form-control form-control-lg" 
-                                placeholder="Search for operator here.." 
-                                v-model="search">
-                            <div class="input-group-append">
-                                <button type="submit" class="btn btn-lg btn-default">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                  </div>
-                  <div class="col-md-9">
-                    <div class="d-flex justify-content-end">
-                      <button @click="downLoadOperator" class="btn btn-sm btn-primary">
-                        <i class="fas fa-file-pdf"></i> Export to PDF                        
-                      </button>
-                    </div>
-                  </div>
-                 </div>
-                 <div class="table-responsive">
-                  <table v-if="facilities.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
-                    <thead>
-                  <tr>
-                    <th @click="sortTable('id')" style="cursor: pointer">#</th>
-                    <th @click="sortTable('name')" style="cursor: pointer">
-                      Operator 
-                      <i v-if="sortKey === 'name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
-                    </th>
-                    <th @click="sortTable('category')" style="cursor: pointer">
-                      Category
-                      <i v-if="sortKey === 'category'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
-                    </th>
-                    <th @click="sortTable('email')" style="cursor: pointer">
-                      Email
-                      <i v-if="sortKey === 'email'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
-                    </th>
-                    <th @click="sortTable('contact_number')" style="cursor: pointer">
-                      Contact
-                      <i v-if="sortKey === 'contact_number'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
-                    </th>
-                    <th @click="sortTable('created_at')" style="cursor: pointer">
-                      Created
-                      <i v-if="sortKey === 'created_at'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
-                    </th>
-                    <th>Actions</th>
-                  </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(facility, index) in sortedFacilities" :key="facility.id"
-                        :class="{ 'table table-selected': selectedRowId === facility.id }" 
-                        @click="selectRow(facility.id)">
-                      <td>{{ (facilities.current_page - 1) * facilities.per_page + index + 1 }}</td>
-                      <td class="text-center">
-                        <Link :href="route('facilities.edit', facility.id)">
-                          {{ facility.name }}
-                          </Link> 
-                      </td>
-
-                      <td class="text-center">{{ facility.category }}</td>
-                                                              
-                      <td class="text-center">                        
-                          {{ facility.email }}           
-                      </td>
-                      <td class="text-center">                        
-                          {{ facility.contact_number }}          
-                      </td>
-
-                      <td class="text-center">{{dayjs(facility.created_at).format('DD-MM-YYYY')}}</td>
-                      
-                      <td>
-                        <div class="d-flex justify-content-center">
-                          <Link class="btn btn-success btn-sm mr-2" :href="route('facilities.show', facility.id)">
-                              <i class="fas fa-clipboard-list"></i><span> Details</span>
-                          </Link>
-                          <Link class="btn btn-info btn-sm mr-2" :href="route('facilities.edit', facility.id)">
-                            <i class="fas fa-edit"></i> <span>Edit</span>
-                          </Link>
-                          <button v-if="hasRoles(['Super Admin'])" class="btn btn-danger btn-sm" @click="deleteFacility(facility.id)">
-                            <i class="fas fa-trash"></i> <span>Del</span>
-                          </button>
-                        </div>
-                      </td>                    
-                    </tr>
-  
-                    </tbody>                
-                  </table>
-
-                 </div>
-                
-
-                <div v-if="facilities.data.length > 0" class="card mt-3">
-                  <Pagination :data="facilities" :updatePageNumber="updatePageNumber"/>                               
-                </div>
-                <div v-else class="card mt-3">
-                  <h3 class="text-center">No Operator found</h3>
-                  <p class="text-center">Please create a Operator to get started.</p>                         
-                </div>
-                
-              </div>
-              <!-- /.card-body -->
-=======
   <Head title="Operators" />
   <AuthenticatedLayout>
     <div class="content-wrapper">
@@ -367,7 +205,6 @@ const sortedFacilities = computed(() => {
                   </Link>
                 </li>
               </ol>
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
             </div>
           </div>
         </div>

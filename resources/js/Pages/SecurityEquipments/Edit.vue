@@ -327,28 +327,6 @@ const deleteMaintenaceSchedule = (id) => {
                           <td>{{ dayjs(schedule.last_performed_date).format('DD-MM-YYYY') }}</td>
                           <td>{{ dayjs(schedule.next_due_date).format('DD-MM-YYYY') }}</td>
 
-<<<<<<< HEAD
-                    <td>{{dayjs(schedule.created_at).format('DD-MM-YYYY')}}</td>
-                    
-                    <td>
-                      <div class="d-flex justify-content-end">
-                       
-                        <Link class="btn btn-info btn-sm mr-2" :href="route('facilities.edit', schedule.id)">
-                          <i class="fas fa-edit"></i> <span>XX</span>
-                        </Link>
-                        <button v-if="hasRoles(['Super Admin'])" class="btn btn-danger btn-sm" @click="deleteMaintenaceSchedule(schedule.id)">
-                          <i class="fas fa-trash"></i> <span></span>
-                        </button>
-                      </div>
-                    </td>                    
-                  </tr>
- 
-                  </tbody>                
-                </table>              
-              </div>
-              <!-- /.card-body -->
-            </div>
-=======
                           <td>{{ schedule.maintenance_type }}</td>
                           <td>{{ schedule.status }}</td>
 
@@ -375,7 +353,6 @@ const deleteMaintenaceSchedule = (id) => {
                     </table>
                   </div>
                   <!-- /.card-body -->
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
                 </div>
               </div>
             </div>

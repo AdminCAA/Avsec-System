@@ -13,24 +13,7 @@ const { auditQuestions } = defineProps({
   },
 });
 
-<<<<<<< HEAD
-  const page = usePage()
-  const roles = page.props.auth.user.roles;
-  const hasRoles = (roles) => {
-    const userRoles = page.props.auth.user?.roles ?? []
-    // If a single role is passed as a string, wrap it in an array
-    const requiredRoles = Array.isArray(roles) ? roles : [roles]
-    return requiredRoles.some(role => userRoles.includes(role))
-  }
-
-  const selectedRowId = ref(null);
-  
-  const selectRow = (id) => {
-    selectedRowId.value = id;
-  };
-=======
 const selectedRowId = ref(null);
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
 
 const selectRow = (id) => {
   selectedRowId.value = id;
@@ -177,97 +160,6 @@ const sortedAuditQuestions = computed(() => {
 
 <template>
 
-<<<<<<< HEAD
-    <!-- Main content -->
-    <div class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-12">
-            <div class="card">
-              
-              <!-- /.card-header -->
-              <div class="card-body">
-
-                <div class="row mb-3">
-                  <div class="col-md-3">
-                    <div class="form-group">
-                            <div class="input-group input-group-sm">
-                                <input 
-                                    type="search" 
-                                    class="form-control form-control-lg" 
-                                    placeholder="Search for audit question here.." 
-                                    v-model="search">
-                                <div class="input-group-append">
-                                    <button type="submit" class="btn btn-lg btn-default">
-                                        <i class="fa fa-search"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                  </div>
-                 </div>
-                 <div class="table-responsive">
-
-                    <table v-if="auditQuestions.data.length > 0"  id="example2" class="table table-sm table-bordered table-hover table-striped">
-                    <thead>
-                    <tr>
-                      <th @click="sortTable('id')" style="cursor: pointer">#</th>
-                      <th @click="sortTable('question')" style="cursor: pointer">
-                          Question 
-                          <i v-if="sortKey === 'question'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
-                      </th>
-
-                      <th @click="sortTable('audit_area_category.name')" style="cursor: pointer">
-                        Audit Area
-                        <i v-if="sortKey === 'audit_area_category.name'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>  
-                      </th>
-                                                                           
-                      <th style="width: 100px;">Created</th>   
-                      <th style="width: 160px;">Actions</th>             
-                    </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(question, index) in sortedAuditQuestions" :key="question.id"
-                        :class="{ 'table table-selected': selectedRowId === question.id }" 
-                        @click="selectRow(question.id)"
-                        >
-
-                      <td>{{ (auditQuestions.current_page - 1) * auditQuestions.per_page + index + 1 }}</td>
-                      
-                      <td>
-                        <Link :href="route('audit-questions.edit', question.id)">
-                          {{ question.question }}
-                        </Link>
-                      </td>
-                      <td class="text-center">{{ question.audit_area_category.name }}</td>                                                                                                  
-                      <td class="text-center">{{dayjs(question.created_at).format('DD-MM-YYYY')}}</td>
-                      
-                      <td>
-                        <div class="d-flex justify-content-center">                        
-                          <Link class="btn btn-info btn-sm mr-2" :href="route('audit-questions.edit', question.id)">
-                            <i class="fas fa-edit"></i> <span>Edit</span>
-                          </Link>
-                          <button v-if="hasRoles(['Super Admin'])" class="btn btn-danger btn-sm" @click="deleteAuditQuestions(question.id)">
-                            <i class="fas fa-trash"></i> <span>Del</span>
-                          </button>
-                        </div>
-                      </td>                    
-                    </tr>  
-                    </tbody>                
-                  </table>
-                 </div>
-                
-
-                <div v-if="auditQuestions.data.length > 0" class="card mt-3">
-                  <Pagination :data="auditQuestions" :updatePageNumber="updatePageNumber"/>                               
-                </div>
-                <div v-else class="card mt-3">
-                  <h3 class="text-center">No question found</h3>
-                  <p class="text-center">Please create a question to get started.</p>                         
-                </div>                
-              </div>
-              <!-- /.card-body -->
-=======
   <Head title="Audit Questions" />
   <AuthenticatedLayout>
     <div class="content-wrapper">
@@ -284,7 +176,6 @@ const sortedAuditQuestions = computed(() => {
                   </Link>
                 </li>
               </ol>
->>>>>>> 38f8373b61a9793faa640ae28cb592a362ddca11
             </div>
           </div>
         </div>
