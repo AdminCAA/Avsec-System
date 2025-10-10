@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\notifyAdminAboutNewuser;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -30,11 +32,20 @@ class CreateNewUser implements CreatesNewUsers
             ],
             'password' => $this->passwordRules(),
         ])->validate();
-
-        return User::create([
+        $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
         ]);
+
+        // Assign the "user" role to the newly created user
+        $user->assignRole('Guest User'); 
+
+        if($user){
+            //Send email to the user
+            Mail::to("felix.mantini@caa.co.zm")->send(new \App\Mail\notifyAdminAboutNewuser($user));
+        }
+
+        return $user;
     }
 }

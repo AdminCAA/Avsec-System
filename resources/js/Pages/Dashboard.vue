@@ -29,24 +29,6 @@ const hasRoles = (roles) => {
 
 
 
-// Example Pie Chart Options
-
-// --- CHART OPTIONS (computed so they react to new props.stats) ---
-// const pieOptions = computed(() => ({
-//   chart: { type: 'pie', backgroundColor: '#fff' },
-//   title: { text: 'Security Concerns' },
-//   series: [
-//     {
-//       name: 'Concerns',
-//       colorByPoint: true,
-//       data: [
-//         { name: 'Open', y: props.stats.openSecurityConcerns, color: '#f39c12' },
-//         { name: 'Closed', y: props.stats.closedSecurityConcerns, color: '#2ecc71' },
-//         { name: 'Overdue', y: props.stats.overdueSecurityConcerns, color: '#e74c3c' }
-//       ]
-//     }
-//   ]
-// }));
 
 const pieOptions = computed(() => ({
   accessibility: {
@@ -251,13 +233,6 @@ const totalSecurityConcernsStats = computed(() =>
   props.stats.operatorStats.map(item => item.total_security)
 );
 
-// const categoriesStats = props.stats.operatorStats.map(item => item.operator_name);
-// const openStats = props.stats.operatorStats.map(item => item.total_open_questions)
-// const overdueStats = props.stats.operatorStats.map(item => item.total_overdue_questions)
-// const closedStats = props.stats.operatorStats.map(item => item.total_closed_questions)
-// const totalQualityControlsStats = props.stats.operatorStats.map(item => item.quality_control_count);
-// const totalSecurityConcernsStats = props.stats.operatorStats.map(item => item.total_security);
-
 const operatorStatisticOptions = computed(() => ({
   accessibility: {
     enabled: false
@@ -444,31 +419,6 @@ watch([startDate, endDate], () => {
   });
 });
 
-
-// const exportPdf = async () => {
-//   const chartImages = [];
-
-//   const charts = document.querySelectorAll('.highcharts-container canvas');
-//   charts.forEach((canvas) => {
-//     chartImages.push(canvas.toDataURL('image/png'));
-//   });
-
-//   console.log('Captured charts:', chartImages); // Check this in the browser console
-
-//   const response = await axios.post(route('dashboard.exportPdf'), {
-//     start_date: startDate.value,
-//     end_date: endDate.value,
-//     charts: chartImages
-//   }, { responseType: 'blob' });
-
-//   const url = window.URL.createObjectURL(new Blob([response.data]));
-//   const link = document.createElement('a');
-//   link.href = url;
-//   link.download = 'Quality_Control_Summary_Report.pdf';
-//   link.click();
-// };
-
-
 const exportPdf = async () => {
   try {
     isLoading.value = true; // Start loading
@@ -518,6 +468,9 @@ const exportPdf = async () => {
           </div>
           <div v-if="hasRoles(['AVSEC Inspector'])" class="col-sm-6">
             <h3 class="m-0">Inspector Dashboard</h3>
+          </div>
+          <div v-if="hasRoles(['Guest User'])" class="col-sm-6">
+            <h3 class="m-0">Guest Dashboard</h3>
           </div>
           </div>
         </div>
@@ -603,140 +556,7 @@ const exportPdf = async () => {
             </div>
           </div>
 
-          <!-- <div class="row justify-content-center">
-
-            
-            <div class="col-lg-3 col-6 mb-4">
-              <div class="small-box bg-audit text-white">
-                <div class="inner">
-                  <h3>{{ props.stats.totalAudits }}</h3>
-                  <p>Audits</p>
-                </div>
-                <div class="icon">
-                  <i class="fas fa-clipboard-check"></i>
-                </div>
-                <Link :href="route('quality-controls.listAudits')" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-                </Link>
-              </div>
-            </div>
-
-            
-            <div class="col-lg-3 col-6 mb-4">
-              <div class="small-box bg-inspection text-white">
-                <div class="inner">
-                  <h3>{{ props.stats.totalInspections }}</h3>
-                  <p>Inspections</p>
-                </div>
-                <div class="icon">
-                  <i class="fas fa-search"></i>
-                </div>
-                <Link :href="route('quality-controls.listInspections')" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-                </Link>
-              </div>
-            </div>
-
-            
-            <div class="col-lg-3 col-6 mb-4">
-              <div class="small-box bg-security-test text-white">
-                <div class="inner">
-                  <h3>{{ props.stats.totalSecurityTests }}</h3>
-                  <p>Security Tests</p>
-                </div>
-                <div class="icon">
-                  <i class="fas fa-shield-alt"></i>
-                </div>
-                <Link :href="route('quality-controls.listSecurityTests')" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-                </Link>
-              </div>
-            </div>
-
-            
-            <div class="col-lg-3 col-6 mb-4">
-              <div class="small-box bg-security-concern text-white">
-                <div class="inner">
-                  <h3>{{ props.stats.totalSecurityConcerns }}</h3>
-                  <p>Security Concerns</p>
-                </div>
-                <div class="icon">
-                  <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <Link :href="route('securityconcerns.index')" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          <div class="row justify-content-center">
-
-            
-            <div class="col-lg-3 col-6 mb-4">
-              <div class="small-box bg-pending text-white">
-                <div class="inner">
-                  <h3>{{ props.stats.pendingQualityControls }}</h3>
-                  <p>Pending</p>
-                </div>
-                <div class="icon">
-                  <i class="fas fa-hourglass-half"></i>
-                </div>
-                <Link :href="route('quality-controls.listPending')" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-                </Link>
-              </div>
-            </div>
-
-            
-            <div class="col-lg-3 col-6 mb-4">
-              <div class="small-box bg-inprogress text-white">
-                <div class="inner">
-                  <h3>{{ props.stats.inProgressQualityControls }}</h3>
-                  <p>In Progress</p>
-                </div>
-                <div class="icon">
-                  <i class="fas fa-spinner"></i>
-                </div>
-                <Link :href="route('quality-controls.listInProgress')" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-                </Link>
-              </div>
-            </div>
-
-           
-            <div class="col-lg-3 col-6 mb-4">
-              <div class="small-box bg-completed text-white">
-                <div class="inner">
-                  <h3>{{ props.stats.completedQualityControls }}</h3>
-                  <p>Completed</p>
-                </div>
-                <div class="icon">
-                  <i class="fas fa-check-circle"></i>
-                </div>
-                <Link :href="route('quality-controls.listCompleted')" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-                </Link>
-              </div>
-            </div>
-
-            
-            <div class="col-lg-3 col-6 mb-4">
-              <div class="small-box bg-overdue text-white">
-                <div class="inner">
-                  <h3>{{ props.stats.overdueQualityControls }}</h3>
-                  <p>Overdue</p>
-                </div>
-                <div class="icon">
-                  <i class="fas fa-exclamation-circle"></i>
-                </div>
-                <Link :href="route('quality-controls.listOverdue')" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-                </Link>
-              </div>
-            </div>
-          </div> -->
-
+          
           <div class="row justify-content-center">
             <div class="col-12">
               <div class="card shadow-sm mb-4">
@@ -908,39 +728,7 @@ const exportPdf = async () => {
 
         <h3 class="text-center mb-4"><strong>Quality Control Compliance Statistics</strong></h3>
           <hr /><br />
-          <!-- <div class="row">
-            <div class="col-md-9">
-              <div class="row g-3 align-items-end">
-                
-                <div class="col-md-3 col-sm-6">
-                  <div class="form-group">
-                    <label for="startDate" class="form-label fw-bold">Start Date</label>
-                    <input id="startDate" type="date" class="form-control form-control-sm" v-model="startDate">
-                  </div>
-                </div>
-
-                
-                <div class="col-md-3 col-sm-6">
-                  <div class="form-group">
-                    <label for="endDate" class="form-label fw-bold">End Date</label>
-                    <input id="endDate" type="date" class="form-control form-control-sm" v-model="endDate">
-                  </div>
-                </div>
-
-               
-                <div class="col-md-3 col-sm-6">
-                  <button class="btn btn-danger w-100" @click="exportPdf">
-                    <i class="fas fa-file-pdf"></i> Export Summary Report PDF
-                  </button>
-
-                </div>
-
-              </div>
-
-            </div>
-          </div> -->
-
-          <!-- Date Range & Export Card -->
+          
           <div class="card mb-4 shadow-sm">
             <!-- Card Header -->
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
@@ -1135,6 +923,14 @@ const exportPdf = async () => {
 
 
       </div><!-- /.container-fluid -->
+
+      <div v-if="hasRoles(['Guest User'])" class="container-fluid">   
+            <p class="text-center mb-4"><strong>Welcome to the AVSEC Information System!</strong>
+            </p>
+            <p class="text-center mb-4">Your account has been successfully created and confirmed, it's now just pending user role assignment by the System Adminitrator.</p>
+            <p class="text-center mb-4">You’ll be notified once your access permissions are set up.</p>
+            <hr /><br />
+      </div>
       </div>
 
       
