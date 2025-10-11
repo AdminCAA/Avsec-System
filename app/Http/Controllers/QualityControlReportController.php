@@ -52,7 +52,8 @@ class QualityControlReportController extends Controller implements HasMiddleware
             'operator' => $operator,
             'groupedAuditedArea' => $selectedChecklistQuestions,
             'users' => $users
-        ])->setPaper('A4', 'portrait');
+        ])->setPaper('A4', 'landscape');
+        //->setPaper('A4', 'portrait');
 
 
         return $pdf->download('qualityControl_'.$qualityControl->id.'.pdf');
