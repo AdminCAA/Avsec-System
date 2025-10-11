@@ -209,14 +209,14 @@ const sortedAuditQuestions = computed(() => {
                       class="table table-sm table-bordered table-hover table-striped">
                       <thead>
                         <tr>
-                          <th @click="sortTable('id')" style="cursor: pointer">#</th>
-                          <th @click="sortTable('question')" style="cursor: pointer">
+                          <th @click="sortTable('id')" style="cursor: pointer; width: 5px;">#</th>
+                          <th @click="sortTable('question')" style="cursor: pointer; width: 350px;">
                             Question
                             <i v-if="sortKey === 'question'"
                               :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
                           </th>
 
-                          <th @click="sortTable('audit_area_category.name')" style="cursor: pointer">
+                          <th @click="sortTable('audit_area_category.name')" style="cursor: pointer; width: 350px;">
                             Audit Area
                             <i v-if="sortKey === 'audit_area_category.name'"
                               :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>

@@ -59,12 +59,7 @@ function validateQuestionForm(questionId) {
   if (!form.finding_category) errors.finding_category = 'Finding category is required';
   if (!form.date_quality_control) errors.date_quality_control = 'Date of Quality Control is required';
   if (!form.finding_observation) errors.finding_observation = 'Finding/Observation is required';
-  //if (!form.problem_cause) errors.problem_cause = 'Problem cause is required';
   if (!form.status) errors.status = 'Status is required';
-  //if (!form.date_of_closure) errors.date_of_closure = 'Date of closure is required';
-  //if (!form.completion_date) errors.completion_date = 'Completion date is required';
-  //if (!form.follow_up_date) errors.follow_up_date = 'Follow-up date is required';
-  //Check if the evidence file is more the 2Mb
 
 
   if (form.evidence_file instanceof File) {
@@ -225,7 +220,7 @@ const handleFileUpload = (questionId, event) => {
   if (file) {
     const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
     getForm(questionId).evidence_file = file;
-    fileName.value[questionId] = file.name;     
+    fileName.value[questionId] = file.name;
     if (!allowedTypes.includes(file.type)) {
       formErrors.value[questionId].evidence_file = 'Only PDF, JPG, or PNG files are allowed.';
     } else {
@@ -235,6 +230,39 @@ const handleFileUpload = (questionId, event) => {
     fileName.value[questionId] = '';
     getForm(questionId).evidence_file = null;
   }
+};
+
+
+const exportToPDF = () => {
+  isLoading.value = true;
+
+  axios({
+    url: route('quality-controls.exportPDF', qualityControl.id),
+    method: 'GET',
+    responseType: 'blob',
+  })
+    .then((response) => {
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `QualityControl_${qualityControl.id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+    })
+    .catch(() => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to generate PDF.',
+        toast: true,
+        position: 'top-end',
+        timer: 3000,
+        showConfirmButton: false,
+      });
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
 };
 
 </script>
@@ -252,7 +280,7 @@ const handleFileUpload = (questionId, event) => {
                 <Link :href="route('facilities.show', qualityControl.facility.id)"><strong>{{
                   qualityControl.facility.name }}</strong> </Link> /
                 <Link :href="route('quality-controls.edit', qualityControl.id)"><strong>{{ qualityControl.title
-                  }}</strong> - <strong>{{ qualityControl.control_type }}</strong> </Link>
+                }}</strong> - <strong>{{ qualityControl.control_type }}</strong> </Link>
               </h4>
             </div>
           </div>
@@ -264,10 +292,27 @@ const handleFileUpload = (questionId, event) => {
           <div class="d-flex justify-content-center align-items-center min-vh-60  bg-light">
             <div class="row w-100 justify-content-center">
               <div class="col-md-12 mb-4">
-                <!-- general form elements -->
+
+                <!-- Approve Checklist & Export button -->
+                <div class="d-flex justify-content-end mb-3">
+
+                  <button class="btn btn-success">
+                    <i class="fas fa-check-circle"></i> Approve Checklist
+                  </button>
+
+                  <button :disabled="isLoading" @click="exportToPDF" class="btn btn-info" style="margin-left: 10px;">
+                    <span v-if="isLoading">
+                      <i class="fas fa-spinner fa-spin"></i> Generating PDF, Please wait...
+                    </span>
+                    <span v-else>
+                      <i class="fas fa-file-pdf"></i> Export to PDF
+                    </span>
+                  </button>
+                </div>
+
                 <div class="card card-info">
                   <div class="card-header">
-                    <h3 class="card-title">Quality Control Checklist</h3>
+                    <h3 class="card-title"><strong>Quality Control Checklist</strong></h3>
                   </div>
                   <div v-for="(questions, area) in groupedCheckListQuestions" :key="area">
                     <div class="card-body">
@@ -453,153 +498,6 @@ const handleFileUpload = (questionId, event) => {
                                             </select>
                                           </div>
                                         </div>
-
-
-
-
-                                        <!-- <div class="card card-info collapsed-card">
-                                      <div class="card-header">
-                                          <h3 style="font-weight: bold;"  class="card-title" data-card-widget="collapse">Corrective Action Plan</h3>
-                                          <div class="card-tools">
-                                              <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
-                                              </button>
-                                        </div>
-                                      </div>
-                                      <div class="card-body">
-                                        <div class="row">
-                                          <div class="form-group col-md-6">
-                                            <label>Action Taken By Operator</label>
-                                            <textarea disabled v-model="getForm(question.id).action_taken
-                                              "class="form-control" rows="2" placeholder="Action Taken">
-                                            </textarea>
-                                                                                        
-                                          </div>
-
-                                          <div class="form-group col-md-6">
-                                            <label>Root Cause of Problem</label>
-                                            <textarea disabled required v-model="getForm(question.id).problem_cause"
-                                              class="form-control" rows="2" placeholder="Cause of Problem"
-                                              
-                                              @change="validateQuestionForm(question.id)"
-                                              :class="{ 
-                                                        'is-invalid': formErrors[question.id]?.problem_cause, 
-                                                        'is-valid': forms[question.id].problem_cause && !formErrors[question.id]?.problem_cause 
-                                                }" 
-                                              >
-                                            </textarea>
-                                            <small v-if="formErrors[question.id]?.problem_cause" class="text-danger">{{ formErrors[question.id].problem_cause }}</small>                                                     
-                                          </div>
-                                        </div> 
-                                    
-                                        <div class="row">
-                                          <div class="form-group col-md-6">
-                                            <label>Short term CAP</label>
-                                            <textarea disabled v-model="getForm(question.id).short_term_action"
-                                            class="form-control" rows="2" placeholder="Short term CAP">
-                                            </textarea>
-                                          </div>
-
-                                          <div class="form-group col-md-6">
-                                            <label>Short term  Date</label>
-                                            <input   disabled                                                   
-                                                v-model="getForm(question.id).short_term_date"                                         
-                                                type="date"
-                                                class="form-control"   
-                                                @change="validateQuestionForm(question.id)"        
-                                                :class="{ 
-                                                    'is-invalid': formErrors[question.id]?.short_term_date, 
-                                                    'is-valid': forms[question.id].short_term_date && !formErrors[question.id]?.short_term_date 
-                                                }"                                                  
-                                                placeholder="Short Term Date"
-                                            />  
-                                            <small v-if="formErrors[question.id]?.short_term_date" class="text-danger">{{ formErrors[question.id].short_term_date }}</small>                                      
-                                          </div>                                     
-                                        </div> 
-
-                                        <div class="row">
-                                          <div class="form-group col-md-6">
-                                            <label>Long term CAP</label>
-                                            <textarea disabled v-model="getForm(question.id).long_term_action" class="form-control" rows="2" placeholder="Long term CAP">
-                                            </textarea>
-                                          </div>
-
-                                          <div class="form-group col-md-6">
-                                            <label>Long Term  Date</label>
-                                            <input  
-                                                disabled                                                   
-                                                v-model="getForm(question.id).long_term_date"                                         
-                                                type="date"
-                                                class="form-control"   
-                                                @change="validateQuestionForm(question.id)"        
-                                                :class="{ 
-                                                    'is-invalid': formErrors[question.id]?.long_term_date, 
-                                                    'is-valid': forms[question.id].long_term_date && !formErrors[question.id]?.long_term_date 
-                                                }"                                                  
-                                                placeholder="Follow-up Date"
-                                            />  
-                                            <small v-if="formErrors[question.id]?.long_term_date" class="text-danger">{{ formErrors[question.id].long_term_date }}</small>                                      
-                                          </div>
-                                        </div>
-
-                                        <div class="row">
-                                          <div class="form-group col-md-6">
-                                            <label>Proposed Completion Date</label>
-                                            <input  
-                                                disabled 
-                                                @change="validateQuestionForm(question.id)"                                                     
-                                                v-model="getForm(question.id).completion_date"                                         
-                                                type="date"
-                                                class="form-control"                                                      
-                                                placeholder="Proposed Completion Date"
-                                                :class="{ 
-                                                    'is-invalid': formErrors[question.id]?.completion_date, 
-                                                    'is-valid': forms[question.id].completion_date && !formErrors[question.id]?.completion_date 
-                                                }" 
-                                            /> 
-                                            
-                                            <small v-if="formErrors[question.id]?.completion_date" class="text-danger">{{ formErrors[question.id].completion_date }}</small>                                                                                                      
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label>Follow-up Date</label>
-                                            <input   
-                                                disabled                                                  
-                                                v-model="getForm(question.id).follow_up_date"                                         
-                                                type="date"
-                                                class="form-control"   
-                                                @change="validateQuestionForm(question.id)"        
-                                                :class="{ 
-                                                    'is-invalid': formErrors[question.id]?.follow_up_date, 
-                                                    'is-valid': forms[question.id].follow_up_date && !formErrors[question.id]?.follow_up_date 
-                                                }"                                                  
-                                                placeholder="Follow-up Date"
-                                            />  
-                                            <small v-if="formErrors[question.id]?.follow_up_date" class="text-danger">{{ formErrors[question.id].follow_up_date }}</small>
-                                          
-                                        </div>
-                                        </div>
-
-                                        <div class="row">                                       
-                                          <div class="form-group col-md-6">
-                                            <label>Date of Closure</label>
-                                            <input 
-                                                disabled                                                      
-                                                v-model="getForm(question.id).date_of_closure"                                         
-                                                type="date"
-                                                class="form-control"     
-                                                @change="validateQuestionForm(question.id)"        
-                                                :class="{ 
-                                                    'is-invalid': formErrors[question.id]?.date_of_closure, 
-                                                    'is-valid': forms[question.id]?.date_of_closure && !formErrors[question.id]?.date_of_closure 
-                                                }"
-                                                                                        
-                                                placeholder="Date of Closure"
-                                            /> 
-                                            <small v-if="formErrors[question.id]?.date_of_closure" class="text-danger">{{ formErrors[question.id]?.date_of_closure }}</small>                                                                                                                                                  
-                                          </div>
-                                        </div>
-                                      </div>
-                                  </div> -->
-
                                         <div class="d-flex justify-content-end">
                                           <button :disabled="isLoading" type="submit" class="btn btn-info mr-1">
                                             <span v-if="isLoading"><i class="fas fa-spinner fa-spin"></i>
@@ -607,12 +505,8 @@ const handleFileUpload = (questionId, event) => {
                                             <span v-else><i class="fas fa-save"></i> Save</span>
                                           </button>
                                         </div>
-
-
                                       </div>
-                                      <!-- /.card-body -->
                                     </div>
-                                    <!-- /.card -->
                                   </div>
                                 </form>
                               </div>
@@ -633,7 +527,6 @@ const handleFileUpload = (questionId, event) => {
 </template>
 
 <style>
-
 .content-wrapper {
   font-family: 'Poppins', 'Segoe UI', sans-serif;
 }
@@ -682,4 +575,5 @@ const handleFileUpload = (questionId, event) => {
   transform: scale(1.05);
   color: #0056b3;
 }
+
 </style>

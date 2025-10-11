@@ -51,7 +51,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
           </Link>
         </p> -->
 
-        <div class="bottom-row">
+        <!-- <div class="bottom-row">
           <div class="avatars">
             <img src="/assets/user1.jpg" alt="user1" />
             <img src="/assets/user2.jpg" alt="user2" />
@@ -59,7 +59,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
             <span>Join with 20k+ Users!</span>
           </div>
           <button class="arrow-btn">➜</button>
-        </div>
+        </div> -->
       </div>
 
       <!-- RIGHT PANEL -->

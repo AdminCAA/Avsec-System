@@ -22,6 +22,7 @@ const { facilities } = defineProps({
   }
 
   const selectedRowId = ref(null);
+  const isDownloading = ref(false);
   
   const selectRow = (id) => {
     selectedRowId.value = id;
@@ -123,6 +124,7 @@ const deleteFacility = (id) => {
 
 const downLoadOperator = async () => {
   try {
+    isDownloading.value = true; // start loading
     const response = await axios.get('/api/facilities/downloadFacilities', {
       responseType: 'blob'
     });
@@ -133,7 +135,6 @@ const downLoadOperator = async () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
   } catch (error) {
     console.log(error);
     Swal.fire({
@@ -146,8 +147,10 @@ const downLoadOperator = async () => {
       timer: 1000,
       timerProgressBar: true,
     });
+  } finally {
+    isDownloading.value = false; // stop loading
   }
-}
+};
 
 
 const sortKey = ref(null);
@@ -234,8 +237,12 @@ const sortedFacilities = computed(() => {
                     </div>
                     <div class="col-md-9">
                       <div class="d-flex justify-content-end">
-                        <button @click="downLoadOperator" class="btn btn-sm btn-primary">
-                          <i class="fas fa-file-pdf"></i> Export to PDF
+                        <button @click="downLoadOperator" class="btn btn-sm custom-btn d-flex align-items-center gap-2"
+                          :disabled="isDownloading">
+                          <i v-if="!isDownloading" class="fas fa-file-pdf icon-space"></i>
+                          <span v-if="!isDownloading">Export to PDF</span>
+                          <div v-else class="spinner-border spinner-border-sm text-light" role="status"></div>
+                          <span v-if="isDownloading">Generating...</span>
                         </button>
                       </div>
                     </div>
@@ -373,4 +380,27 @@ const sortedFacilities = computed(() => {
   padding: 12px;
   letter-spacing: 0.5px;
 }
+
+.custom-btn {
+  background-color: #44444E;
+  border-color: #44444E;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.custom-btn:hover:not(:disabled) {
+  background-color: #5a5a65;
+  border-color: #5a5a65;
+  color: #fff;
+}
+
+.custom-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.icon-space {
+  margin-right: 10px;
+}
+
 </style>
