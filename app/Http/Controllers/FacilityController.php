@@ -242,14 +242,28 @@ class FacilityController extends Controller implements HasMiddleware
         );
     }
 
-    public function downloadOperatorsPDF(){
+    // public function downloadOperatorsPDF(){
         
-        $operators = Facility::all();        
-        $pdf = Pdf::loadView('pdfTemplates.operators', [
-            'operators' => $operators,
-        ]);
-        return $pdf->download('operators.pdf');        
-    }
+    //     $operators = Facility::all();        
+    //     $pdf = Pdf::loadView('pdfTemplates.operators', [
+    //         'operators' => $operators,
+    //     ]);
+    //     return $pdf->download('operators.pdf');        
+    // }
+
+    public function downloadOperatorsPDF()
+{
+    $operators = Facility::all();
+
+    $pdf = Pdf::loadView('pdfTemplates.operators', [
+        'operators' => $operators,
+        'generatedAt' => now()->format('F j, Y g:i A'),
+    ])->setPaper('a4', 'landscape');
+
+    return $pdf->download('operators.pdf');
+}
+
+
 
 
     // public function downloadPdf($id)

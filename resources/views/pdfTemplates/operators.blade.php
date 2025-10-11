@@ -2,190 +2,122 @@
 <html>
 
 <head>
+    <meta charset="utf-8">
     <title>Operators List</title>
     <style>
         body {
             font-family: 'Poppins', 'Segoe UI', sans-serif;
             font-size: 12px;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ---------- COVER PAGE ---------- */
+        .cover-page {
+            text-align: center;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            page-break-after: always;
+        }
+
+        .cover-page img {
+            height: 180px;
+            margin-bottom: 25px;
+        }
+
+        .cover-page h2 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 800;
+            color: #44444E;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cover-page h3 {
+            margin: 20px 0 25px;
+            font-size: 26px;
+            /* Larger subtitle */
+            color: #000;
+            text-transform: uppercase;
+        }
+
+        .cover-date {
+            font-size: 16px;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        /* ---------- HEADER & TABLE ---------- */
+        .header {
+            text-align: center;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 15px;
         }
 
         th,
         td {
             border: 1px solid #000;
             padding: 6px;
-            margin: 0
-        }
-
-        h2,
-        h3 {
-            margin-top: 15px;
+            margin: 0;
         }
 
         th {
             background-color: #a8a8a8;
         }
 
-        .header,
-        .footer {
-            text-align: center;
+        h4 {
+            margin-top: 10px;
+            margin-bottom: 5px;
         }
-
     </style>
-    <script setup>
-        const logoImage = '/assets/caa-logo.png';
-    </script>
 </head>
 
 <body>
-    <div class="header">
-        <div>
-            <img src="../public/assets/caa-logo.png" alt="Logo" style="height: 100px">
-            <h4>CIVIL AVIATION AUTHORITY</h4>
-        </div>
-        <hr>
-        <h4> AVSEC OPERATORS LIST</h4>
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Operator</th>
-                    <th>Category</th>
-                    <th>Email</th>
-                    <th>Contact</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if ($operators->isNotEmpty())
-                    @foreach ($operators as $index => $operator)
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $operator->name }}</td>
-                            <td>{{ $operator->category }}</td>
-                            <td>{{ $operator->email }}</td>
-                            <td>{{ $operator->contact_number }}</td>
-                        </tr>
-                    @endforeach
-                @else
+
+    {{-- Cover Page --}}
+    <div class="cover-page">
+        <img src="{{ public_path('assets/caa-logo.png') }}" alt="CAA Logo">
+        <h2>CIVIL AVIATION AUTHORITY</h2>
+        <h3>AVSEC OPERATORS LIST</h3>
+        <div class="cover-date">Generated on: {{ $generatedAt }}</div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Operator</th>
+                <th>Category</th>
+                <th>Email</th>
+                <th>Contact</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if ($operators->isNotEmpty())
+                @foreach ($operators as $index => $operator)
                     <tr>
-                        <td colspan="5">No Operator is available.</td>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $operator->name }}</td>
+                        <td>{{ $operator->category }}</td>
+                        <td>{{ $operator->email }}</td>
+                        <td>{{ $operator->contact_number }}</td>
                     </tr>
-                @endif
-            </tbody>
-        </table>
-
-        {{-- <h3>License Categories</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Category</th>
-                    <th>License Class</th>
-                    <th>Aircraft Types</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if ($application->licenseCategories->isNotEmpty())
-                @foreach ($application->licenseCategories as $category)
-                <tr>
-                    <td>{{ $category->category }}</td>
-                    <td>{{ $category->licenseClass }}</td>
-                    <td>{{ $category->aircraftTypes }}</td>
-                </tr>
                 @endforeach
-                @else
+            @else
                 <tr>
-                    <td colspan="3">No license categories available.</td>
+                    <td colspan="5" style="text-align: center;">No Operator is available.</td>
                 </tr>
-                @endif
-            </tbody>
-        </table> --}}
-
-        {{-- <h3>Single Engine Aircrafts</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Day Dual</th>
-                    <th>Day Pilot</th>
-                    <th>Night Dual</th>
-                    <th>Night Pilot</th>
-                    <th>FSTD</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($application->singleEngineAircrafts ?? [] as $single)
-                <tr>
-                    <td>{{ $single->dayDual }}</td>
-                    <td>{{ $single->dayPilot }}</td>
-                    <td>{{ $single->nightDual }}</td>
-                    <td>{{ $single->nightPilot }}</td>
-                    <td>{{ $single->fstd }}</td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5">No single engine aircraft data available.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table> --}}
-
-        {{-- <h3>Multi Engine Aircrafts</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Day First Pilot</th>
-                    <th>Day Second Pilot</th>
-                    <th>Night First Pilot</th>
-                    <th>Night Second Pilot</th>
-                    <th>Night Dual</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($application->multiEngineAircrafts ?? [] as $multi)
-                <tr>
-                    <td>{{ $multi->dayFirstPilot }}</td>
-                    <td>{{ $multi->daySecondPilot }}</td>
-                    <td>{{ $multi->nightFirstPilot }}</td>
-                    <td>{{ $multi->nightSecondPilot }}</td>
-                    <td>{{ $multi->nightDual }}</td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5">No multi-engine aircraft data available.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table> --}}
-        {{--
-        <h3>Type Ratings</h3>
-        @if ($application->typeRatings && $application->typeRatings->isEmpty())
-        <p>No type ratings submitted.</p>
-        @else
-        <table>
-            <thead>
-                <tr>
-                    <th>Type</th>
-                    <th>Rating</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($application->typeRatings ?? [] as $rating)
-                <tr>
-                    <td>{{ $rating->type ?? 'N/A' }}</td>
-                    <td>{{ $rating->rating ?? 'N/A' }}</td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="2">No type ratings available.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-        @endif --}}
-
+            @endif
+        </tbody>
+    </table>
 </body>
 
 </html>

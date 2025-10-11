@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Certification;
 use App\Models\Facility;
+use App\Models\Qualification;
 use App\Models\Training;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -27,9 +30,6 @@ class PersonnelController extends Controller implements HasMiddleware
         ];
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {        
         $searchQuery = User::search($request);
@@ -41,9 +41,6 @@ class PersonnelController extends Controller implements HasMiddleware
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $facilities = Facility::orderBy('name','ASC')->get();        
@@ -59,9 +56,6 @@ class PersonnelController extends Controller implements HasMiddleware
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         //
@@ -120,9 +114,6 @@ class PersonnelController extends Controller implements HasMiddleware
         }        
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
@@ -137,9 +128,6 @@ class PersonnelController extends Controller implements HasMiddleware
         ]);        
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         //
@@ -158,78 +146,72 @@ class PersonnelController extends Controller implements HasMiddleware
         ]);
     }
 
-  
+    public function update(Request $request, string $id)
+    {
+        $user = User::findOrFail($id);
 
-public function update(Request $request, string $id)
-{
-    $user = User::findOrFail($id);
-
-    // Validate request
-    $validator = Validator::make($request->all(), [
-        'portrait' => 'nullable|image|max:2048',
-        'name' => 'required|string|max:255',
-        'email' => [
-            'required',
-            'email',
-            'max:255',
-            Rule::unique('users')->ignore($user->id), // Ignore current user
-        ],
-        'nrc' => 'required|string|max:20',
-        'gender' => 'required|string|max:6',
-        'phone_number' => 'nullable|string|max:20',
-        'password' => [
-            'nullable', // Password should be optional on update
-            'string',
-            Password::min(8)->mixedCase()->letters()->numbers()->symbols()
-        ],
-        'facility_id' => 'required|exists:facilities,id',
-        'user_type' => ['required', 'string', Rule::in(User::UserTypes)],
-        'is_certified' => ['required', 'string', Rule::in(User::UserStatuses)],
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 422);
-    }
-
-    DB::beginTransaction();
-
-    try {
-        $facility = Facility::findOrFail($request->facility_id);
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'nrc' => $request->nrc,
-            'gender' => $request->gender,
-            'phone_number' => $request->phone_number,
-            'password' => $request->password ? bcrypt($request->password) : $user->password,
-            'facility_id' => $request->facility_id,
-            'facility_name' => $facility->name,
-            'user_type' => $request->user_type,
-            'is_certified' => $request->is_certified,
+        // Validate request
+        $validator = Validator::make($request->all(), [
+            'portrait' => 'nullable|image|max:2048',
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($user->id), // Ignore current user
+            ],
+            'nrc' => 'required|string|max:20',
+            'gender' => 'required|string|max:6',
+            'phone_number' => 'nullable|string|max:20',
+            'password' => [
+                'nullable', // Password should be optional on update
+                'string',
+                Password::min(8)->mixedCase()->letters()->numbers()->symbols()
+            ],
+            'facility_id' => 'required|exists:facilities,id',
+            'user_type' => ['required', 'string', Rule::in(User::UserTypes)],
+            'is_certified' => ['required', 'string', Rule::in(User::UserStatuses)],
         ]);
 
-        // Handle portrait upload if provided
-        if ($request->hasFile('portrait')) {
-            if ($user->portrait && Storage::disk('public')->exists($user->portrait)) {
-                Storage::disk('public')->delete($user->portrait);
-            }
-
-            $portraitPath = $request->file('portrait')->store('portraits', 'public');
-            $user->update(['portrait' => $portraitPath]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        DB::commit();
-        return redirect()->route('personnels.index')->with('success', 'Personnel updated successfully.');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json(['error' => 'An error occurred while updating the user.'], 500);
+        DB::beginTransaction();
+
+        try {
+            $facility = Facility::findOrFail($request->facility_id);
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'nrc' => $request->nrc,
+                'gender' => $request->gender,
+                'phone_number' => $request->phone_number,
+                'password' => $request->password ? bcrypt($request->password) : $user->password,
+                'facility_id' => $request->facility_id,
+                'facility_name' => $facility->name,
+                'user_type' => $request->user_type,
+                'is_certified' => $request->is_certified,
+            ]);
+
+            // Handle portrait upload if provided
+            if ($request->hasFile('portrait')) {
+                if ($user->portrait && Storage::disk('public')->exists($user->portrait)) {
+                    Storage::disk('public')->delete($user->portrait);
+                }
+
+                $portraitPath = $request->file('portrait')->store('portraits', 'public');
+                $user->update(['portrait' => $portraitPath]);
+            }
+
+            DB::commit();
+            return redirect()->route('personnels.index')->with('success', 'Personnel updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'An error occurred while updating the user.'], 500);
+        }
     }
-}
 
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         //
@@ -248,5 +230,20 @@ public function update(Request $request, string $id)
                 'status' => true
             ], 200);    
     }
-  
+
+    public function downloadPersonnelPDF($id)
+    {
+        $user = User::with(['qualifications', 'certifications'])->findOrFail($id);
+
+        $pdf = Pdf::loadView('pdfTemplates.personnelDetails', [
+            'personnel' => $user, // passing User as personnel
+            'qualifications' => $user->qualifications ?? [],
+            'certifications' => $user->certifications ?? [],
+        ])->setPaper('a4', 'portrait'); // landscape if you want
+
+        return $pdf->download("personnel_{$user->name}.pdf");
+    }
+
+
+
 }
