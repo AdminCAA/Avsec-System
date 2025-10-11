@@ -169,6 +169,17 @@ const getStatusClass = (status) => {
   }
 }
 
+const getApprovalStatusClass = (status) => {
+  switch (status) {
+    case 'Pending':
+      return 'status-pending';
+    case 'Approved':
+      return 'status-completed';   
+    default:
+      return 'status-default';
+  }
+}
+
 
   const getUserColor= (name)=> {
     let hash = 0;
@@ -319,6 +330,10 @@ const sortedQualityControls = computed(() => {
                       <i v-if="sortKey === 'control_type'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
                     </th>
 
+                    <th @click="sortTable('approval_status')" style="cursor: pointer">
+                      Approval
+                      <i v-if="sortKey === 'approval_status'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                    </th>
                     <th @click="sortTable('status')" style="cursor: pointer">
                       Status
                       <i v-if="sortKey === 'status'" :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
@@ -355,12 +370,18 @@ const sortedQualityControls = computed(() => {
 
                     </td>
 
-                    <td class="text-center">{{ item.control_type }}</td>    
+                    <td class="text-center">{{ item.control_type }}</td> 
+
+                    <td class="text-center">      
+                      <span  :class="getApprovalStatusClass(item.approval_status)" class="badge p-2">
+                        {{ item.approval_status }}  
+                      </span>                                                  
+                    </td> 
+
                     <td class="text-center">      
                       <span  :class="getStatusClass(item.status)" class="badge p-2">
                         {{ item.status }}  
-                      </span>                  
-                                
+                      </span>                                                  
                     </td>                                                       
                     <td class="text-center">                        
                         {{ item.facility.name }}           

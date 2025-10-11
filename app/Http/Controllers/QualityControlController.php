@@ -30,7 +30,8 @@ class QualityControlController extends Controller implements HasMiddleware
                 'listAudits','listInspections',
                 'listSecurityTests','listPending',
                 'listInProgress','listCompleted',
-                'listOverdue'
+                'listOverdue',
+                'approveChecklist'
             ]),
         ];
     }
@@ -406,6 +407,15 @@ class QualityControlController extends Controller implements HasMiddleware
             'start_date' => $request->start_date ?? '',
             'end_date' => $request->end_date ?? '',
         ]);
-    }    
+    }  
+    
+    public function approveChecklist(Request $request, $id){
+        $qualityControl = QualityControl::findOrFail($id);
+        $qualityControl->approval_status = 'Approved';
+        $qualityControl->approved_by = Auth::id();
+        $qualityControl->approved_at = now();
+        $qualityControl->save();
+        return redirect()->route('quality-controls.show', $id)->with('success', 'Quality Control checklist approved successfully.');
+    }
 }
 
