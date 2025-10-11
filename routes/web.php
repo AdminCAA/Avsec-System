@@ -221,10 +221,8 @@ Route::middleware(['auth','verified'])->group(function () {
 
     // Export PDF Route
     Route::post('/dashboard/export-pdf', [DashboardController::class, 'exportPdf'])->name('dashboard.exportPdf');
-   // Route::get('/facilities/{id}/export', [FacilityController::class, 'exportFacilitiesPdf'])->name('facilities.export');
-
-Route::get('/facilities/{id}/download-pdf', [FacilityController::class, 'downloadPdf'])->name('facilities.downloadPdf');
-
+    Route::get('/facilities/{id}/download-pdf', [FacilityController::class, 'downloadPdf'])->name('facilities.downloadPdf');
+    Route::get('/personnels/{id}/download', [PersonnelController::class, 'downloadPersonnelPDF'])->name('personnels.download');
 
 
 
@@ -232,9 +230,10 @@ Route::get('/facilities/{id}/download-pdf', [FacilityController::class, 'downloa
 
 
 
+Route::get('/quality-controls/{id}/export-pdf', [QualityControlController::class, 'exportPDF'])
+    ->name('quality-controls.exportPDF');
 
-
-
+    
 
 
 

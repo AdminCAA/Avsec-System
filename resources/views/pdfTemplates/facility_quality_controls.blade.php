@@ -100,7 +100,7 @@
         </div>
 
         <h1 class="cover-title">QUALITY CONTROL REPORT</h1>
-        <p class="cover-subtitle"><strong>Facility:</strong> {{ $facility->name }}</p>
+        <p class="cover-subtitle"><strong>Operator:</strong> {{ $facility->name }}</p>
 
         <p class="cover-date">
             <strong>Generated on:</strong> {{ now()->format('d F Y, H:i') }}

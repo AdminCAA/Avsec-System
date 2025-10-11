@@ -10,10 +10,12 @@ use App\Models\AuditQuestion;
 use App\Models\Department;
 use App\Models\User;
 use App\Models\SelectedChecklistQuestion;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
-
+use setasign\Fpdi\Fpdi;
+use setasign\Fpdf\Fpdf;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
@@ -35,7 +37,6 @@ class QualityControlController extends Controller implements HasMiddleware
         ];
     }
 
-    //
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -266,7 +267,6 @@ class QualityControlController extends Controller implements HasMiddleware
         return response()->json(['errors' => $validator->errors()], 422);
     }
 
-
     public function saveQuestionResponse(Request $request,string $id){
         $validator = Validator::make($request->all(),[
             'question_id' => 'required|integer',
@@ -331,7 +331,6 @@ class QualityControlController extends Controller implements HasMiddleware
         return redirect()->route('quality-controls.show',$request->quality_control_id)->with('success', 'Checklist updated successfully.');        
     }
 
-
     public function listAudits(Request $request){
         $searchQuery = QualityControl::with(['facility','users','selectedChecklistQuestions'])->search($request);
         $qualityControls = $searchQuery->where('control_type','Audit')->orderBy('created_at','desc')->paginate(50);
@@ -364,6 +363,7 @@ class QualityControlController extends Controller implements HasMiddleware
             'end_date' => $request->end_date ?? '',
         ]);
     }
+
     public function listPending(Request $request){
         $searchQuery = QualityControl::with(['facility','users','selectedChecklistQuestions'])->search($request);
         $qualityControls =  $searchQuery->where('status','Pending')->orderBy('created_at','desc')->paginate(50);
@@ -407,5 +407,188 @@ class QualityControlController extends Controller implements HasMiddleware
             'end_date' => $request->end_date ?? '',
         ]);
     }    
+
+    // public function exportPDF($id) 
+    // {
+    //     // Eager load facility and checklist questions
+    //     $qualityControl = QualityControl::with(['facility', 'selectedchecklistQuestions'])->findOrFail($id);
+
+    //     // Group questions by audit_area_name
+    //     $groupedQuestions = $qualityControl->selectedchecklistQuestions
+    //         ->groupBy('audit_area_name')
+    //         ->map(function ($questions) {
+    //             return $questions->map(function ($q) {
+    //                 return [
+    //                     'question' => $q->question,
+    //                     'response' => $q->question_response ?? 'N/A',
+    //                     'finding_category' => $q->finding_category ?? 'N/A',
+    //                     'observation' => $q->finding_observation ?? 'N/A',
+    //                     'status' => $q->status ?? 'N/A',
+    //                 ];
+    //             });
+    //         });
+
+    //     $pdf = Pdf::loadView('pdfTemplates.selectedQualityControls', [
+    //         'qualityControl' => $qualityControl,
+    //         'groupedQuestions' => $groupedQuestions
+    //     ])->setPaper('a4', 'portrait');
+
+    //     $fileName = 'QualityControl_' . $qualityControl->id . '.pdf';
+    //     return $pdf->download($fileName);
+    // }
+
+
+
+
+
+// public function exportPDF($id) 
+// {
+//     // Eager load facility and checklist questions
+//     $qualityControl = QualityControl::with(['facility', 'selectedchecklistQuestions'])->findOrFail($id);
+
+//     // Group questions by audit_area_name
+//     $groupedQuestions = $qualityControl->selectedchecklistQuestions
+//         ->groupBy('audit_area_name')
+//         ->map(function ($questions) {
+//             return $questions->map(function ($q) {
+//                 return [
+//                     'question' => $q->question,
+//                     'response' => $q->question_response ?? 'N/A',
+//                     'finding_category' => $q->finding_category ?? 'N/A',
+//                     'observation' => $q->finding_observation ?? 'N/A',
+//                     'status' => $q->status ?? 'N/A',
+//                 ];
+//             });
+//         });
+
+//     $pdf = Pdf::loadView('pdfTemplates.qualityControls', [
+//         'qualityControl' => $qualityControl,
+//         'groupedQuestions' => $groupedQuestions
+//     ])->setPaper('a4', 'portrait');
+
+//     $fileName = 'QualityControl_' . $qualityControl->id . '.pdf';
+//     return $pdf->download($fileName);
+// }
+
+
+
+
+
+public function exportPDF($id)
+{
+    $qualityControl = QualityControl::with(['facility', 'selectedchecklistQuestions'])->findOrFail($id);
+
+    $questions = $qualityControl->selectedchecklistQuestions->map(function ($q) {
+        return [
+            'id' => $q->id,
+            'audit_area_name' => $q->audit_area_name,
+            'question' => $q->question,
+            'question_response' => $q->question_response ?? 'N/A',
+            'finding_observation' => $q->finding_observation ?? 'N/A',
+            'finding_category' => $q->finding_category ?? 'N/A',
+            'date_quality_control' => $q->date_quality_control ?? 'N/A',
+            'status' => $q->status ?? 'N/A',
+            'evidence_file' => $q->evidence_file ?? null,
+            //'immediate_corrective_action' => $q->immediate_corrective_action ?? 'N/A',
+            // 'recommendations' => $q->recommendations ?? 'N/A',
+            // 'reference' => $q->reference ?? 'N/A',
+            //'proposed_follow_up_action' => $q->proposed_follow_up_action ?? 'N/A',
+        ];
+    });
+
+    // 1️Generate main QC PDF
+    $pdf = Pdf::loadView('pdfTemplates.selectedQualityControls', [
+        'qualityControl' => $qualityControl,
+        'questions' => $questions
+    ])->setPaper('a4', 'portrait');//portrait
+    // ->setPaper('a4', 'landscape');
+
+    $mainPdfPath = storage_path("app/public/temp_qc_{$qualityControl->id}.pdf");
+    $pdf->save($mainPdfPath);
+
+    // 2 Merge PDFs with FPDI
+    $fpdi = new Fpdi();
+
+    // Add main PDF
+    $pageCount = $fpdi->setSourceFile($mainPdfPath);
+    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+        $tplId = $fpdi->importPage($pageNo);
+        $size = $fpdi->getTemplateSize($tplId);
+        $fpdi->AddPage($size['orientation'], [$size['width'], $size['height']]);
+        $fpdi->useTemplate($tplId);
+    }
+
+    // Add evidence PDFs
+    foreach ($qualityControl->selectedchecklistQuestions as $q) {
+        if ($q->evidence_file && Storage::disk('public')->exists($q->evidence_file)) {
+            $evidencePath = storage_path("app/public/{$q->evidence_file}");
+            if (strtolower(pathinfo($evidencePath, PATHINFO_EXTENSION)) === 'pdf') {
+                $pageCount = $fpdi->setSourceFile($evidencePath);
+                for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+                    $tplId = $fpdi->importPage($pageNo);
+                    $size = $fpdi->getTemplateSize($tplId);
+                    $fpdi->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                    $fpdi->useTemplate($tplId);
+                }
+            }
+        }
+    }
+
+    $outputFileName = 'QualityControl_' . $qualityControl->id . '.pdf';
+    return response()->streamDownload(function () use ($fpdi) {
+        $fpdi->Output('F', 'php://output');
+    }, $outputFileName);
+}
+
+
+// public function exportPDF($id) 
+// {
+//     $qualityControl = QualityControl::with(['facility', 'selectedchecklistQuestions'])->findOrFail($id);
+
+//     $questions = $qualityControl->selectedchecklistQuestions->map(function ($q) {
+//         return [
+//             'id' => $q->id,
+//             //'audit_question_id' => $q->audit_question_id,
+//             'audit_area_name' => $q->audit_area_name,
+//             'question' => $q->question,
+//             'question_response' => $q->question_response ?? 'N/A',
+//             'finding_category' => $q->finding_category ?? 'N/A',
+//             'date_quality_control' => $q->date_quality_control ?? 'N/A',
+//             'finding_observation' => $q->finding_observation ?? 'N/A',
+//             'action_taken' => $q->action_taken ?? 'N/A',
+//             'problem_cause' => $q->problem_cause ?? 'N/A',
+//             'short_term_action' => $q->short_term_action ?? 'N/A',
+//             'long_term_action' => $q->long_term_action ?? 'N/A',
+//             'completion_date' => $q->completion_date ?? 'N/A',
+//             'follow_up_date' => $q->follow_up_date ?? 'N/A',
+//             'proposed_follow_up_action' => $q->proposed_follow_up_action ?? 'N/A',
+//             'date_of_closure' => $q->date_of_closure ?? 'N/A',
+//             'status' => $q->status ?? 'N/A',
+//             'created_at' => $q->created_at,
+//             'updated_at' => $q->updated_at,
+//             'evidence_file' => $q->evidence_file ?? 'N/A',
+//             'modified_at' => $q->modified_at ?? 'N/A',
+//             'immediate_corrective_action' => $q->immediate_corrective_action ?? 'N/A',
+//             'recommendations' => $q->recommendations ?? 'N/A',
+//             'reference' => $q->reference ?? 'N/A',
+//             'short_term_date' => $q->short_term_date ?? 'N/A',
+//             'long_term_date' => $q->long_term_date ?? 'N/A',
+//             'cap_file' => $q->cap_file ?? 'N/A',
+//             'cap_status' => $q->cap_status ?? 'N/A',
+//             'reason_for_rejection' => $q->reason_for_rejection ?? 'N/A',
+//         ];
+//     });
+
+//     $pdf = Pdf::loadView('pdfTemplates.selectedQualityControls', [
+//         'qualityControl' => $qualityControl,
+//         'questions' => $questions
+//     ])->setPaper('a4', 'landscape'); // landscape for many columns
+
+//     return $pdf->download('QualityControl_' . $qualityControl->id . '.pdf');
+// }
+
+
+
+
 }
 
