@@ -18,6 +18,7 @@ class QualityControl extends Model
         'scheduled_date',
         'end_date', 
         'status',
+        'approval_status',
         'user_id',
         'department_id',
         'department_name',

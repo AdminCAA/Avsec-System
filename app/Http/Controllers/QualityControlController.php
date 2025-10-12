@@ -20,6 +20,7 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 
+
 class QualityControlController extends Controller implements HasMiddleware
 {
     
@@ -33,7 +34,9 @@ class QualityControlController extends Controller implements HasMiddleware
                 'listSecurityTests','listPending',
                 'listInProgress','listCompleted',
                 'listOverdue',
-                'approveChecklist'
+                'approveChecklist',
+                'exportPDF',
+
             ]),
         ];
     }
@@ -49,7 +52,8 @@ class QualityControlController extends Controller implements HasMiddleware
         }else {
            // For non-admins (e.g., AVSEC Inspectors), show only QualityControls linked via the pivot table
             $searchQuery->whereHas('users', function ($query) use ($user) {
-                $query->where('users.id', $user->id);
+                $query->where('users.id', $user->id)
+                    ->where('approval_status', 'Approved');
             });
         }
 
@@ -174,14 +178,15 @@ class QualityControlController extends Controller implements HasMiddleware
             // Update the users assigned to this quality control
             if (!empty($request->selectedUsers)) {
                 $qualityControl->users()->sync($request->selectedUsers);
-                //send email to the users assigned to this quality control      
-                foreach($request->selectedUsers as $userId){
-                    $user = User::find($userId);
-                    if($user){
-                        //Send email to the user
-                        Mail::to($user->email)->send(new \App\Mail\notify_assigned_inspectors($user));
-                    }
-                }          
+                //send email to the users assigned to this quality control   
+
+                // foreach($request->selectedUsers as $userId){
+                //     $user = User::find($userId);
+                //     if($user){
+                //         //Send email to the user
+                //         Mail::to($user->email)->send(new \App\Mail\notify_assigned_inspectors($user));
+                //     }
+                // }          
 
             } else {
                 // If no users assigned, detach all users
@@ -589,7 +594,25 @@ public function exportPDF($id)
 // }
 
 
-
-
+    public function approveQualityControl($id){
+        $user = Auth::user();
+        $qualityControl = QualityControl::findOrFail($id);
+        $qualityControl->approval_status = 'Approved';
+        $qualityControl->approved_by = $user->name;
+        $qualityControl->approved_at = now();
+        $qualityControl->save();
+        if (!empty($qualityControl->users)) {            
+            //send email to the users assigned to this quality control      
+            foreach($qualityControl->users as $user){             
+                if($user){
+                    //Send email to the user
+                    Mail::to($user->email)->send(new \App\Mail\notify_assigned_inspectors($user));
+                }
+            } 
+        }else{            
+            return redirect()->json('errors')->with('error', 'No user was assigned to carry out this quality control.', 422);
+        }   
+        return redirect()->route('quality-controls.show', $id)->with('success', 'Quality Control checklist approved successfully.');
+    }
 }
 

@@ -201,12 +201,15 @@ class UserController extends Controller implements HasMiddleware
             $user->save();
             // Assign roles to the user
             if(!empty($request->roles)){
-                // Check if the role exists
-                $user->syncRoles($request->roles);
-                if($user){
-                    //Send email to the user
+                // Check if user has Guest Role, meaning the user is new 
+                if($user->hasRole('Guest User')){
+                    //Sync the roles and send email notification
+                    $user->syncRoles($request->roles);    
                     Mail::to($user->email)->send(new \App\Mail\notifyNewuser($user));
-                }
+                }else{
+                    // Just sync the roles
+                    $user->syncRoles($request->roles);
+                }                
             }else{
                 // If no role is selected, assign the default role
                 $user->syncRoles([]);

@@ -104,7 +104,7 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('quality-controls/inprogress', [QualityControlController::class, 'listInProgress'])->name('quality-controls.listInProgress');
     Route::get('quality-controls/completed', [QualityControlController::class, 'listCompleted'])->name('quality-controls.listCompleted');
     Route::get('quality-controls/overdue', [QualityControlController::class, 'listOverdue'])->name('quality-controls.listOverdue');
-
+    Route::post('/quality-controls/{id}/approve', [QualityControlController::class, 'approveQualityControl'])->name('quality-controls.approve');
 
 
 

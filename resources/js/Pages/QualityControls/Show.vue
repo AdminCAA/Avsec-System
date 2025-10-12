@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { usePage,Head, Link } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
 import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
@@ -17,6 +17,19 @@ const { qualityControl, groupedCheckListQuestions } = defineProps({
     required: true
   }
 });
+
+const hideButton = ref(true);
+
+const page = usePage()
+const roles = page.props.auth.user.roles;
+
+// Function to check if the user has a specific role
+const hasRoles = (roles) => {
+    const userRoles = page.props.auth.user?.roles ?? []
+    // If a single role is passed as a string, wrap it in an array
+    const requiredRoles = Array.isArray(roles) ? roles : [roles]
+    return requiredRoles.some(role => userRoles.includes(role))
+}
 
 const responseOptions = [
   { id: 1, option: 'Yes' },
@@ -50,6 +63,7 @@ const followupActionOptions = [
 
 const forms = ref({});
 const isLoading = ref(false);
+const isApproving = ref(false);
 const formErrors = ref({});
 
 function validateQuestionForm(questionId) {
@@ -75,6 +89,61 @@ function validateQuestionForm(questionId) {
   formErrors.value[questionId] = errors;
 
   return Object.keys(errors).length === 0;
+}
+
+function approveQualityControl(qualityControlId) {    
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "You are about to approve this checklist. This action cannot be undone.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, approve it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      isApproving.value = true;
+      axios.post(route('quality-controls.approve', qualityControlId))
+        .then(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Checklist has been approved successfully',
+            toast: true,
+            position: 'top-end',
+            timer: 1500,
+            showConfirmButton: false
+          })
+          hideButton.value = false;
+        })
+        .catch(error => {
+          if (error.response?.status === 422) {            
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'No user was assigned to carry out this quality control',
+              toast: true,
+              position: 'top-end',
+              timer: 3000,
+              showConfirmButton: false
+            });
+          } else {
+            console.error(error);
+            Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while approving the checklist.',
+            toast: true,
+            position: 'top-end',
+            timer: 2000,
+            showConfirmButton: false
+          });
+         }          
+        })
+        .finally(() => {
+          isApproving.value = false;
+        });
+    }
+  });
 }
 
 
@@ -294,11 +363,20 @@ const exportToPDF = () => {
               <div class="col-md-12 mb-4">
 
                 <!-- Approve Checklist & Export button -->
-                <div class="d-flex justify-content-end mb-3">
-
-                  <button class="btn btn-success">
-                    <i class="fas fa-check-circle"></i> Approve Checklist
-                  </button>
+                <div class="d-flex justify-content-end mb-3">   
+                  
+                    <div v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator'])">
+                      <button v-show="hideButton" v-if="qualityControl.approval_status !== 'Approved'" class="btn btn-success" @click.prevent="approveQualityControl(qualityControl.id)" :disabled="isApproving">
+                        <span v-if="isApproving">
+                          <i class="fas fa-spinner fa-spin"></i> Processing, please wait...
+                        </span>
+                        <span v-else>
+                          <i class="fas fa-check-circle"></i> Approve Checklist
+                        </span>                    
+                      </button>
+                    </div>
+                      
+                  
 
                   <button :disabled="isLoading" @click="exportToPDF" class="btn btn-info" style="margin-left: 10px;">
                     <span v-if="isLoading">

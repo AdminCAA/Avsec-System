@@ -16,6 +16,7 @@
         "nesbot/carbon": "^3.10",
         "setasign/fpdf": "^1.8",
         "setasign/fpdi": "2.6",
+        "setasign/fpdi-fpdf": "^2.3",
         "spatie/laravel-permission": "^6.17",
         "tightenco/ziggy": "^2.0"
     },
