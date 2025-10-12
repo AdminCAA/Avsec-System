@@ -18,12 +18,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Schedule the custom reminder email command
-        // $schedule->command('emails:reminder')
-        //          ->dailyAt('09:00')            // Run every day at 9:00 AM
-        //          ->withoutOverlapping()        // Prevent overlapping if it takes long
-        //          ->onOneServer()               // For load-balanced apps
-        //          ->runInBackground();          // Don't block other jobs
+      
 
         $schedule->command('app:send-reminder-emails')
                  ->everyMinute()          // Run every day at 9:00 AM
@@ -35,7 +30,15 @@ class Kernel extends ConsoleKernel
                  ->everyMinute()          // Run every day at 9:00 AM
                  ->withoutOverlapping()        // Prevent overlapping if it takes long
                  ->onOneServer()               // For load-balanced apps
-                 ->runInBackground();          // Don't block other jobs
+                 ->runInBackground();  
+                 
+    // Don't block other jobs
+    //  New: Send maintenance reminders 14 days before due date
+        $schedule->command('maintenance:send-reminders')
+                 ->everyMinute()               // for testing; change to ->dailyAt('08:00') in production
+                 ->withoutOverlapping()
+                 ->onOneServer()
+                 ->runInBackground();
 
     }
 
