@@ -47,6 +47,7 @@ const submit = () => {
               class="input-field"
               :class="{ 'is-invalid': form.errors.code }"
               autofocus
+              style="width: 100%"
             />
             <div v-if="form.errors.code" class="error">{{ form.errors.code }}</div>
           </div>

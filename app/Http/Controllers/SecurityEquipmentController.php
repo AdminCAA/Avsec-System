@@ -16,31 +16,28 @@ use Illuminate\Routing\Controllers\Middleware;
 
 class SecurityEquipmentController extends Controller implements HasMiddleware
 {
+
     public static function middleware():array {
         return [
             new Middleware('permission:manage security equipments', only: ['index','create','store','edit','update','show','destroy','createSchedule','storeSchedule','deleteMaintenanceSchedule']),
         ];
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
-        //
-         // Fetch all facilities from the database
-         $searchQuery = SecurityEquipment::search($request);
-         $securityEquipments =  $searchQuery->orderBy('name','asc')->paginate(50);
-         // Return the facilities to the view
-         return Inertia::render('SecurityEquipments/List', [
-             'securityEquipments' => $securityEquipments,
-             'search' => $request->search ?? '',
-         ]);
+        // Fetch all security equipment records with optional search
+        $searchQuery = SecurityEquipment::search($request);
+
+        // Order by ID descending (latest first)
+        $securityEquipments = $searchQuery->orderBy('id', 'desc')->paginate(50);
+
+        // Return data to Inertia view
+        return Inertia::render('SecurityEquipments/List', [
+            'securityEquipments' => $securityEquipments,
+            'search' => $request->search ?? '',
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $statuses = SecurityEquipment::STATUSES;
@@ -54,50 +51,44 @@ class SecurityEquipmentController extends Controller implements HasMiddleware
             ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
-        $validator = Validator::make($request->all(),
-            [
-                'name' => 'required|string|max:255',
-                'facility_id' => 'required|integer|exists:facilities,id',
-                'description' => 'nullable|string|max:1000',
-                'status' => 'required|string|max:255',           
-            ]
-        );
-        // Check if validation passes
-        if($validator->passes()){
-            // Create a new facility
-            $facility = Facility::findOrFail($request->id);
-            SecurityEquipment::create([
-                'facility_id'=> $request->facility_id,
-                'name' => $request->name,
-                'facility_name' => $facility->name,
-                'serial_number' => $request->serial_number,
-                'description' => $request->description,
-                'status' => $request->status,              
-            ]);
-            // Redirect to the facilities list with a success message
-            return redirect()->route('security-equipments.index')->with('success', 'Security Equipment created successfully.');
-        }else{
+
+        //dd($request->all());
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'facility_id' => 'required|integer|exists:facilities,id',
+            'serial_number' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|string|max:255',           
+        ]);
+
+        if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
+
+        // Use facility_id, not id
+        $facility = Facility::findOrFail($request->facility_id);
+
+        SecurityEquipment::create([
+            'facility_id'   => $facility->id,
+            'facility_name' => $facility->name,
+            'name'          => $request->name,
+            'serial_number' => $request->serial_number,
+            'description'   => $request->description,
+            'status'        => $request->status,              
+        ]);
+
+        return redirect()->route('security-equipments.index')
+                        ->with('success', 'Security Equipment created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         //
@@ -116,9 +107,6 @@ class SecurityEquipmentController extends Controller implements HasMiddleware
 
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         //
@@ -190,9 +178,6 @@ class SecurityEquipmentController extends Controller implements HasMiddleware
         
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         //
@@ -221,4 +206,6 @@ class SecurityEquipmentController extends Controller implements HasMiddleware
             200
         );
     }
+
+
 }

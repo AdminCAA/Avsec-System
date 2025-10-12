@@ -10,12 +10,19 @@ class SecurityEquipment extends Model
 {
     //    
     protected $fillable = [
-        'name','status','facility_id','serial_number','description','facility_name'
+
+        'name',
+        'status',
+        'facility_id',
+        'serial_number',
+        'description',
+        'facility_name',
+        
     ];
 
     public const STATUSES = [        
-        'Active',
-        'Inactive',
+        'Serviceable',
+        'Unserviceable',
         'Under Maintenance',
         'Due for Maintenance',
         'Decommissioned',             

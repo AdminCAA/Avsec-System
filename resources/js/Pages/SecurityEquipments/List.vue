@@ -115,46 +115,22 @@ const deleteSecurityEquipment = (id) => {
     })
 }
 
-// const getStatusClass = (status)=>{
-//   switch (status) {
-
-//     case 'Under Maintenance':
-//       return 'bg-info text-white';
-
-//     case 'Active':
-//       return 'bg-success text-white';
-
-//     case 'Due for Maintenance':
-//       return 'bg-danger text-white';
-
-//     case 'Decommissioned':
-//       return 'bg-warning text-dark';
-
-//     case 'Inactive':
-//       return 'bg-dark text-white';
-//     default:
-//       return 'bg-light text-dark';
-//   }
-// }
-
-
 const getStatusClass = (status) => {
   switch (status) {
     case 'Under Maintenance':
       return 'status-under-maintenance';
-    case 'Active':
+    case 'Serviceable':
       return 'status-active';
     case 'Due for Maintenance':
       return 'status-due-maintenance';
     case 'Decommissioned':
       return 'status-decommissioned';
-    case 'Inactive':
+    case 'Unserviceable':
       return 'status-inactive';
     default:
       return 'status-default';
   }
 }
-
 
 const sortKey = ref(null);
 const sortDirection = ref('asc');
@@ -254,22 +230,22 @@ const sortedSecurityEquipments = computed(() => {
                     <thead>
                       <tr>
                         <th>#</th>
-                        <th @click="sortTable('name')" style="cursor: pointer">
+                        <th @click="sortTable('name')" style="cursor: pointer" class="text-left">
                           Name
                           <i v-if="sortKey === 'name'"
                             :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
                         </th>
-                        <th>Serial</th>
-                        <th>Status</th>
+                        <th class="text-left">Serial</th>
+                        <th class="text-left">Status</th>
 
-                        <th @click="sortTable('facility_name')" style="cursor: pointer">
+                        <th @click="sortTable('facility_name')" style="cursor: pointer" class="text-left">
                           Operator
                           <i v-if="sortKey === 'facility_name'"
                             :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
                         </th>
 
 
-                        <th>Created</th>
+                        <th class="text-left">Created</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
@@ -287,7 +263,7 @@ const sortedSecurityEquipments = computed(() => {
                         <td>
                           {{ equipment.serial_number }}
                         </td>
-                        <td class="text-center">
+                        <td class="text-left">
                           <span :class="getStatusClass(equipment.status)" class="badge p-2">
                             {{ equipment.status }}
                           </span>
@@ -372,42 +348,41 @@ const sortedSecurityEquipments = computed(() => {
 .status-under-maintenance {
   background-color: rgba(23, 162, 184, 0.1);
   /* info cyan */
-  border: 1px solid #17a2b8;
+  /* border: 1px solid #17a2b8; */
   color: #17a2b8;
 }
 
 
 .status-active {
   background-color: #f6ffed;
-  border: 1px solid #b7eb8f;
+  /* border: 1px solid #b7eb8f; */
   color: #389e0d;
 }
 
 .status-due-maintenance {
   background-color: rgba(220, 53, 69, 0.1);
   /* danger red */
-  border: 1px solid #dc3545;
+  /* border: 1px solid #dc3545; */
   color: #dc3545;
 }
 
 .status-decommissioned {
   background-color: rgba(255, 193, 7, 0.1);
   /* warning yellow */
-  border: 1px solid #ffc107;
+  /* border: 1px solid #ffc107; */
   color: #ffc107;
 }
 
 .status-inactive {
   background-color: rgba(52, 58, 64, 0.1);
-  /* dark gray */
-  border: 1px solid #343a40;
+  /* border: 1px solid #343a40; */
   color: #343a40;
 }
 
 .status-default {
   background-color: rgba(108, 117, 125, 0.1);
   /* light gray */
-  border: 1px solid #6c757d;
+  /* border: 1px solid #6c757d; */
   color: #6c757d;
 }
 </style>
