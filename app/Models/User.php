@@ -104,6 +104,12 @@ class User extends Authenticatable implements MustVerifyEmail
                     
     }
 
+    public function approvedQualityControls()
+    {
+        return $this->belongsToMany(QualityControl::class, 'approvers_quality_controls')->withTimestamps();
+    }
+    
+
     public function facility()
     {
         return $this->belongsTo(Facility::class);

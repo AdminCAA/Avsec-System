@@ -95,5 +95,10 @@ class QualityControl extends Model
     public function users()
     {
         return $this->belongsToMany(User::class)->withTimestamps();
-    }    
+    }  
+    
+    public function approvers()
+    {
+        return $this->belongsToMany(User::class,'approvers_quality_controls')->withTimestamps();
+    }
 }

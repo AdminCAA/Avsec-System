@@ -18,6 +18,7 @@ const {
   groupedAuditQuestions,
   users,
   hasAssignedUsers,
+  hasApproverUsers,
   departments
 } = defineProps({
   groupedAuditQuestions: {
@@ -52,6 +53,10 @@ const {
     type: Array,
     required: true
   },
+  hasApproverUsers: {
+    type: Array,
+    required: true
+  },
   departments: {
     type: Object,
     required: true
@@ -62,8 +67,10 @@ const {
 
 
 const selectedUsers = ref([]);
+const selectedApproverUsers = ref([]);
 
 selectedUsers.value = hasAssignedUsers;
+selectedApproverUsers.value = hasApproverUsers;
 
 const statusOptions = [
   { label: 'In Progress', value: 'In Progress' },
@@ -104,7 +111,8 @@ function editQualityControl() {
     end_date: form.end_date || '',
     status: form.status || '', // Ensure status is always a string
     selectedCheckListQuestions: selectedCheckListQuestions.value,
-    selectedUsers: selectedUsers.value || [] // Ensure selectedUsers is always an array
+    selectedUsers: selectedUsers.value || [], // Ensure selectedUsers is always an array
+    selectedApproverUsers: selectedApproverUsers.value || [] // Ensure selectedApproverUsers is always an array
   })
     .then(() => {
       Swal.fire({
@@ -256,7 +264,7 @@ const handleClick = () => {
                                   <div class="col-md-12">                                      
                                       <div class="card card-info collapsed-card shadow-sm">
                                         <div class="card-header">
-                                            <h3 style="font-weight: bold;" class="card-title" data-card-widget="collapse">Basic Information</h3>
+                                            <h3 style="font-weight: bold;" class="card-title" data-card-widget="collapse"><i class="fas fa-arrow-right"></i> Basic Information</h3>
                                             <div class="card-tools">
                                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                               <i class="fas fa-plus"></i>
@@ -385,7 +393,7 @@ const handleClick = () => {
                                 <div class="col-md-12">                                      
                                       <div class="card card-info collapsed-card shadow-sm">
                                         <div class="card-header">
-                                            <h3 style="font-weight: bold;" class="card-title" data-card-widget="collapse">Assign Inspectors</h3>
+                                            <h3 style="font-weight: bold;" class="card-title" data-card-widget="collapse"><i class="fas fa-arrow-right"></i> Assign Inspectors</h3>
                                             <div class="card-tools">
                                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                               <i class="fas fa-plus"></i>
@@ -429,7 +437,7 @@ const handleClick = () => {
                                 <div class="col-md-12">                                      
                                       <div class="card card-info collapsed-card shadow-sm">
                                         <div class="card-header">
-                                            <h3 style="font-weight: bold;" class="card-title" data-card-widget="collapse">Assign Inspectors</h3>
+                                            <h3 style="font-weight: bold;" class="card-title" data-card-widget="collapse"><i class="fas fa-arrow-right"></i> Assign Approvers</h3>
                                             <div class="card-tools">
                                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                               <i class="fas fa-plus"></i>
@@ -445,11 +453,11 @@ const handleClick = () => {
                                                     class="custom-control custom-checkbox mr-3 mb-2" 
                                                     v-for="(user, index) in users" :key="user.id">
                                                     <input class="custom-control-input" 
-                                                        :id="'user-' + user.id"
+                                                        :id="'approveUser-' + user.id"
                                                         type="checkbox"                                               
-                                                        v-model="selectedUsers"                                                
+                                                        v-model="selectedApproverUsers"                                                
                                                         :value="user.id">
-                                                    <label :for="'user-' + user.id" class="custom-control-label">
+                                                    <label :for="'approveUser-' + user.id" class="custom-control-label">
                                                       <Link :href="route('personnels.show', user.id)" class="d-flex align-items-center">
                                                           <!-- User Avatar -->                                                     
                                                         <span class="badge px-1 mr-2" style="border-radius:10px; background-color:whitesmoke ;">
@@ -469,41 +477,10 @@ const handleClick = () => {
                                   </div> 
                               </div>  
 
-                              <div class="col-sm-6">
-                                <h3 class="mb-2"><strong>Responsible Inspectors</strong></h3>
-                              </div>
-                              <div class="row">
-                                <div class="col-sm-12">
-                                  <div class="card card-info card-outline">
-                                    <div class="card-header">
-                                      <h5 class="card-title"><strong>Assign Inspectors</strong></h5>
-                                    </div>
-                                    <div v-if="users.length > 0" class="form-group d-flex flex-wrap card-body">
-                                      <div class="custom-control custom-checkbox mr-3 mb-2" v-for="(user, index) in users"
-                                        :key="user.id">
-                                        <input class="custom-control-input" :id="'user-' + user.id" type="checkbox"
-                                          v-model="selectedUsers" :value="user.id">
-                                        <label :for="'user-' + user.id" class="custom-control-label">
-                                          <Link :href="route('personnels.show', user.id)" class="d-flex align-items-center">
-                                          <!-- User Avatar -->
-                                          <span class="badge px-1 mr-2"
-                                            style="border-radius:10px; background-color:whitesmoke ;">
-                                            <img class="profile-user-img img-fluid img-circle"
-                                              :src="user.portrait ? `/storage/${user.portrait}` : '/storage/portraits/avatar.png'"
-                                              alt="User profile picture">
-                                            {{ user.name }}
-                                          </span>
-
-                                          </Link>
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
+                              
 
                               <div class="col-sm-6">
-                                <h3 class="mb-2"><strong>Select Quality Control Checklist Questions</strong></h3>
+                                <h3 class="mb-2">Select Quality Control Checklist Questions</h3>
                               </div>
                               <div class="row">
                                 <div class="col-md-12" v-for="(questions, area) in groupedAuditQuestions" :key="area">
@@ -511,7 +488,7 @@ const handleClick = () => {
                                     class="col-md-12">
                                     <div class="card card-info collapsed-card shadow-sm">
                                       <div class="card-header">
-                                        <h3 style="font-weight: bold;" class="card-title" data-card-widget="collapse">{{ area }}
+                                        <h3 style="font-weight: bold;" class="card-title" data-card-widget="collapse"><i class="fas fa-arrow-right"></i> {{ area }}
                                         </h3>
                                         <div class="card-tools">
                                           <button type="button" class="btn btn-tool" data-card-widget="collapse">

@@ -91,7 +91,13 @@ class QualityControlController extends Controller implements HasMiddleware
         //Get all users with user_type of Inspector
         $users = User::where('user_type', 'CAA Staff')->select('id','name','portrait')->get();
         //Get the users that have been assigned to this quality control
+
         $hasAssignedUsers = $qualityControl->users->pluck('id'); 
+
+        //Get the users that have been assigned as approvers to this quality control
+
+        $hasApproverUsers = $qualityControl->approvers->pluck('id');
+
         $departments = Department::all(); 
 
         //Get all quality control types from the QualityControl model        
@@ -114,6 +120,7 @@ class QualityControlController extends Controller implements HasMiddleware
             'groupedAuditQuestions' => $groupedAuditQuestions,
             'users' => $users,
             'hasAssignedUsers' => $hasAssignedUsers, 
+            'hasApproverUsers' => $hasApproverUsers,
             'departments' => $departments,            
         ]);
     }
@@ -177,23 +184,24 @@ class QualityControlController extends Controller implements HasMiddleware
             
             // Update the users assigned to this quality control
             if (!empty($request->selectedUsers)) {
-                $qualityControl->users()->sync($request->selectedUsers);
-                //send email to the users assigned to this quality control   
-
-                // foreach($request->selectedUsers as $userId){
-                //     $user = User::find($userId);
-                //     if($user){
-                //         //Send email to the user
-                //         Mail::to($user->email)->send(new \App\Mail\notify_assigned_inspectors($user));
-                //     }
-                // }          
-
+                $qualityControl->users()->sync($request->selectedUsers);                      
             } else {
                 // If no users assigned, detach all users
                 $qualityControl->users()->detach();
             }
 
-
+            if(!empty($request->selectedApproverUsers)){
+                $qualityControl->approvers()->sync($request->selectedApproverUsers);
+                foreach($request->selectedApproverUsers as $userId){
+                    $user = User::find($userId);
+                    if($user){
+                        //Send email to the user
+                        Mail::to($user->email)->send(new \App\Mail\notifyApprovingInspectors($user));
+                    }
+                }  
+            }else{
+                $qualityControl->approvers()->detach();
+            }
             return redirect()->route('quality-controls.index')->with('success', 'Quality Control updated successfully.');
         }
         return response()->json(['errors' => $validator->errors()], 422);

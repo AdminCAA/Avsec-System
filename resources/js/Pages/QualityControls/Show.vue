@@ -401,7 +401,7 @@ const exportToPDF = () => {
                             class="col-md-12">
                             <div class="card card-info collapsed-card shadow-sm">
                               <div class="card-header">
-                                <h3 style="font-weight: bold;" class="card-title" data-card-widget="collapse">{{
+                                <h3 style="font-weight: bold;" class="card-title" data-card-widget="collapse"><i class="fas fa-arrow-right"></i> {{
                                   area.trim() }}</h3>
                                 <div class="card-tools">
                                   <button type="button" class="btn btn-tool" data-card-widget="collapse">
