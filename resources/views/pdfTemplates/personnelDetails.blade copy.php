@@ -42,6 +42,7 @@
         .cover-page h2 {
             margin: 20px 0 25px;
             font-size: 26px;
+            /* Larger subtitle */
             color: #000;
             text-transform: uppercase;
         }
@@ -52,33 +53,20 @@
             margin-top: 10px;
         }
 
-        .section-title {
-            margin-top: 30px;
-            font-size: 18px;
-            text-decoration: underline;
+        .cover p {
+            font-size: 16px;
         }
 
-        .info-section {
-            display: flex;
-            align-items: flex-start;
+        .info-table,
+        .qual-table,
+        .cert-table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 20px;
         }
 
-        .portrait {
-            width: 120px;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 10px;
-            border: 2px solid #ccc;
-            margin-right: 25px;
-        }
-
-        .info-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
+        th,
+        td {
             border: 1px solid #333232;
             padding: 6px;
             text-align: left;
@@ -88,13 +76,22 @@
             background-color: #d1cfcf;
         }
 
-        .qual-table, .cert-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+        .section-title {
+            margin-top: 30px;
+            font-size: 18px;
+            text-decoration: underline;
+        }
+
+        .portrait {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 10px;
         }
     </style>
 </head>
+
 <body>
 
     <!-- Cover Page -->
@@ -107,41 +104,40 @@
 
     <!-- Personal Information -->
     <h3 class="section-title">Personal Information</h3>
-
-    <div class="info-section">
-        @if(!empty($personnel->portrait) && file_exists(public_path($personnel->portrait)))
-            <img src="{{ public_path($personnel->portrait) }}" alt="Portrait" class="portrait">
-        @else
-            <img src="{{ public_path('assets/default-avatar.png') }}" alt="Default Portrait" class="portrait">
-        @endif
-
-        <table class="info-table">
-            <tr>
-                <th>Name</th>
-                <td>{{ $personnel->name }}</td>
-                <th>Gender</th>
-                <td>{{ $personnel->gender }}</td>
-            </tr>
-            <tr>
-                <th>Email</th>
-                <td>{{ $personnel->email }}</td>
-                <th>Phone</th>
-                <td>{{ $personnel->phone_number }}</td>
-            </tr>
-            <tr>
-                <th>NRC</th>
-                <td>{{ $personnel->nrc }}</td>
-                <th>Facility</th>
-                <td>{{ $personnel->facility_name }}</td>
-            </tr>
-            <tr>
-                <th>Category</th>
-                <td>{{ $personnel->user_type }}</td>
-                <th>Certification Status</th>
-                <td>{{ $personnel->is_certified }}</td>
-            </tr>
-        </table>
-    </div>
+    <table class="info-table">
+        <tr>
+            <th>Name</th>
+            <td>{{ $personnel->name }}</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>{{ $personnel->email }}</td>
+        </tr>
+        <tr>
+            <th>Gender</th>
+            <td>{{ $personnel->gender }}</td>
+        </tr>
+        <tr>
+            <th>Phone</th>
+            <td>{{ $personnel->phone_number }}</td>
+        </tr>
+        <tr>
+            <th>NRC</th>
+            <td>{{ $personnel->nrc }}</td>
+        </tr>
+        <tr>
+            <th>Category</th>
+            <td>{{ $personnel->user_type }}</td>
+        </tr>
+        <tr>
+            <th>Certification Status</th>
+            <td>{{ $personnel->is_certified }}</td>
+        </tr>
+        <tr>
+            <th>Facility</th>
+            <td>{{ $personnel->facility_name }}</td>
+        </tr>
+    </table>
 
     <!-- Qualifications -->
     <h3 class="section-title">Qualifications</h3>
@@ -210,4 +206,6 @@
     @endif
 
 </body>
+
 </html>
+  

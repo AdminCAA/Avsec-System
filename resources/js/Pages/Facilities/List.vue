@@ -253,27 +253,27 @@ const sortedFacilities = computed(() => {
                       <thead>
                         <tr>
                           <th @click="sortTable('id')" style="cursor: pointer">#</th>
-                          <th @click="sortTable('name')" style="cursor: pointer">
+                          <th @click="sortTable('name')" style="cursor: pointer; text-align: left;">
                             Operator
                             <i v-if="sortKey === 'name'"
                               :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
                           </th>
-                          <th @click="sortTable('category')" style="cursor: pointer">
+                          <th @click="sortTable('category')" style="cursor: pointer; text-align: left;">
                             Category
                             <i v-if="sortKey === 'category'"
                               :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
                           </th>
-                          <th @click="sortTable('email')" style="cursor: pointer">
+                          <th @click="sortTable('email')" style="cursor: pointer; text-align: left;">
                             Email
                             <i v-if="sortKey === 'email'"
                               :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
                           </th>
-                          <th @click="sortTable('contact_number')" style="cursor: pointer">
+                          <th @click="sortTable('contact_number')" style="cursor: pointer; text-align: left;">
                             Contact
                             <i v-if="sortKey === 'contact_number'"
                               :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
                           </th>
-                          <th @click="sortTable('created_at')" style="cursor: pointer">
+                          <th @click="sortTable('created_at')" style="cursor: pointer; text-align: left;">
                             Created
                             <i v-if="sortKey === 'created_at'"
                               :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
