@@ -16,8 +16,8 @@ class SecurityEquipmentSeeder extends Seeder
     {
         $faker = \Faker\Factory::create();
         $statuses = [ 
-            'Active',
-            'Inactive',
+            'Serviceable',
+            'Unserviceable',
             'Under Maintenance',
             'Due for Maintenance',
             'Decommissioned', 

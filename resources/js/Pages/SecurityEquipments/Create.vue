@@ -132,7 +132,7 @@ console.log(statuses);
                         <div class="form-group col-md-6">
                           <label>Location</label>
                           <v-select v-model="form.facility_id" :options="facilities" :reduce="facility => facility.id"
-                            label="name" placeholder="-- Select Location / Facility --" :input-class="{
+                            label="name" placeholder="-- Select Location / Operator --" :input-class="{
                               'is-invalid': formErrors.facility_id,
                               'is-valid': form.facility_id && !formErrors.facility_id
                             }" />
