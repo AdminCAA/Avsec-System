@@ -1,10 +1,12 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { usePage,Head, Link } from '@inertiajs/vue3';
+import { usePage, Head, Link } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
 import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import 'vue-select/dist/vue-select.css'
+
+const cameraInputs = ref({}); // this should be an empty object
 
 const { qualityControl, groupedCheckListQuestions } = defineProps({
   qualityControl: {
@@ -20,15 +22,16 @@ const { qualityControl, groupedCheckListQuestions } = defineProps({
 
 const hideButton = ref(true);
 
+
 const page = usePage()
 const roles = page.props.auth.user.roles;
 
 // Function to check if the user has a specific role
 const hasRoles = (roles) => {
-    const userRoles = page.props.auth.user?.roles ?? []
-    // If a single role is passed as a string, wrap it in an array
-    const requiredRoles = Array.isArray(roles) ? roles : [roles]
-    return requiredRoles.some(role => userRoles.includes(role))
+  const userRoles = page.props.auth.user?.roles ?? []
+  // If a single role is passed as a string, wrap it in an array
+  const requiredRoles = Array.isArray(roles) ? roles : [roles]
+  return requiredRoles.some(role => userRoles.includes(role))
 }
 
 const responseOptions = [
@@ -91,7 +94,7 @@ function validateQuestionForm(questionId) {
   return Object.keys(errors).length === 0;
 }
 
-function approveQualityControl(qualityControlId) {    
+function approveQualityControl(qualityControlId) {
   Swal.fire({
     title: 'Are you sure?',
     text: "You are about to approve this checklist. This action cannot be undone.",
@@ -116,7 +119,7 @@ function approveQualityControl(qualityControlId) {
           hideButton.value = false;
         })
         .catch(error => {
-          if (error.response?.status === 422) {            
+          if (error.response?.status === 422) {
             Swal.fire({
               icon: 'error',
               title: 'Error',
@@ -129,15 +132,15 @@ function approveQualityControl(qualityControlId) {
           } else {
             console.error(error);
             Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'An error occurred while approving the checklist.',
-            toast: true,
-            position: 'top-end',
-            timer: 2000,
-            showConfirmButton: false
-          });
-         }          
+              icon: 'error',
+              title: 'Error',
+              text: 'An error occurred while approving the checklist.',
+              toast: true,
+              position: 'top-end',
+              timer: 2000,
+              showConfirmButton: false
+            });
+          }
         })
         .finally(() => {
           isApproving.value = false;
@@ -163,6 +166,7 @@ function submitQuestionForm(questionId) {
     formData.append('recommendations', forms.value[questionId].recommendations);
     formData.append('reference', forms.value[questionId].reference);
     formData.append('immediate_corrective_action', forms.value[questionId].immediate_corrective_action);
+    formData.append('risk', forms.value[questionId].risk);
     formData.append('short_term_action', forms.value[questionId].short_term_action);
     formData.append('short_term_date', forms.value[questionId].short_term_date);
     formData.append('long_term_action', forms.value[questionId].long_term_action);
@@ -176,6 +180,11 @@ function submitQuestionForm(questionId) {
     if (forms.value[questionId].evidence_file instanceof File) {
       formData.append('evidence_file', forms.value[questionId].evidence_file);
     }
+
+    if (forms.value[questionId].captured_image_file instanceof File) {
+      formData.append('captured_image_file', forms.value[questionId].captured_image_file);
+    }
+
 
     axios.post(route('quality-controls.saveQuestionResponse', questionId), formData).then(() => {
       Swal.fire({
@@ -231,6 +240,7 @@ function getForm(questionId) {
       recommendations: '',
       reference: '',
       immediate_corrective_action: '',
+      risk: '',
       short_term_action: '',
       short_term_date: '',
       long_term_action: '',
@@ -243,7 +253,9 @@ function getForm(questionId) {
       completion_date: '',
       date_of_closure: '',
       follow_up_date: '',
-      evidence_file: null
+      evidence_file: null,
+      captured_image_file: null,
+      captured_image_preview: null,
     };
   }
   return forms.value[questionId];
@@ -261,6 +273,7 @@ onMounted(() => {
         recommendations: question.recommendations || '',
         reference: question.reference || '',
         immediate_corrective_action: question.immediate_corrective_action || '',
+        risk: question.risk || '',
         short_term_action: question.short_term_action || '',
         short_term_date: question.short_term_date || '',
         long_term_action: question.long_term_action || '',
@@ -273,7 +286,10 @@ onMounted(() => {
         completion_date: question.completion_date || '',
         date_of_closure: question.date_of_closure || '',
         follow_up_date: question.follow_up_date || '',
-        evidence_file: question.evidence_file || null
+        evidence_file: question.evidence_file || null,
+
+
+        captured_image_file: question.captured_image_file || null,
       };
     }
   }
@@ -334,6 +350,93 @@ const exportToPDF = () => {
     });
 };
 
+function captureImage(questionId) {
+  // Check if we are on desktop (browser supports webcam)
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    // Open webcam
+    openWebcam(questionId);
+  } else {
+    // Fallback: trigger file input on mobile
+    const input = cameraInputs.value?.[questionId];
+    if (input) input.click();
+  }
+}
+
+async function openWebcam(questionId) {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+    const video = document.createElement('video');
+    video.srcObject = stream;
+    video.autoplay = true;
+
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = 0;
+    modal.style.left = 0;
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
+    modal.style.display = 'flex';
+    modal.style.flexDirection = 'column';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.appendChild(video);
+
+    const captureButton = document.createElement('button');
+    captureButton.textContent = 'Capture';
+    captureButton.style.marginTop = '10px';
+    captureButton.className = 'btn btn-success';
+    modal.appendChild(captureButton);
+
+    document.body.appendChild(modal);
+
+    captureButton.addEventListener('click', () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/png');
+
+      // Save to form
+      getForm(questionId).evidence_file_preview = dataUrl;
+
+      // Convert dataUrl to File object for submission if needed
+      fetch(dataUrl)
+        .then(res => res.blob())
+        .then(blob => {
+          getForm(questionId).captured_image_file = new File([blob], `capture_${Date.now()}.png`, { type: 'image/png' });
+        });
+
+      // Stop webcam
+      stream.getTracks().forEach(track => track.stop());
+      document.body.removeChild(modal);
+    });
+  } catch (err) {
+    // Fallback: mobile input if webcam fails
+    const input = cameraInputs.value?.[questionId];
+    if (input) input.click();
+  }
+}
+
+function handleCameraCapture(questionId, event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Preview for images
+  if (file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      getForm(questionId).evidence_file_preview = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Save to form for submission
+  getForm(questionId).captured_image_file = file;
+}
+
 </script>
 
 <template>
@@ -349,7 +452,8 @@ const exportToPDF = () => {
                 <Link :href="route('facilities.show', qualityControl.facility.id)"><strong>{{
                   qualityControl.facility.name }}</strong> </Link> /
                 <Link :href="route('quality-controls.edit', qualityControl.id)"><strong>{{ qualityControl.title
-                }}</strong> - <strong>{{ qualityControl.control_type }}</strong> </Link>
+                  }}</strong> - <strong>{{ qualityControl.control_type }}</strong> </Link>
+
               </h4>
             </div>
           </div>
@@ -363,20 +467,22 @@ const exportToPDF = () => {
               <div class="col-md-12 mb-4">
 
                 <!-- Approve Checklist & Export button -->
-                <div class="d-flex justify-content-end mb-3">   
-                  
-                    <div v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator'])">
-                      <button v-show="hideButton" v-if="qualityControl.approval_status !== 'Approved'" class="btn btn-success" @click.prevent="approveQualityControl(qualityControl.id)" :disabled="isApproving">
-                        <span v-if="isApproving">
-                          <i class="fas fa-spinner fa-spin"></i> Processing, please wait...
-                        </span>
-                        <span v-else>
-                          <i class="fas fa-check-circle"></i> Approve Checklist
-                        </span>                    
-                      </button>
-                    </div>
-                      
-                  
+                <div class="d-flex justify-content-end mb-3">
+
+                  <div v-if="hasRoles(['Administrator', 'Super Admin', 'AVSEC Administrator'])">
+                    <button v-show="hideButton" v-if="qualityControl.approval_status !== 'Approved'"
+                      class="btn btn-success" @click.prevent="approveQualityControl(qualityControl.id)"
+                      :disabled="isApproving">
+                      <span v-if="isApproving">
+                        <i class="fas fa-spinner fa-spin"></i> Processing, please wait...
+                      </span>
+                      <span v-else>
+                        <i class="fas fa-check-circle"></i> Approve Checklist
+                      </span>
+                    </button>
+                  </div>
+
+
 
                   <button :disabled="isLoading" @click="exportToPDF" class="btn btn-info" style="margin-left: 10px;">
                     <span v-if="isLoading">
@@ -401,8 +507,9 @@ const exportToPDF = () => {
                             class="col-md-12">
                             <div class="card card-info collapsed-card shadow-sm">
                               <div class="card-header">
-                                <h3 style="font-weight: bold;" class="card-title" data-card-widget="collapse"><i class="fas fa-arrow-right"></i> {{
-                                  area.trim() }}</h3>
+                                <h3 style="font-weight: bold;" class="card-title" data-card-widget="collapse"><i
+                                    class="fas fa-arrow-right"></i> {{
+                                      area.trim() }}</h3>
                                 <div class="card-tools">
                                   <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                     <i class="fas fa-plus"></i>
@@ -486,6 +593,7 @@ const exportToPDF = () => {
 
                                           </div>
                                         </div>
+
                                         <div class="row">
                                           <div class="form-group col-md-6">
                                             <label>Recommendations</label>
@@ -540,7 +648,7 @@ const exportToPDF = () => {
                                         </div>
 
                                         <div class="row">
-                                          <div class="form-group col-md-6">
+                                          <div class="form-group col-md-3">
                                             <label v-if="!question.evidence_file">Evidence Attachment</label>
                                             <a v-if="question.evidence_file" data-bs-toggle="tooltip"
                                               title="View Evidence Attachment"
@@ -563,6 +671,91 @@ const exportToPDF = () => {
                                               formErrors[question.id]?.evidence_file }}</small>
                                           </div>
 
+                                          <!-- <div class="form-group col-md-3">
+
+                                        
+                                            <div class="mb-2">
+                                              <label
+                                                v-if="!question.captured_image_file || forms[question.id].evidence_file_preview">
+                                                Capture Evidence Image
+                                              </label>
+                                              <a v-else :href="`/storage/${JSON.parse(question.captured_image_file)}`"
+                                                target="_blank">
+                                                <i class="fas fa-paperclip"></i> View Existing Attachment
+                                              </a>
+                                            </div>
+
+                                      
+                                            <div v-if="forms[question.id].evidence_file_preview" class="mb-2">
+                                              <img :src="forms[question.id].evidence_file_preview"
+                                                alt="Captured preview" class="img-fluid rounded border"
+                                                style="max-height: 150px;" />
+                                            </div>
+
+                            
+                                            <input type="file" accept="image/*" class="d-none" capture="environment"
+                                              :ref="el => { if (!cameraInputs.value) cameraInputs.value = {}; if (el) cameraInputs.value[question.id] = el; }"
+                                              @change="handleCameraCapture(question.id, $event)" />
+
+                                            <div class="d-flex gap-2 mt-2">
+                                              <button type="button" class="btn btn-info btn-sm"
+                                                @click="captureImage(question.id)" style="width: 100%;">
+                                                <i class="fas fa-camera"></i> Capture
+                                              </button>
+                                            </div>
+
+                                          
+                                            <small v-if="formErrors[question.id]?.captured_image_file"
+                                              class="text-danger">
+                                              {{ formErrors[question.id]?.captured_image_file }}
+                                            </small>
+                                          </div> -->
+
+                                          <div class="form-group col-md-3">
+
+                                            <!-- Label or Existing Attachment Link -->
+                                            <div class="mb-2 d-flex justify-content-between align-items-center">
+                                              <label class="mb-0"
+                                                v-if="!question.captured_image_file || forms[question.id].evidence_file_preview">
+                                                Capture Image Evidence
+                                              </label>
+                                              <a v-else :href="`/storage/${JSON.parse(question.captured_image_file)}`"
+                                                target="_blank" class="text-decoration-none small">
+                                                <i class="fas fa-paperclip"></i> View Existing Attachment
+                                              </a>
+                                            </div>
+
+                                            <!-- Captured Preview -->
+                                            <div v-if="forms[question.id].evidence_file_preview" class="mb-2">
+                                              <div class="border rounded shadow-sm p-2" style="background: #f9f9f9;">
+                                                <div class="mb-1 small text-muted">Captured Preview</div>
+                                                <img :src="forms[question.id].evidence_file_preview"
+                                                  alt="Captured preview" class="img-fluid rounded"
+                                                  style="width: 100%; max-height: 200px; object-fit: cover;" />
+                                              </div>
+                                            </div>
+
+                                            <!-- File Input (Hidden) -->
+                                            <input type="file" accept="image/*" class="d-none" capture="environment"
+                                              :ref="el => { if (!cameraInputs.value) cameraInputs.value = {}; if (el) cameraInputs.value[question.id] = el; }"
+                                              @change="handleCameraCapture(question.id, $event)" />
+
+                                            <!-- Capture Button -->
+                                            <div class="d-flex gap-2 mt-2">
+                                              <button type="button" class="btn btn-info btn-sm flex-grow-1"
+                                                @click="captureImage(question.id)">
+                                                <i class="fas fa-camera"></i> Capture
+                                              </button>
+                                            </div>
+
+                                            <!-- Validation Error -->
+                                            <small v-if="formErrors[question.id]?.captured_image_file"
+                                              class="text-danger">
+                                              {{ formErrors[question.id]?.captured_image_file }}
+                                            </small>
+
+                                          </div>
+
                                           <div class="form-group col-md-6">
                                             <label>Status</label>
                                             <select v-model="getForm(question.id).status" class="form-control"
@@ -576,6 +769,20 @@ const exportToPDF = () => {
                                             </select>
                                           </div>
                                         </div>
+
+                                        <div class="row">
+                                          <div class="form-group col-md-6">
+                                            <label>Risk</label>
+                                            <textarea v-model="getForm(question.id).risk
+                                              " class="form-control" rows="2" placeholder="Risk Comment"
+                                              @change="validateQuestionForm(question.id)" :class="{
+                                                'is-invalid': formErrors[question.id]?.risk,
+                                                'is-valid': forms[question.id].risk && !formErrors[question.id]?.risk
+                                              }">
+                                        </textarea>
+                                          </div>
+                                        </div>
+
                                         <div class="d-flex justify-content-end">
                                           <button :disabled="isLoading" type="submit" class="btn btn-info mr-1">
                                             <span v-if="isLoading"><i class="fas fa-spinner fa-spin"></i>
@@ -653,5 +860,4 @@ const exportToPDF = () => {
   transform: scale(1.05);
   color: #0056b3;
 }
-
 </style>
