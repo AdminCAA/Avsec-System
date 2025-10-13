@@ -107,14 +107,14 @@ watch(() => form.audit_area_category_id, (value) => {
 </script>
 
 <template>
-  <Head title="Create Audit Question" />
+  <Head title="Create Quality Control Question" />
   <AuthenticatedLayout>
     <div class="content-wrapper">    
         <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h3 class="m-0"><strong>Audit Question / Create</strong></h3>
+                    <h3 class="m-0"><strong>Quality Control Question / Create</strong></h3>
                 </div>                
             </div>
         </div>
@@ -128,7 +128,7 @@ watch(() => form.audit_area_category_id, (value) => {
                     <!-- general form elements -->
                     <div class="card card-info">
                         <div class="card-header">
-                            <h3 class="card-title">Create Audit Question</h3>
+                            <h3 class="card-title">Create Question</h3>
                         </div>
                         <!-- form start -->                        
                         <form @submit.prevent="createAuditQuestion">

@@ -169,6 +169,8 @@ class QualityControlController extends Controller implements HasMiddleware
                                 'audit_question_id' => $questionItem->id,
                                 'audit_area_name' => $questionItem->audit_area_name,
                                 'quality_control_id' => $qualityControl->id,
+                                'reference' => $questionItem->reference,                                
+                                'risk_description' => $questionItem->risk_description,
                             ]);
                         }
                     }
@@ -352,12 +354,12 @@ class QualityControlController extends Controller implements HasMiddleware
         $validator = Validator::make($request->all(), [
             'question_id' => 'required|integer',
             'quality_control_id' => 'required|integer',
-            'question_response' => 'required|string|in:Yes,No,Pass,Fail,Not Applicable,Not confirmed',
+            'question_response' => 'required|string|in:Yes,No,Pass,Fail,Not Applicable,Not Confirmed',
             'finding_observation' => 'required|string',
             'action_taken' => 'nullable|string',
             'immediate_corrective_action' => 'nullable|string',
             'recommendations' => 'nullable|string',
-            'reference' => 'nullable|string',
+            'reference' => 'nullable|string',            
             'status' => 'required|string|in:Open,Closed,Overdue',
             'finding_category' => 'required|string|in:Compliant,Not Compliant(Minor),Not Compliant(Serious),Not Applicable,Not Confirmed',
             'date_quality_control' => 'required|date',
@@ -372,7 +374,7 @@ class QualityControlController extends Controller implements HasMiddleware
             'follow_up_date' => 'nullable|date',
             'evidence_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'captured_image_file' => 'nullable|file|mimes:jpg,jpeg,png|max:2048', // single file
-            'risk' => 'nullable|string',
+            'risk_description' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -402,7 +404,7 @@ class QualityControlController extends Controller implements HasMiddleware
             'reference',
             'short_term_date',
             'long_term_date',
-            'risk'
+            'risk_description',
         ]);
 
         // Handle evidence_file (single file)
@@ -422,14 +424,12 @@ class QualityControlController extends Controller implements HasMiddleware
                     Storage::disk('public')->delete($existingFile);
                 }
             }
+            // Store new file
+            $filePath = $request->file('captured_image_file')->store('qc_captures', 'public');
 
-        // Store new file
-        $filePath = $request->file('captured_image_file')->store('qc_captures', 'public');
-
-        // Save as JSON
-        $data['captured_image_file'] = json_encode($filePath);
-    }
-
+            // Save as JSON
+            $data['captured_image_file'] = json_encode($filePath);
+        }
 
         // Update the question
         $question->update($data);

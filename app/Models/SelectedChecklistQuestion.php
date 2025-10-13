@@ -37,7 +37,9 @@ class SelectedChecklistQuestion extends Model
         'cap_status',
         'reason_for_rejection',
         'captured_image_file',
-        // 'risk',
+        //'reference_doc',
+        //'reference_search_text',
+        'risk_description',
     ];
 
     protected $casts = [

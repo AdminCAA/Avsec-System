@@ -1,10 +1,11 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { usePage, Head, Link } from '@inertiajs/vue3';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import 'vue-select/dist/vue-select.css'
+
 
 const cameraInputs = ref({}); // this should be an empty object
 
@@ -40,7 +41,7 @@ const responseOptions = [
   { id: 3, option: 'Pass' },
   { id: 4, option: 'Fail' },
   { id: 5, option: 'Not Applicable' },
-  { id: 6, option: 'Not Comfirmed' },
+  { id: 6, option: 'Not Confirmed' },
 ]
 
 const findingCategoryOptions = [
@@ -166,7 +167,7 @@ function submitQuestionForm(questionId) {
     formData.append('recommendations', forms.value[questionId].recommendations);
     formData.append('reference', forms.value[questionId].reference);
     formData.append('immediate_corrective_action', forms.value[questionId].immediate_corrective_action);
-    formData.append('risk', forms.value[questionId].risk);
+    formData.append('risk_description', forms.value[questionId].risk_description);
     formData.append('short_term_action', forms.value[questionId].short_term_action);
     formData.append('short_term_date', forms.value[questionId].short_term_date);
     formData.append('long_term_action', forms.value[questionId].long_term_action);
@@ -240,7 +241,7 @@ function getForm(questionId) {
       recommendations: '',
       reference: '',
       immediate_corrective_action: '',
-      risk: '',
+      risk_description: '',
       short_term_action: '',
       short_term_date: '',
       long_term_action: '',
@@ -261,6 +262,7 @@ function getForm(questionId) {
   return forms.value[questionId];
 }
 
+
 onMounted(() => {
   for (const [_, questions] of Object.entries(groupedCheckListQuestions)) {
     for (const question of questions) {
@@ -273,7 +275,7 @@ onMounted(() => {
         recommendations: question.recommendations || '',
         reference: question.reference || '',
         immediate_corrective_action: question.immediate_corrective_action || '',
-        risk: question.risk || '',
+        risk_description: question.risk_description || '',
         short_term_action: question.short_term_action || '',
         short_term_date: question.short_term_date || '',
         long_term_action: question.long_term_action || '',
@@ -287,12 +289,57 @@ onMounted(() => {
         date_of_closure: question.date_of_closure || '',
         follow_up_date: question.follow_up_date || '',
         evidence_file: question.evidence_file || null,
-
-
         captured_image_file: question.captured_image_file || null,
       };
+
+      //Watch for changes to this specific question’s response
+      watch(() => forms.value[question.id]?.question_response,
+        (newVal) => {
+          if (newVal?.toLowerCase() === 'yes' 
+            || newVal?.toLowerCase() === 'pass')             
+          {            
+            const form = getForm(question.id);
+            form.finding_category =  'Compliant';
+            form.status = 'Closed';
+            form.finding_observation = 'Not Applicable';
+            form.recommendations = 'Not Applicable';
+            form.immediate_corrective_action = 'Not Applicable';
+            form.proposed_follow_up_action = 'Not Applicable';
+            form.risk_description = 'Not Applicable';            
+          }
+
+          if (newVal?.toLowerCase() === 'no' 
+              || newVal?.toLowerCase() === 'fail' 
+              || newVal?.toLowerCase() === 'not confirmed') 
+          {
+            const form = getForm(question.id);
+            form.finding_category = '';
+            form.status = 'Open';
+            form.finding_observation = '';
+            form.recommendations = '';
+            form.immediate_corrective_action = '';
+            form.proposed_follow_up_action = '';
+            form.risk_description = question?.risk_description || '';
+         }
+
+         if(newVal?.toLowerCase() === 'not applicable'){
+            const form = getForm(question.id);
+            form.finding_category =  'Not Applicable';
+            form.status = 'Closed';
+            form.finding_observation = 'Not Applicable';
+            form.recommendations = 'Not Applicable';
+            form.immediate_corrective_action = 'Not Applicable';
+            form.proposed_follow_up_action = 'Not Applicable';
+            form.risk_description = 'Not Applicable';
+         }
+        }
+      );
     }
   }
+
+
+
+
 });
 
 const fileName = ref({});
@@ -580,7 +627,33 @@ function handleCameraCapture(questionId, event) {
                                               class="text-danger">{{ formErrors[question.id].finding_category }}</small>
                                           </div>
 
+                                          
                                           <div class="form-group col-md-6">
+                                            <label>Risk Description</label>
+                                            <textarea v-model="getForm(question.id).risk_description
+                                              " class="form-control" rows="2" placeholder="Risk Comment"
+                                              @change="validateQuestionForm(question.id)" :class="{
+                                                'is-invalid': formErrors[question.id]?.risk_description,
+                                                'is-valid': forms[question.id].risk_description && !formErrors[question.id]?.risk_description
+                                              }">
+                                            </textarea>
+                                          </div>                                                                                
+                                        </div>
+
+                                        <div class="row">                                         
+                                          <div class="form-group col-md-3">
+                                            <label>Reference</label>
+                                            <input v-model="getForm(question.id).reference" type="text"
+                                              class="form-control" @change="validateQuestionForm(question.id)" :class="{
+                                                'is-invalid': formErrors[question.id]?.reference,
+                                                'is-valid': forms[question.id].reference && !formErrors[question.id]?.reference
+                                              }" placeholder="Reference (Optional)" />
+                                            <small v-if="formErrors[question.id]?.reference" class="text-danger">{{
+                                              formErrors[question.id].reference }}
+                                              </small>
+
+                                          </div>
+                                          <div class="form-group col-md-3">
                                             <label>Date of Quality Control</label>
                                             <input v-model="getForm(question.id).date_quality_control" type="date"
                                               class="form-control" @change="validateQuestionForm(question.id)" :class="{
@@ -592,9 +665,6 @@ function handleCameraCapture(questionId, event) {
                                               }}</small>
 
                                           </div>
-                                        </div>
-
-                                        <div class="row">
                                           <div class="form-group col-md-6">
                                             <label>Recommendations</label>
                                             <textarea v-model="getForm(question.id).recommendations"
@@ -603,21 +673,9 @@ function handleCameraCapture(questionId, event) {
                                                 'is-invalid': formErrors[question.id]?.recommendations,
                                                 'is-valid': forms[question.id].recommendations && !formErrors[question.id]?.recommendations
                                               }">
-                                        </textarea>
+                                            </textarea>
                                             <small v-if="formErrors[question.id]?.recommendations"
                                               class="text-danger">{{ formErrors[question.id].recommendations }}</small>
-                                          </div>
-
-                                          <div class="form-group col-md-6">
-                                            <label>Reference</label>
-                                            <input v-model="getForm(question.id).reference" type="text"
-                                              class="form-control" @change="validateQuestionForm(question.id)" :class="{
-                                                'is-invalid': formErrors[question.id]?.reference,
-                                                'is-valid': forms[question.id].reference && !formErrors[question.id]?.reference
-                                              }" placeholder="Reference" />
-                                            <small v-if="formErrors[question.id]?.reference" class="text-danger">{{
-                                              formErrors[question.id].reference }}</small>
-
                                           </div>
                                         </div>
 
@@ -671,46 +729,7 @@ function handleCameraCapture(questionId, event) {
                                               formErrors[question.id]?.evidence_file }}</small>
                                           </div>
 
-                                          <!-- <div class="form-group col-md-3">
-
-                                        
-                                            <div class="mb-2">
-                                              <label
-                                                v-if="!question.captured_image_file || forms[question.id].evidence_file_preview">
-                                                Capture Evidence Image
-                                              </label>
-                                              <a v-else :href="`/storage/${JSON.parse(question.captured_image_file)}`"
-                                                target="_blank">
-                                                <i class="fas fa-paperclip"></i> View Existing Attachment
-                                              </a>
-                                            </div>
-
                                       
-                                            <div v-if="forms[question.id].evidence_file_preview" class="mb-2">
-                                              <img :src="forms[question.id].evidence_file_preview"
-                                                alt="Captured preview" class="img-fluid rounded border"
-                                                style="max-height: 150px;" />
-                                            </div>
-
-                            
-                                            <input type="file" accept="image/*" class="d-none" capture="environment"
-                                              :ref="el => { if (!cameraInputs.value) cameraInputs.value = {}; if (el) cameraInputs.value[question.id] = el; }"
-                                              @change="handleCameraCapture(question.id, $event)" />
-
-                                            <div class="d-flex gap-2 mt-2">
-                                              <button type="button" class="btn btn-info btn-sm"
-                                                @click="captureImage(question.id)" style="width: 100%;">
-                                                <i class="fas fa-camera"></i> Capture
-                                              </button>
-                                            </div>
-
-                                          
-                                            <small v-if="formErrors[question.id]?.captured_image_file"
-                                              class="text-danger">
-                                              {{ formErrors[question.id]?.captured_image_file }}
-                                            </small>
-                                          </div> -->
-
                                           <div class="form-group col-md-3">
 
                                             <!-- Label or Existing Attachment Link -->
@@ -770,18 +789,7 @@ function handleCameraCapture(questionId, event) {
                                           </div>
                                         </div>
 
-                                        <div class="row">
-                                          <div class="form-group col-md-6">
-                                            <label>Risk</label>
-                                            <textarea v-model="getForm(question.id).risk
-                                              " class="form-control" rows="2" placeholder="Risk Comment"
-                                              @change="validateQuestionForm(question.id)" :class="{
-                                                'is-invalid': formErrors[question.id]?.risk,
-                                                'is-valid': forms[question.id].risk && !formErrors[question.id]?.risk
-                                              }">
-                                        </textarea>
-                                          </div>
-                                        </div>
+                                       
 
                                         <div class="d-flex justify-content-end">
                                           <button :disabled="isLoading" type="submit" class="btn btn-info mr-1">
