@@ -34,7 +34,7 @@ const responseOptions = [
     { id: 3, option: 'Pass' },
     { id: 4, option: 'Fail' },
     { id: 5, option: 'Not Applicable' },
-    { id: 6, option: 'Not Comfirmed' },
+    { id: 6, option: 'Not Confirmed' },
 ]
 
 const findingCategoryOptions = [

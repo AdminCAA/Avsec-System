@@ -34,8 +34,11 @@ class PersonnelController extends Controller implements HasMiddleware
     {        
         $searchQuery = User::search($request);
         // Fetch all personnel from the database
-        $personnels = $searchQuery->whereIn('user_type', User::UserTypes)->orderBy('created_at', 'desc')
-        ->paginate(50);
+        $personnels = $searchQuery
+            ->whereIn('user_type', User::UserTypes)
+            ->where('user_type', '!=', 'CAA Staff')
+            ->orderBy('created_at', 'desc')
+            ->paginate(50);
         return Inertia::render('Personnels/List',[
             'personnels' => $personnels                
         ]);
