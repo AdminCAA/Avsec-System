@@ -12,7 +12,11 @@ class AuditQuestion extends Model
     protected $fillable = [
         'audit_area_category_id',
         'question',
-        'audit_area_name'
+        'audit_area_name',
+        'reference',
+        'reference_doc',
+        'reference_search_text',
+        'risk_description',        
     ];
     
     public function auditAreaCategory()

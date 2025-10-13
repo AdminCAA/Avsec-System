@@ -57,6 +57,8 @@ class AuditQuestionController extends Controller implements HasMiddleware
         $validator = Validator::make($request->all(), [
             'audit_area_category_id' => 'required|exists:audit_area_categories,id',
             'question' => 'required|string',
+            'reference' => 'nullable|string|max:60',
+            'risk_description' => 'nullable|string',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -72,6 +74,8 @@ class AuditQuestionController extends Controller implements HasMiddleware
             'audit_area_category_id' => $request->audit_area_category_id,
             'question' => trim($request->question),
             'audit_area_name'=> trim($auditAreaCategory->name),
+            'reference' => trim($request->reference),
+            'risk_description' => trim($request->risk_description),
         ]);
         return redirect()->route('audit-questions.index')->with('success', 'Audit question created successfully.');
       
@@ -109,6 +113,8 @@ class AuditQuestionController extends Controller implements HasMiddleware
         $validator = Validator::make($request->all(), [
             'audit_area_category_id' => 'required|exists:audit_area_categories,id',
             'question' => 'required|string|unique:audit_questions,question,'.$auditQuestion->id .',id',
+            'reference' => 'nullable|string|max:60',
+            'risk_description' => 'nullable|string',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -120,6 +126,8 @@ class AuditQuestionController extends Controller implements HasMiddleware
             'audit_area_category_id' => $request->audit_area_category_id,
             'question' => trim($request->question),
             'audit_area_name'=> trim($auditAreaCategory->name),
+            'reference' => trim($request->reference),
+            'risk_description' => trim($request->risk_description),
         ]);
         return redirect()->route('audit-questions.index')->with('success', 'Audit question updated successfully.');
     }

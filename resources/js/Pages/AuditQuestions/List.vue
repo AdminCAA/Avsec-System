@@ -222,6 +222,12 @@ const sortedAuditQuestions = computed(() => {
                               :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
                           </th>
 
+                          <th @click="sortTable('reference')" style="cursor: pointer; width: 350px;">
+                            Reference
+                            <i v-if="sortKey === 'reference'"
+                              :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                          </th>
+
                           <th style="width: 100px;">Created</th>
                           <th style="width: 160px;">Actions</th>
                         </tr>
@@ -239,6 +245,7 @@ const sortedAuditQuestions = computed(() => {
                             </Link>
                           </td>
                           <td>{{ question.audit_area_category.name }}</td>
+                          <td>{{ question.reference }}</td>
                           <td>{{ dayjs(question.created_at).format('DD-MM-YYYY') }}</td>
 
                           <td>

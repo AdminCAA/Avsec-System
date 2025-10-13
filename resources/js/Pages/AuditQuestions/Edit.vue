@@ -23,12 +23,26 @@ const {auditCategories, auditQuestion} = defineProps({
 const form = useForm({
   question: auditQuestion.question,
   audit_area_category_id: auditQuestion.audit_area_category_id,    
+  reference: auditQuestion.reference,
+  risk_description: auditQuestion.risk_description,
 });
 
 const isLoading = ref(false);
 const formErrors = ref({});
 
 function editAuditQuestion() {
+  if (!form.question || !form.audit_area_category_id ) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Please fix the validation errors before submitting.',
+      toast: true,
+      position: 'top-end',
+      timer: 3000,
+      showConfirmButton: false
+    });
+    return;
+  }
+
   isLoading.value = true;  
   axios.post(route('audit-questions.update', auditQuestion.id), form)
     .then(() => {
@@ -72,6 +86,12 @@ watch(() => form.question, (value) => {
     : '';
 });
 
+watch(() => form.risk_description, (value) => {
+  formErrors.value.risk_description = value && value.length < 3
+    ? 'Risk description must be at least 3 characters.'
+    : '';
+});
+
 watch(() => form.audit_area_category_id, (value) => {
   formErrors.value.audit_area_category_id = !value? 'Audit Area is required.'
     : value.length < 3
@@ -106,9 +126,7 @@ watch(() => form.audit_area_category_id, (value) => {
                                 </div>
                                 <!-- form start -->                        
                                 <form @submit.prevent="editAuditQuestion">
-                                    <div class="card-body">
-                                    <!-- Name -->
-                                    <!-- Row 1: Name & Category -->
+                                    <div class="card-body">                                 
                                         <div class="row">
                                             <div class="form-group col-md-12">
                                             <label>Question</label>
@@ -124,9 +142,14 @@ watch(() => form.audit_area_category_id, (value) => {
                                             </textarea>
 
                                             <InputError :message="formErrors.question" class="mt-1" />
+                                            <div v-if="form.question && !formErrors.question"
+                                              class="valid-feedback d-block">
+                                              Question looks good!
                                             </div>
+                                            </div>
+                                            
 
-                                            <div class="form-group col-md-12">                                    
+                                            <div class="form-group col-md-6">                                    
                                             <label>Audit Area Category</label>                                        
                                             <v-select
                                                 v-model="form.audit_area_category_id"
@@ -140,7 +163,52 @@ watch(() => form.audit_area_category_id, (value) => {
                                                 }"
                                             />
                                             <InputError :message="formErrors.audit_area_category_id" class="mt-1" />
+                                                <div v-if="form.audit_area_category_id && !formErrors.audit_area_category_id"
+                                                  class="valid-feedback d-block">
+                                                  Audit Area Category looks good!
+                                                </div>
                                             </div>
+
+                                            <div class="form-group col-md-6">
+                                              <label>Reference</label>
+                                              <input
+                                                v-model="form.reference" 
+                                                type="text" 
+                                                class="form-control"
+                                                :class="{ 
+                                                    'is-invalid': formErrors.reference, 
+                                                    'is-valid': form.reference && !formErrors.reference 
+                                                }"
+                                                  placeholder="Enter Reference (Optional)"/>                                    
+                                          
+                                              <InputError :message="formErrors.reference || form.errors.reference"
+                                              class="mt-2" />
+                                              <div v-if="form.reference && !formErrors.reference"
+                                                  class="valid-feedback d-block">
+                                                  Reference looks good!
+                                              </div>
+                                            </div>
+
+                                          <div class="form-group col-md-12">
+                                              <label>Risk Description</label>
+                                              <textarea
+                                                v-model="form.risk_description" 
+                                                type="text" 
+                                                class="form-control"
+                                                :class="{ 
+                                                    'is-invalid': formErrors.risk_description, 
+                                                    'is-valid': form.risk_description && !formErrors.risk_description 
+                                                }"
+                                                placeholder="Enter Risk Description (Optional)">
+                                              </textarea>
+
+                                            <InputError :message="formErrors.risk_description || form.errors.risk_description"
+                                                class="mt-2" />
+                                            <div v-if="form.risk_description && !formErrors.risk_description"
+                                                class="valid-feedback d-block">
+                                              Risk Description looks good!
+                                            </div>
+                                          </div>  
                                         </div>                                                                                                                                                                                                                                                        
                                     </div>
 
