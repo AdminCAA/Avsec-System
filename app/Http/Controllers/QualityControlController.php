@@ -281,8 +281,75 @@ class QualityControlController extends Controller implements HasMiddleware
         return response()->json(['errors' => $validator->errors()], 422);
     }
 
-    public function saveQuestionResponse(Request $request,string $id){
-        $validator = Validator::make($request->all(),[
+    // public function saveQuestionResponse(Request $request,string $id){
+    //     $validator = Validator::make($request->all(),[
+    //         'question_id' => 'required|integer',
+    //         'quality_control_id' => 'required|integer',
+    //         'question_response' => 'required|string|in:Yes,No,Pass,Fail,Not Applicable,Not confirmed',
+    //         'finding_observation' => 'required|string',
+    //         'action_taken' => 'nullable|string',
+    //         'immediate_corrective_action' => 'nullable|string',
+    //         'recommendations' => 'nullable|string',
+    //         'reference' => 'nullable|string',
+    //         'status' => 'required|string|in:Open,Closed,Overdue',
+    //         'finding_category' => 'required|string|in:Compliant,Not Compliant(Minor),Not Compliant(Serious),Not Applicable,Not Confirmed,Not Applicable,Not Confirmed',
+    //         'date_quality_control' => 'required|date',
+    //         'problem_cause' => 'nullable|string',
+    //         'proposed_follow_up_action' => 'nullable|string|in:Onsite,Administrative,Onsite and Administrative,Not Applicable',
+    //         'short_term_action' => 'nullable|string',
+    //         'short_term_date' => 'nullable|date',
+    //         'long_term_action' => 'nullable|string',
+    //         'long_term_date' => 'nullable|date',
+    //         'completion_date' => 'nullable|date',
+    //         'date_of_closure' => 'nullable|date',
+    //         'follow_up_date' => 'nullable|date',
+    //         'evidence_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', 
+    //     ]);
+
+    //     if($validator->fails()){
+    //         return response()->json(['errors' => $validator->errors()], 422);
+    //     }
+
+    //     $selectedCheckliskQuestion = SelectedChecklistQuestion::findOrFail($request->question_id);
+    //     $selectedCheckliskQuestion->update([                    
+    //         'question_response' => $request->question_response,
+    //         'finding_observation' => $request->finding_observation,
+    //         'action_taken' => $request->action_taken,
+    //         'status' => $request->status,
+    //         'finding_category' => $request->finding_category,
+    //         'date_quality_control' => $request->date_quality_control,
+    //         'problem_cause' =>$request->problem_cause,
+    //         'proposed_follow_up_action' => $request->proposed_follow_up_action,
+    //         'short_term_action' => $request->short_term_action,
+    //         'long_term_action' => $request->long_term_action,
+    //         'completion_date' => $request->completion_date,
+    //         'date_of_closure' => $request->date_of_closure,
+    //         'follow_up_date' => $request->follow_up_date,
+    //         'immediate_corrective_action' => $request->immediate_corrective_action,
+    //         'recommendations' => $request->recommendations,
+    //         'reference' => $request->reference,
+    //         'short_term_date' => $request->short_term_date,
+    //         'long_term_date' => $request->long_term_date,
+
+    //     ]);
+
+    //     if ($request->hasFile('evidence_file')) {
+    //         // Delete old file if exists
+    //         if ($selectedCheckliskQuestion->evidence_file) {
+    //             Storage::disk('public')->delete($selectedCheckliskQuestion->evidence_file);
+    //         }
+    //         $selectedCheckliskQuestion->evidence_file = $request->file('evidence_file')->store('qc_evidences', 'public');
+    //     }
+        
+    //     $selectedCheckliskQuestion->save();
+    //     return redirect()->route('quality-controls.show',$request->quality_control_id)->with('success', 'Checklist updated successfully.');        
+    // }
+
+   
+    public function saveQuestionResponse(Request $request, string $id)
+    {
+        // Validation
+        $validator = Validator::make($request->all(), [
             'question_id' => 'required|integer',
             'quality_control_id' => 'required|integer',
             'question_response' => 'required|string|in:Yes,No,Pass,Fail,Not Applicable,Not confirmed',
@@ -292,7 +359,7 @@ class QualityControlController extends Controller implements HasMiddleware
             'recommendations' => 'nullable|string',
             'reference' => 'nullable|string',
             'status' => 'required|string|in:Open,Closed,Overdue',
-            'finding_category' => 'required|string|in:Compliant,Not Compliant(Minor),Not Compliant(Serious),Not Applicable,Not Confirmed,Not Applicable,Not Confirmed',
+            'finding_category' => 'required|string|in:Compliant,Not Compliant(Minor),Not Compliant(Serious),Not Applicable,Not Confirmed',
             'date_quality_control' => 'required|date',
             'problem_cause' => 'nullable|string',
             'proposed_follow_up_action' => 'nullable|string|in:Onsite,Administrative,Onsite and Administrative,Not Applicable',
@@ -303,46 +370,73 @@ class QualityControlController extends Controller implements HasMiddleware
             'completion_date' => 'nullable|date',
             'date_of_closure' => 'nullable|date',
             'follow_up_date' => 'nullable|date',
-            'evidence_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', 
+            'evidence_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'captured_image_file' => 'nullable|file|mimes:jpg,jpeg,png|max:2048', // single file
+            'risk' => 'nullable|string',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $selectedCheckliskQuestion = SelectedChecklistQuestion::findOrFail($request->question_id);
-        $selectedCheckliskQuestion->update([                    
-            'question_response' => $request->question_response,
-            'finding_observation' => $request->finding_observation,
-            'action_taken' => $request->action_taken,
-            'status' => $request->status,
-            'finding_category' => $request->finding_category,
-            'date_quality_control' => $request->date_quality_control,
-            'problem_cause' =>$request->problem_cause,
-            'proposed_follow_up_action' => $request->proposed_follow_up_action,
-            'short_term_action' => $request->short_term_action,
-            'long_term_action' => $request->long_term_action,
-            'completion_date' => $request->completion_date,
-            'date_of_closure' => $request->date_of_closure,
-            'follow_up_date' => $request->follow_up_date,
-            'immediate_corrective_action' => $request->immediate_corrective_action,
-            'recommendations' => $request->recommendations,
-            'reference' => $request->reference,
-            'short_term_date' => $request->short_term_date,
-            'long_term_date' => $request->long_term_date,
+        // Find the question
+        $question = SelectedChecklistQuestion::findOrFail($request->question_id);
 
+        // Prepare data for update
+        $data = $request->only([
+            'question_response',
+            'finding_observation',
+            'action_taken',
+            'status',
+            'finding_category',
+            'date_quality_control',
+            'problem_cause',
+            'proposed_follow_up_action',
+            'short_term_action',
+            'long_term_action',
+            'completion_date',
+            'date_of_closure',
+            'follow_up_date',
+            'immediate_corrective_action',
+            'recommendations',
+            'reference',
+            'short_term_date',
+            'long_term_date',
+            'risk'
         ]);
 
+        // Handle evidence_file (single file)
         if ($request->hasFile('evidence_file')) {
-            // Delete old file if exists
-            if ($selectedCheckliskQuestion->evidence_file) {
-                Storage::disk('public')->delete($selectedCheckliskQuestion->evidence_file);
+            if ($question->evidence_file) {
+                Storage::disk('public')->delete($question->evidence_file);
             }
-            $selectedCheckliskQuestion->evidence_file = $request->file('evidence_file')->store('qc_evidences', 'public');
+            $data['evidence_file'] = $request->file('evidence_file')->store('qc_evidences', 'public');
         }
-        
-        $selectedCheckliskQuestion->save();
-        return redirect()->route('quality-controls.show',$request->quality_control_id)->with('success', 'Checklist updated successfully.');        
+
+        // Handle captured_image_file (single file)
+        if ($request->hasFile('captured_image_file')) {
+            // Delete existing file if exists
+            if (!empty($question->captured_image_file)) {
+                $existingFile = json_decode($question->captured_image_file, true);
+                if ($existingFile) {
+                    Storage::disk('public')->delete($existingFile);
+                }
+            }
+
+        // Store new file
+        $filePath = $request->file('captured_image_file')->store('qc_captures', 'public');
+
+        // Save as JSON
+        $data['captured_image_file'] = json_encode($filePath);
+    }
+
+
+        // Update the question
+        $question->update($data);
+
+        return redirect()
+            ->route('quality-controls.show', $request->quality_control_id)
+            ->with('success', 'Checklist updated successfully.');
     }
 
     public function listAudits(Request $request){
@@ -422,185 +516,71 @@ class QualityControlController extends Controller implements HasMiddleware
         ]);
     }    
 
-    // public function exportPDF($id) 
-    // {
-    //     // Eager load facility and checklist questions
-    //     $qualityControl = QualityControl::with(['facility', 'selectedchecklistQuestions'])->findOrFail($id);
+    public function exportPDF($id)
+    {
+        $qualityControl = QualityControl::with(['facility', 'selectedchecklistQuestions'])->findOrFail($id);
 
-    //     // Group questions by audit_area_name
-    //     $groupedQuestions = $qualityControl->selectedchecklistQuestions
-    //         ->groupBy('audit_area_name')
-    //         ->map(function ($questions) {
-    //             return $questions->map(function ($q) {
-    //                 return [
-    //                     'question' => $q->question,
-    //                     'response' => $q->question_response ?? 'N/A',
-    //                     'finding_category' => $q->finding_category ?? 'N/A',
-    //                     'observation' => $q->finding_observation ?? 'N/A',
-    //                     'status' => $q->status ?? 'N/A',
-    //                 ];
-    //             });
-    //         });
+        $questions = $qualityControl->selectedchecklistQuestions->map(function ($q) {
+            return [
+                'id' => $q->id,
+                'audit_area_name' => $q->audit_area_name,
+                'question' => $q->question,
+                'question_response' => $q->question_response ?? 'N/A',
+                'finding_observation' => $q->finding_observation ?? 'N/A',
+                'finding_category' => $q->finding_category ?? 'N/A',
+                'date_quality_control' => $q->date_quality_control ?? 'N/A',
+                'status' => $q->status ?? 'N/A',
+                'evidence_file' => $q->evidence_file ?? null,
+                //'immediate_corrective_action' => $q->immediate_corrective_action ?? 'N/A',
+                // 'recommendations' => $q->recommendations ?? 'N/A',
+                // 'reference' => $q->reference ?? 'N/A',
+                //'proposed_follow_up_action' => $q->proposed_follow_up_action ?? 'N/A',
+            ];
+        });
 
-    //     $pdf = Pdf::loadView('pdfTemplates.selectedQualityControls', [
-    //         'qualityControl' => $qualityControl,
-    //         'groupedQuestions' => $groupedQuestions
-    //     ])->setPaper('a4', 'portrait');
+        // 1️Generate main QC PDF
+        $pdf = Pdf::loadView('pdfTemplates.selectedQualityControls', [
+            'qualityControl' => $qualityControl,
+            'questions' => $questions
+        ])->setPaper('a4', 'portrait');//portrait
+        // ->setPaper('a4', 'landscape');
 
-    //     $fileName = 'QualityControl_' . $qualityControl->id . '.pdf';
-    //     return $pdf->download($fileName);
-    // }
+        $mainPdfPath = storage_path("app/public/temp_qc_{$qualityControl->id}.pdf");
+        $pdf->save($mainPdfPath);
 
+        // 2 Merge PDFs with FPDI
+        $fpdi = new Fpdi();
 
+        // Add main PDF
+        $pageCount = $fpdi->setSourceFile($mainPdfPath);
+        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+            $tplId = $fpdi->importPage($pageNo);
+            $size = $fpdi->getTemplateSize($tplId);
+            $fpdi->AddPage($size['orientation'], [$size['width'], $size['height']]);
+            $fpdi->useTemplate($tplId);
+        }
 
-
-
-// public function exportPDF($id) 
-// {
-//     // Eager load facility and checklist questions
-//     $qualityControl = QualityControl::with(['facility', 'selectedchecklistQuestions'])->findOrFail($id);
-
-//     // Group questions by audit_area_name
-//     $groupedQuestions = $qualityControl->selectedchecklistQuestions
-//         ->groupBy('audit_area_name')
-//         ->map(function ($questions) {
-//             return $questions->map(function ($q) {
-//                 return [
-//                     'question' => $q->question,
-//                     'response' => $q->question_response ?? 'N/A',
-//                     'finding_category' => $q->finding_category ?? 'N/A',
-//                     'observation' => $q->finding_observation ?? 'N/A',
-//                     'status' => $q->status ?? 'N/A',
-//                 ];
-//             });
-//         });
-
-//     $pdf = Pdf::loadView('pdfTemplates.qualityControls', [
-//         'qualityControl' => $qualityControl,
-//         'groupedQuestions' => $groupedQuestions
-//     ])->setPaper('a4', 'portrait');
-
-//     $fileName = 'QualityControl_' . $qualityControl->id . '.pdf';
-//     return $pdf->download($fileName);
-// }
-
-
-
-
-
-public function exportPDF($id)
-{
-    $qualityControl = QualityControl::with(['facility', 'selectedchecklistQuestions'])->findOrFail($id);
-
-    $questions = $qualityControl->selectedchecklistQuestions->map(function ($q) {
-        return [
-            'id' => $q->id,
-            'audit_area_name' => $q->audit_area_name,
-            'question' => $q->question,
-            'question_response' => $q->question_response ?? 'N/A',
-            'finding_observation' => $q->finding_observation ?? 'N/A',
-            'finding_category' => $q->finding_category ?? 'N/A',
-            'date_quality_control' => $q->date_quality_control ?? 'N/A',
-            'status' => $q->status ?? 'N/A',
-            'evidence_file' => $q->evidence_file ?? null,
-            //'immediate_corrective_action' => $q->immediate_corrective_action ?? 'N/A',
-            // 'recommendations' => $q->recommendations ?? 'N/A',
-            // 'reference' => $q->reference ?? 'N/A',
-            //'proposed_follow_up_action' => $q->proposed_follow_up_action ?? 'N/A',
-        ];
-    });
-
-    // 1️Generate main QC PDF
-    $pdf = Pdf::loadView('pdfTemplates.selectedQualityControls', [
-        'qualityControl' => $qualityControl,
-        'questions' => $questions
-    ])->setPaper('a4', 'portrait');//portrait
-    // ->setPaper('a4', 'landscape');
-
-    $mainPdfPath = storage_path("app/public/temp_qc_{$qualityControl->id}.pdf");
-    $pdf->save($mainPdfPath);
-
-    // 2 Merge PDFs with FPDI
-    $fpdi = new Fpdi();
-
-    // Add main PDF
-    $pageCount = $fpdi->setSourceFile($mainPdfPath);
-    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-        $tplId = $fpdi->importPage($pageNo);
-        $size = $fpdi->getTemplateSize($tplId);
-        $fpdi->AddPage($size['orientation'], [$size['width'], $size['height']]);
-        $fpdi->useTemplate($tplId);
-    }
-
-    // Add evidence PDFs
-    foreach ($qualityControl->selectedchecklistQuestions as $q) {
-        if ($q->evidence_file && Storage::disk('public')->exists($q->evidence_file)) {
-            $evidencePath = storage_path("app/public/{$q->evidence_file}");
-            if (strtolower(pathinfo($evidencePath, PATHINFO_EXTENSION)) === 'pdf') {
-                $pageCount = $fpdi->setSourceFile($evidencePath);
-                for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-                    $tplId = $fpdi->importPage($pageNo);
-                    $size = $fpdi->getTemplateSize($tplId);
-                    $fpdi->AddPage($size['orientation'], [$size['width'], $size['height']]);
-                    $fpdi->useTemplate($tplId);
+        // Add evidence PDFs
+        foreach ($qualityControl->selectedchecklistQuestions as $q) {
+            if ($q->evidence_file && Storage::disk('public')->exists($q->evidence_file)) {
+                $evidencePath = storage_path("app/public/{$q->evidence_file}");
+                if (strtolower(pathinfo($evidencePath, PATHINFO_EXTENSION)) === 'pdf') {
+                    $pageCount = $fpdi->setSourceFile($evidencePath);
+                    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+                        $tplId = $fpdi->importPage($pageNo);
+                        $size = $fpdi->getTemplateSize($tplId);
+                        $fpdi->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                        $fpdi->useTemplate($tplId);
+                    }
                 }
             }
         }
+
+        $outputFileName = 'QualityControl_' . $qualityControl->id . '.pdf';
+        return response()->streamDownload(function () use ($fpdi) {
+            $fpdi->Output('F', 'php://output');
+        }, $outputFileName);
     }
-
-    $outputFileName = 'QualityControl_' . $qualityControl->id . '.pdf';
-    return response()->streamDownload(function () use ($fpdi) {
-        $fpdi->Output('F', 'php://output');
-    }, $outputFileName);
-}
-
-
-// public function exportPDF($id) 
-// {
-//     $qualityControl = QualityControl::with(['facility', 'selectedchecklistQuestions'])->findOrFail($id);
-
-//     $questions = $qualityControl->selectedchecklistQuestions->map(function ($q) {
-//         return [
-//             'id' => $q->id,
-//             //'audit_question_id' => $q->audit_question_id,
-//             'audit_area_name' => $q->audit_area_name,
-//             'question' => $q->question,
-//             'question_response' => $q->question_response ?? 'N/A',
-//             'finding_category' => $q->finding_category ?? 'N/A',
-//             'date_quality_control' => $q->date_quality_control ?? 'N/A',
-//             'finding_observation' => $q->finding_observation ?? 'N/A',
-//             'action_taken' => $q->action_taken ?? 'N/A',
-//             'problem_cause' => $q->problem_cause ?? 'N/A',
-//             'short_term_action' => $q->short_term_action ?? 'N/A',
-//             'long_term_action' => $q->long_term_action ?? 'N/A',
-//             'completion_date' => $q->completion_date ?? 'N/A',
-//             'follow_up_date' => $q->follow_up_date ?? 'N/A',
-//             'proposed_follow_up_action' => $q->proposed_follow_up_action ?? 'N/A',
-//             'date_of_closure' => $q->date_of_closure ?? 'N/A',
-//             'status' => $q->status ?? 'N/A',
-//             'created_at' => $q->created_at,
-//             'updated_at' => $q->updated_at,
-//             'evidence_file' => $q->evidence_file ?? 'N/A',
-//             'modified_at' => $q->modified_at ?? 'N/A',
-//             'immediate_corrective_action' => $q->immediate_corrective_action ?? 'N/A',
-//             'recommendations' => $q->recommendations ?? 'N/A',
-//             'reference' => $q->reference ?? 'N/A',
-//             'short_term_date' => $q->short_term_date ?? 'N/A',
-//             'long_term_date' => $q->long_term_date ?? 'N/A',
-//             'cap_file' => $q->cap_file ?? 'N/A',
-//             'cap_status' => $q->cap_status ?? 'N/A',
-//             'reason_for_rejection' => $q->reason_for_rejection ?? 'N/A',
-//         ];
-//     });
-
-//     $pdf = Pdf::loadView('pdfTemplates.selectedQualityControls', [
-//         'qualityControl' => $qualityControl,
-//         'questions' => $questions
-//     ])->setPaper('a4', 'landscape'); // landscape for many columns
-
-//     return $pdf->download('QualityControl_' . $qualityControl->id . '.pdf');
-// }
-
 
     public function approveQualityControl($id){
         $user = Auth::user();
@@ -622,5 +602,7 @@ public function exportPDF($id)
         }   
         return redirect()->route('quality-controls.show', $id)->with('success', 'Quality Control checklist approved successfully.');
     }
+
+
 }
 
