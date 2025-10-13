@@ -304,18 +304,11 @@ const sortedSecurityEquipments = computed(() => {
                   </div>
 
                 </div>
-                <!-- /.card-body -->
               </div>
-              <!-- /.card -->
-
-              <!-- /.card -->
             </div>
-            <!-- /.col -->
           </div>
-          <!-- /.row -->
-        </div><!-- /.container-fluid -->
+        </div>
       </div>
-      <!-- /.content -->
     </div>
   </AuthenticatedLayout>
 </template>

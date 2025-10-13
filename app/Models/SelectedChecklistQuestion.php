@@ -35,8 +35,15 @@ class SelectedChecklistQuestion extends Model
         'evidence_file',
         'cap_file',
         'cap_status',
-        'reason_for_rejection'
+        'reason_for_rejection',
+        'captured_image_file',
+        // 'risk',
     ];
+
+    protected $casts = [
+        'captured_image_file' => 'string',
+    ];
+
 
     public function scopeSearch(Builder $query , Request $request){       
         return $query->where(function($query) use ($request){
