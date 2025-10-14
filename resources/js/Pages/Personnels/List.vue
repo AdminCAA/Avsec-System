@@ -172,22 +172,20 @@ const sortedPersonnels = computed(() => {
     <Head title="Personnels" />
     <AuthenticatedLayout>
         <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
     <div class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h3 class="m-0">AVSEC Personnel</h3>
-          </div><!-- /.col -->
+            <h3 class="m-0"><strong>AVSEC Personnel</strong></h3>
+          </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><Link class="btn btn-info"  :href="route('personnels.create')"><i class="fas fa-plus"></i> Create</Link></li>             
             </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
+          </div>
+        </div>
+      </div>
     </div>
-    <!-- /.content-header -->
 
     <!-- Main content -->
     <div class="content">
@@ -283,34 +281,34 @@ const sortedPersonnels = computed(() => {
                             </div>                        
                         </div>
                       </td>
-                      <td class="text-center">
+                      <td>
                         <Link :href="route('personnels.show', personnel.id)">
                           {{ personnel.name }}
                         </Link>
                       </td>
-                      <td class="text-center">{{ personnel.gender }}</td>
-                      <td class="text-center">                        
+                      <td>{{ personnel.gender }}</td>
+                      <td>                        
                           {{ personnel.email }}           
                       </td>
-                      <td class="text-center">{{ personnel.nrc }}</td>
-                      <td class="text-center">                        
+                      <td>{{ personnel.nrc }}</td>
+                      <td>                        
                           {{ personnel.phone_number }}          
                       </td>
-                      <td class="text-center">
+                      <td>
                         <span class="badge p-2"
                               :class="personnel.is_certified === 'Certified' ? 'certified' : 'not-certified'">
                           {{ personnel.is_certified }}
                         </span>
                       </td>
 
-                      <td class="text-center">{{ personnel.user_type }}</td>
-                      <td class="text-center">                        
+                      <td>{{ personnel.user_type }}</td>
+                      <td>                        
                         <Link v-if="personnel.facility_id"  :href="route('facilities.show', personnel.facility_id)">
                           {{ personnel.facility_name }}
                         </Link>
                       </td>
 
-                      <td class="text-center">{{dayjs(personnel.created_at).format('DD-MM-YYYY')}}</td>
+                      <td>{{dayjs(personnel.created_at).format('DD-MM-YYYY')}}</td>
                       
                       <td class="text-center">
                         <div class="d-flex justify-content-end">

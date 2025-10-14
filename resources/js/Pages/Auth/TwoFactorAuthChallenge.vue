@@ -212,7 +212,7 @@ html {
 }
 
 .btn-primary:hover {
-  background: #333;
+  background-color: #005fa3;
 }
 
 .account-text {
@@ -272,12 +272,14 @@ html {
 .register-info {
   position: absolute;
   bottom: 40px;
-  background: rgba(255,255,255,0.9);
+  background: rgba(255, 255, 255, 0.5); /* reduced opacity */
   padding: 20px;
   border-radius: 12px;
   text-align: center;
   max-width: 80%;
+  backdrop-filter: blur(2px); 
 }
+
 
 .register-info h3 {
   margin-bottom: 10px;
