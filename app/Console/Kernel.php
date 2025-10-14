@@ -40,6 +40,24 @@ class Kernel extends ConsoleKernel
                  ->onOneServer()
                  ->runInBackground();
 
+        // --- NEW: Weekly Security Concerns Reminder ---
+        $schedule->command('security:weekly-reminder')
+                ->weekly()
+                ->fridays()
+                ->at('09:00')
+                ->withoutOverlapping()
+                ->onOneServer()
+                ->runInBackground();
+
+         //
+         $schedule->command('app:check-quality-control-overdua-status')
+                ->weekly()
+                ->fridays()
+                ->at('08:00')
+                ->withoutOverlapping()
+                ->onOneServer()
+                ->runInBackground();
+
     }
 
     protected function commands(): void

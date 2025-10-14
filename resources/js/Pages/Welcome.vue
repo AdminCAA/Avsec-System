@@ -49,15 +49,16 @@ const toggleMobileMenu = () => {
         <li>
           <Link :href="route('welcome')" class="active">Home</Link>
         </li>
-        <!-- <li>
-          <Link :href="route('aboutPage')">About us</Link>
-        </li> -->
         <li>
           <a href="https://www.caa.co.zm/about-us" target="_blank" rel="noopener noreferrer">
             About Us
           </a>
         </li>
-
+         <li>
+          <a href="https://www.caa.co.zm/documents" target="_blank" rel="noopener noreferrer">
+            Documents
+          </a>
+        </li>
 
         <template v-if="canLogin">
           <li v-if="$page.props.auth?.user">
@@ -73,18 +74,11 @@ const toggleMobileMenu = () => {
           </template>
         </template>
 
-        <!-- <li>
-          <Link :href="route('contactPage')" class="contact-btn spaced-link">
-          Contact us
-          </Link>
-        </li> -->
          <li>
           <a href="https://www.caa.co.zm/contact-us" target="_blank" rel="noopener noreferrer" class="contact-btn spaced-link">
             Contact Us
           </a>
         </li>
-
-        
 
       </ul>
     </nav>
