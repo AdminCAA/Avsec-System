@@ -53,6 +53,7 @@ const form = useForm({
   description: securityEquipment.description,
 });
 
+
 const isLoading = ref(false);
 const formErrors = ref({});
 
@@ -339,9 +340,9 @@ const deleteMaintenaceSchedule = (id) => {
                           <td>
                             <div class="d-flex justify-content-end">
 
-                              <!-- <Link class="btn btn-info btn-sm mr-2" :href="route('facilities.edit', schedule.id)">
+                              <Link class="btn btn-info btn-sm mr-2" :href="route('security-equipments.editSchedule', schedule.id)">
                           <i class="fas fa-edit"></i> <span>Edit</span>
-                        </Link> -->
+                        </Link>
                               <button class="btn btn-danger btn-sm" @click="deleteMaintenaceSchedule(schedule.id)">
                                 <i class="fas fa-trash"></i> <span></span>
                               </button>
