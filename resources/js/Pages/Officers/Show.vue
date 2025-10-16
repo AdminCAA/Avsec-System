@@ -364,7 +364,7 @@ const downloadPDF = async () => {
                                         <p class="text-muted text-center">Status: {{ personnel.is_certified }}</p>
                                         <p class="text-muted text-center">Gender: {{ personnel.gender }}</p>
                                         <p class="text-muted text-center">NRC: {{ personnel.nrc }}</p>
-                                        <p class="text-muted text-center">Operator:
+                                        <p v-if=" personnel.facility_id" class="text-muted text-center">Operator:
                                             <Link :href="route('facilities.show', personnel.facility_id)">
                                             {{ personnel.facility_name }}</Link>
                                         </p>
@@ -413,7 +413,7 @@ const downloadPDF = async () => {
                                                     :class="{ active: activeTab === 'Mandatory Course' }"
                                                     href="#mandatorycourse"
                                                     @click.prevent="activeTab = 'Mandatory Course'">
-                                                    <i class="fas fa-exclamation-circle"></i> Mandatory Course
+                                                    <i class="fas fa-university"></i> Mandatory Course
                                                 </a>
                                             </li>
 

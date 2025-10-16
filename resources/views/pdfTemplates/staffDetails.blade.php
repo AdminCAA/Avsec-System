@@ -71,6 +71,7 @@
             border-radius: 10px;
             border: 2px solid #ccc;
             margin-right: 25px;
+            margin-bottom: 10px;
         }
 
         .info-table {
@@ -109,10 +110,10 @@
     <h3 class="section-title">Personal Information</h3>
 
     <div class="info-section">
-        @if(!empty($personnel->portrait) && file_exists(public_path($personnel->portrait)))
-            <img src="{{ public_path($personnel->portrait) }}" alt="Portrait" class="portrait">
+        @if(!empty($personnel->portrait) && file_exists(public_path('storage/'. $personnel->portrait)))
+             <img src="{{ public_path('storage/'.$personnel->portrait) }}" alt="Portrait" class="portrait mb-2">           
         @else
-            <img src="{{ public_path('assets/default-avatar.png') }}" alt="Default Portrait" class="portrait">
+            <img src="{{ public_path('assets/avatar.png') }}" alt="Default Portrait" class="portrait">
         @endif
 
         <table class="info-table">

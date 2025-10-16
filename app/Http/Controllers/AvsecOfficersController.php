@@ -108,12 +108,13 @@ class AvsecOfficersController extends Controller
     public function show(string $id)
     {
         
-        $personnel = User::findOrFail($id);
+        
+        $personnel = User::findOrFail($id);        
         $qualifications = $personnel->qualifications()->orderBy('created_at', 'desc')->get();
         $certifications = $personnel->certifications()->orderBy('created_at', 'desc')->get();
         $mandatorycourse = $personnel->mandatorycourse()->orderBy('created_at', 'desc')->get();
         $specialisedtraining = $personnel->specialisedtraining()->orderBy('created_at', 'desc')->get();
-
+        
         return Inertia::render('Officers/Show', [
             'personnel' => $personnel,
             'qualifications' => $qualifications,
