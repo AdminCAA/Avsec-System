@@ -24,6 +24,7 @@ use App\Http\Controllers\QualityControlReportController;
 use App\Http\Controllers\DepartmentsController;
 use App\Http\Controllers\MandatoryCourseController;
 use App\Http\Controllers\SpecialisedTrainingController;
+use App\Http\Controllers\ProtocolQuestionsController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -261,6 +262,28 @@ Route::middleware(['auth','verified'])->group(function () {
 
 
 
+    Route::get('/quality-controls/{id}/export-pdf', [QualityControlController::class, 'exportPDF'])->name('quality-controls.exportPDF');
+
+    //Protocol Questions Routes
+    //Facility Routes
+    Route::get('/protocolquestions', [ProtocolQuestionsController::class, 'index'])->name('protocolquestions.index');
+    Route::get('/protocolquestions/create', [ProtocolQuestionsController::class, 'create'])->name('protocolquestions.create');
+    Route::post('/protocolquestions', [ProtocolQuestionsController::class, 'store'])->name('protocolquestions.store');
+    Route::get('/protocolquestions/{id}/edit', [ProtocolQuestionsController::class, 'edit'])->name('protocolquestions.edit');
+    Route::post('/protocolquestions/{id}', [ProtocolQuestionsController::class, 'update'])->name('protocolquestions.update');
+    Route::delete('/protocolquestions/{id}', [ProtocolQuestionsController::class, 'destroy'])->name('protocolquestions.destroy');
+    Route::get('/protocolquestions/{id}/show', [ProtocolQuestionsController::class, 'show'])->name('protocolquestions.show');    
+    Route::get('/protocolquestions/{id}/createReference', [ProtocolQuestionsController::class, 'createReference'])->name('protocolquestions.createReference');
+    Route::post('/protocolquestions/{id}/storeReference', [ProtocolQuestionsController::class, 'storeReference'])->name('protocolquestions.storeReference');
+    Route::get('/protocolquestions/{id}/editReference', [ProtocolQuestionsController::class, 'editReference'])->name('protocolquestions.editReference');
+    Route::post('/protocolquestions/{id}/updateReference', [ProtocolQuestionsController::class, 'updateReference'])->name('protocolquestions.updateReference');
+    Route::delete('/protocolquestions/{id}/destroyReferenceDocument', [ProtocolQuestionsController::class, 'destroyReferenceDocument'])->name('protocolquestions.destroyReferenceDocument');
+
+    Route::get('/protocolquestions/{id}/createEvidence', [ProtocolQuestionsController::class, 'createEvidence'])->name('protocolquestions.createEvidence');
+    Route::post('/protocolquestions/{id}/storeEvidence', [ProtocolQuestionsController::class, 'storeEvidence'])->name('protocolquestions.storeEvidence');
+    Route::get('/protocolquestions/{id}/editEvidence', [ProtocolQuestionsController::class, 'editEvidence'])->name('protocolquestions.editEvidence');
+    Route::post('/protocolquestions/{id}/updateEvidence', [ProtocolQuestionsController::class, 'updateEvidence'])->name('protocolquestions.updateEvidence');
+    Route::delete('/protocolquestions/{id}/destroyEvidenceDocument', [ProtocolQuestionsController::class, 'destroyEvidenceDocument'])->name('protocolquestions.destroyEvidenceDocument');
 
 });
 
