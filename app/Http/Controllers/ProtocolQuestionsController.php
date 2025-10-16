@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ReferenceDocument;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 
 class ProtocolQuestionsController extends Controller implements HasMiddleware
@@ -368,4 +369,21 @@ class ProtocolQuestionsController extends Controller implements HasMiddleware
             200
         );          
     }
+
+    public function exportPDF()
+    {
+        $protocolQuestions = ProtocolQuestion::with(['referenceDocuments', 'evidenceDocuments'])->get();
+
+        $pdf = Pdf::loadView('pdfTemplates.protocolQuestions', compact('protocolQuestions'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('protocol_questions.pdf');
+    }
+
+
+
+
+
+
+
 }
