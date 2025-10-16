@@ -149,6 +149,43 @@ class SecurityEquipmentController extends Controller implements HasMiddleware
         );
     }
 
+//    public function editSchedule(string $id){
+//         $securityEquipment = SecurityEquipment::findOrFail($id);
+//         return Inertia::render('SecurityEquipments/EditSchedule',
+//             [
+//                 'securityEquipment' => $securityEquipment,
+//             ]
+//         );
+//     }
+
+    // public function editSchedule(string $id)
+    // {
+    //     $securityEquipment = SecurityEquipment::findOrFail($id);
+
+    //     // Fetch the latest or specific maintenance schedule for this equipment
+    //     $maintainanceSchedule = $securityEquipment->maintainanceSchedules()->latest()->first();
+
+    //     return Inertia::render('SecurityEquipments/EditSchedule', [
+    //         'securityEquipment' => $securityEquipment,
+    //         'maintainanceSchedules' => $maintainanceSchedule,
+    //     ]);
+    // }
+
+    public function editSchedule(string $id)
+{
+    $securityEquipment = SecurityEquipment::findOrFail($id);
+
+    // Fetch the latest or specific maintenance schedule for this equipment
+    $maintainanceSchedule = MaintenanceSchedule::findOrFail($id);
+
+    return Inertia::render('SecurityEquipments/EditSchedule', [
+        'securityEquipment' => $securityEquipment,
+        'maintainanceSchedules' => $maintainanceSchedule,
+    ]);
+}
+
+
+
     public  function storeSchedule(Request $request){
         $validator = Validator::make($request->all(),[
             'id' => 'required|integer',
@@ -206,6 +243,71 @@ class SecurityEquipmentController extends Controller implements HasMiddleware
             200
         );
     }
+
+
+// public function updateSchedule(Request $request, string $id)
+// {
+//     $schedule = MaintenanceSchedule::findOrFail($id);
+
+//     $validated = $request->validate([
+//         'last_performed_date' => 'required|date',
+//         'next_due_date' => 'required|date|after_or_equal:last_performed_date',
+//         'status' => 'required|string',
+//         'maintenance_type' => 'required|string',
+//         'frequency' => 'required|string',
+//         'assigned_to' => 'required|string',
+//         'description' => 'nullable|string',
+//     ]);
+
+//     $schedule->update($validated);
+
+//     return back()->with('success', 'Maintenance schedule updated successfully.');
+// }
+
+
+public function updateSchedule(Request $request, string $id)
+{
+    $validator = Validator::make($request->all(), [
+        'last_performed_date' => 'nullable|date',
+        'next_due_date' => 'nullable|date|after_or_equal:last_performed_date',
+        'maintenance_type' => 'required|string',
+        'status' => 'required|string',
+        'frequency' => 'required|string',
+        'assigned_to' => 'nullable|string',
+        'description' => 'nullable|string',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    // Find the maintenance schedule record
+    $maintenanceSchedule = MaintenanceSchedule::findOrFail($id);
+
+    // Update fields
+    $maintenanceSchedule->update([
+        'maintenance_type' => $request->maintenance_type,
+        'last_performed_date' => $request->last_performed_date,
+        'next_due_date' => $request->next_due_date,
+        'status' => $request->status,
+        'frequency' => $request->frequency,
+        'assigned_to' => $request->assigned_to,
+        'description' => $request->description,
+    ]);
+
+     return redirect()->route('security-equipments.index')
+                        ->with('success', 'Security Equipment created successfully.');
+
+    // return redirect()
+    // ->route('security-equipments.edit', $maintenanceSchedule->security_equipment_id)
+    // ->with('success', 'Maintenance schedule updated successfully.');
+
+
+    // return redirect()
+    //     ->route('security-equipments.index', $maintenanceSchedule->security_equipment_id)
+    //     ->with('success', 'Maintenance schedule updated successfully.');
+}
+
 
 
 }

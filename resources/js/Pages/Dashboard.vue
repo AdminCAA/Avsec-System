@@ -932,9 +932,6 @@ const exportPdf = async () => {
             <hr /><br />
       </div>
       </div>
-
-      
-      <!-- /.content -->
     </div>
   </AuthenticatedLayout>
 </template>
@@ -944,6 +941,10 @@ const exportPdf = async () => {
   font-family: 'Poppins', 'Segoe UI', sans-serif;
 }
 
+.flex-grow-1 {
+    flex-grow: 1 !important;
+    padding-left: 8px;
+}
 
 .small-box {
   transition: transform 0.2s ease-in-out;

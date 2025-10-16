@@ -156,7 +156,17 @@
                           <i class="fas fa-chevron-circle-right nav-icon"></i>
                       <p>Trainings</p>
                       </Link>
-                  </li>                  
+                  </li>   
+                  
+                    <li class="nav-item">
+                      <Link :href="route('officers.index')" class="nav-link"
+                      :class="{ active: currentPath.startsWith('/officers') }"
+                      >
+                          <i class="fas fa-chevron-circle-right nav-icon"></i>
+                      <p>Avsec Officers</p>
+                      </Link>
+                  </li> 
+
                   </ul>
               </li>
 
