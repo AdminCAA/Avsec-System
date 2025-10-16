@@ -12,7 +12,8 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
           <div class="image">
-          <img :src="avatar" class="img-circle elevation-2" alt="User Image">
+          <img :src="currentUser.portrait ?`/storage/${currentUser.portrait}`
+                                                    : '/storage/portraits/avatar.png'" class="img-circle elevation-2" alt="User Image">
           </div>
           <div class="info">
           <Link :href="route('profile.edit')" class="d-block">{{ currentUser.name }}</Link>
@@ -300,12 +301,13 @@
     import axios from 'axios';
 
 
-defineProps({
+const {currentUser} = defineProps({
     currentUser: {
         type: Object,
         required: true
     }
 });
+
 const page = usePage()
 const roles = page.props.auth.user.roles;
 

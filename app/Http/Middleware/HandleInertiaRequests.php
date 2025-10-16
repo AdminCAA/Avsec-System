@@ -36,7 +36,7 @@ class HandleInertiaRequests extends Middleware
             // ],
             'auth' => [
                 'user' => $request->user()
-                    ? $request->user()->only('id', 'name', 'email','email_verified_at') + [
+                    ? $request->user()->only('id', 'name', 'email','email_verified_at','portrait') + [
                         'two_factor_enabled' => $request->user()->two_factor_enabled,
                         'roles' => $request->user()->roles->pluck('name'), // Get only the role names                        
                     ]
