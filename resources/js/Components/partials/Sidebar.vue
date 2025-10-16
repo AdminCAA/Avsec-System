@@ -189,13 +189,11 @@
               </li>
              
                                         
-              <li v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator','AVSEC Inspector'])" class="nav-item">
-                  <a href="#" class="nav-link">
-                      <i class="nav-icon fas fa-toolbox"></i>
-                  <p>
-                      AVSEC Documents                  
-                  </p>
-                  </a>
+              <li v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator','AVSEC Inspector'])" class="nav-item">                 
+                  <Link :href="route('protocolquestions.index')" class="nav-link"
+                        :class="{ active: currentPath.startsWith('/protocolquestions') }">
+                        <i class="nav-icon fas fa-toolbox"></i> <p> Protocol Questions</p>
+                  </Link>
               </li>
               
               <li v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator','AVSEC Inspector'])" class="nav-item">
@@ -301,7 +299,6 @@ defineProps({
 const page = usePage()
 const roles = page.props.auth.user.roles;
 
-console.log('User Roles:', roles);
 
 // Function to check if the user has a specific role
 const hasRoles = (roles) => {
