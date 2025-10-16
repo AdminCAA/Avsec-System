@@ -121,11 +121,13 @@ class FacilityController extends Controller implements HasMiddleware
         $audits = $facility->qualityControls()->with('users')->where('control_type', 'Audit')->paginate(2, ['*'], 'audits_page');
         $inspections = $facility->qualityControls()->with('users')->where('control_type', 'Inspection')->paginate(2, ['*'], 'inspections_page');
         $securityTests = $facility->qualityControls()->with('users')->where('control_type', 'Security Test')->paginate(2, ['*'], 'security_tests_page');
+        $documentApprovals = $facility->qualityControls()->with('users')->where('control_type', 'Document Approval')->paginate(2, ['*'], 'document_approval_page');
 
         $qualityControlCounts = [
             'audits' => $facility->qualityControls->where('control_type', 'Audit')->count(),
             'inspections' => $facility->qualityControls->where('control_type', 'Inspection')->count(),
             'securityTests' => $facility->qualityControls->where('control_type', 'Security Test')->count(),
+            'documentApprovals' => $facility->qualityControls->where('control_type', 'Document Approval')->count(),
         ];
 
         $operatorStats = Facility::where('id', $id)
@@ -155,7 +157,8 @@ class FacilityController extends Controller implements HasMiddleware
             'qualityControlCounts' => $qualityControlCounts,
             'audits' => $audits,
             'inspections' => $inspections,
-            'securityTests' => $securityTests,    
+            'securityTests' => $securityTests,   
+            'documentApprovals' => $documentApprovals, 
             'usersCount'  => $usersCount,
             'facility' => $operatorStats
         ]);

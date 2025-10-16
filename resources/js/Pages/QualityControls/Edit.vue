@@ -229,8 +229,8 @@ const handleClick = () => {
                 <li class="breadcrumb-item">
                   <button class="btn btn-success mr-2" :class="{ 'disabled': !canStart }" @click.prevent="handleClick"
                     :href="route('quality-controls.show', qualityControl.id)">
-                    <i class="fas fa-binoculars"></i>
-                    Start {{ qualityControl.control_type }}
+                    <i class="fas fa-clipboard-check"></i>
+                    Checklist - {{ qualityControl.control_type }}
                   </button>
                 </li>
                 <li class="breadcrumb-item">

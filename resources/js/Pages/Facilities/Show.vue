@@ -10,7 +10,8 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 import InputError from '@/Components/InputError.vue';
 import dayjs from 'dayjs';
 
-const { facility, qualityControlCounts, audits, inspections, securityTests, usersCount, operatorStats } = defineProps({
+const { facility, qualityControlCounts, audits, inspections, securityTests,documentApprovals, usersCount, operatorStats }
+ = defineProps({
   facility: {
     type: Object,
     required: true
@@ -22,15 +23,19 @@ const { facility, qualityControlCounts, audits, inspections, securityTests, user
   audits: { type: Object, required: true },
   inspections: { type: Object, required: true },
   securityTests: { type: Object, required: true },
+  documentApprovals: { type: Object, required: true },
   usersCount: { type: Number, required: true },
 });
 
 
+
+console.log(qualityControlCounts)
 const isLoading = ref(false);
 const formErrors = ref({});
 const qc = facility.quality_controls || [];
-const controlTypes = ['Audit', 'Inspection', 'Security Test']
+const controlTypes = ['Audit', 'Inspection', 'Security Test','Document Approval'];
 const activeTab = ref('Audit');
+
 const filteredQualityControls = computed(() => {
   return qc.filter(qc => qc.control_type === activeTab.value);
 });
@@ -40,7 +45,7 @@ const paginatedControls = computed(() => {
     case 'Audit': return audits;
     case 'Inspection': return inspections;
     case 'Security Test': return securityTests;
-    case 'Document Review': return documentReviews;
+    case 'Document Approval': return documentApprovals;
     default: return [];
   }
 });
@@ -299,6 +304,10 @@ const exportPdf = async () => {
                             qualityControlCounts.securityTests }}</span></h5>
                       </li>
                       <li class="list-group-item">
+                        <h5>Document Approvals <span class="float-right badge bg-warning">{{
+                            qualityControlCounts.documentApprovals }}</span></h5>
+                      </li>
+                      <li class="list-group-item">
                         <h5>Certified Personnels <span class="float-right badge bg-danger">{{ usersCount }}</span></h5>
                       </li>
                     </ul>
@@ -349,7 +358,7 @@ const exportPdf = async () => {
                             </div>
                             <div class="col-sm-12">
                               <ol class="float-sm-right">
-                                <Link class="btn btn-info" :href="route('quality-controls.edit', qc.id)">
+                                <Link class="btn btn-info" :href="route('quality-controls.show', qc.id)">
                                 <i class="fas fa-list"></i> Details
                                 </Link>
                               </ol>
