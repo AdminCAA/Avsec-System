@@ -10,6 +10,7 @@ use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\QualityControlController;
 use App\Http\Controllers\AuditQuestionController;
 use App\Http\Controllers\AuditAreaCategoryController;
+use App\Http\Controllers\AvsecOfficersController;
 use App\Http\Controllers\CertificationsController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PersonnelController;
@@ -21,6 +22,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FollowupController;
 use App\Http\Controllers\QualityControlReportController;
 use App\Http\Controllers\DepartmentsController;
+use App\Http\Controllers\MandatoryCourseController;
+use App\Http\Controllers\SpecialisedTrainingController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -147,6 +150,13 @@ Route::middleware(['auth','verified'])->group(function () {
     
 
 
+
+    
+    Route::get('/security-equipments/{id}/editSchedule', [SecurityEquipmentController::class, 'editSchedule'])->name('security-equipments.editSchedule');
+    Route::post('/security-equipments/schedule/{id}', [SecurityEquipmentController::class, 'updateSchedule'])->name('security-equipments.updateSchedule');
+
+
+
     //Training Routes
     Route::get('/trainings', [TrainingController::class, 'index'])->name('trainings.index');
     Route::get('/trainings/create', [TrainingController::class, 'create'])->name('trainings.create');
@@ -216,24 +226,39 @@ Route::middleware(['auth','verified'])->group(function () {
     //Two Factor Authentication
     Route::post('/users/disable2fa/{id}', [UserController::class, 'disable2fa'])->name('users.disable2fa');
 
-
-
-
     // Export PDF Route
     Route::post('/dashboard/export-pdf', [DashboardController::class, 'exportPdf'])->name('dashboard.exportPdf');
     Route::get('/facilities/{id}/download-pdf', [FacilityController::class, 'downloadPdf'])->name('facilities.downloadPdf');
     Route::get('/personnels/{id}/download', [PersonnelController::class, 'downloadPersonnelPDF'])->name('personnels.download');
-
-
-
-
-
-
-
-Route::get('/quality-controls/{id}/export-pdf', [QualityControlController::class, 'exportPDF'])
-    ->name('quality-controls.exportPDF');
-
+    Route::get('/quality-controls/{id}/export-pdf', [QualityControlController::class, 'exportPDF'])->name('quality-controls.exportPDF');
+        
+    //Officers Training Routes
+    Route::get('/officers', [AvsecOfficersController::class, 'index'])->name('officers.index');
+    Route::get('/officers/create', [AvsecOfficersController::class, 'create'])->name('officers.create');
+    Route::post('/officers', [AvsecOfficersController::class, 'store'])->name('officers.store');
+    Route::get('/officers/{id}/show', [AvsecOfficersController::class, 'show'])->name('officers.show');
+    Route::get('/officers/{id}/edit', [AvsecOfficersController::class, 'edit'])->name('officers.edit');
+    Route::post('/officers/{id}', [AvsecOfficersController::class, 'update'])->name('officers.update');
+    Route::delete('/officers/{id}', [AvsecOfficersController::class, 'destroy'])->name('officers.destroy');    
     
+    //Mandatory course Routes
+    Route::get('/personnels/{id}/mandatorycourses/create', [MandatoryCourseController::class, 'create'])->name('mandatorycourses.create');
+    Route::post('/mandatorycourses/store', [MandatoryCourseController::class, 'store'])->name('mandatorycourses.store');
+    Route::delete('/officers/{id}', [MandatoryCourseController::class, 'destroy'])->name('mandatorycourses.destroy');    
+    Route::get('/mandatorycourses/{id}/edit', [MandatoryCourseController::class, 'edit'])->name('mandatorycourses.edit');
+    Route::post('/mandatorycourses/{id}', [MandatoryCourseController::class, 'update'])->name('mandatorycourses.update');
+
+    //specialised trainig routes
+    Route::get('/personnels/{id}/specialisedtrainings/create', [SpecialisedTrainingController::class, 'create'])->name('specialisedtrainings.create');
+    Route::post('/specialisedtrainings/store', [SpecialisedTrainingController::class, 'store'])->name('specialisedtrainings.store');
+    Route::delete('/specialisedtrainings/{id}', [SpecialisedTrainingController::class, 'destroy'])->name('specialisedtrainings.destroy');
+    Route::get('/specialisedtrainings/{id}/edit', [SpecialisedTrainingController::class, 'edit'])->name('specialisedtrainings.edit');
+    Route::post('/specialisedtrainings/{id}', [SpecialisedTrainingController::class, 'update'])->name('specialisedtrainings.update');
+  
+
+
+    Route::get('/officers/{id}/download', [MandatoryCourseController::class, 'downloadStaffPDF'])->name('officers.download');
+
 
 
 

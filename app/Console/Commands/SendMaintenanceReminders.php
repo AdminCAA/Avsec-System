@@ -10,29 +10,42 @@ use Carbon\Carbon;
 
 class SendMaintenanceReminders extends Command
 {
-    
-
     protected $signature = 'maintenance:send-reminders';
 
-    protected $description = 'Send maintenance reminders 14 days before next due date';
+    protected $description = 'Send maintenance reminders 14 days before next due date and mark overdue schedules';
 
     public function handle()
     {
-        $targetDate = Carbon::now()->addDays(14)->toDateString();
+        $today = Carbon::now()->toDateString();
+        $reminderDate = Carbon::now()->addDays(14)->toDateString();
 
-        $schedules = MaintenanceSchedule::whereDate('next_due_date', $targetDate)->get();
+        // 1️⃣ Send reminders 14 days before due date
+        $upcomingSchedules = MaintenanceSchedule::whereDate('next_due_date', $reminderDate)->get();
 
-        if ($schedules->isEmpty()) {
+        if ($upcomingSchedules->isEmpty()) {
             $this->info('No maintenance reminders to send today.');
-            return;
+        } else {
+            foreach ($upcomingSchedules as $schedule) {
+                Mail::to('umoyoprintex@gmail.com')->send(new MaintenanceReminderMail($schedule));
+                $this->info("Reminder sent for equipment ID: {$schedule->securityEquipment->id}");
+            }
         }
 
-        foreach ($schedules as $schedule) {
-            Mail::to('umoyoprintex@gmail.com')->send(new MaintenanceReminderMail($schedule));
-            $this->info("Reminder sent for equipment ID: {$schedule->securityEquipment->id}");
+        // 2️⃣ Mark overdue schedules
+        $overdueSchedules = MaintenanceSchedule::whereDate('next_due_date', '<', $today)
+            ->where('status', '!=', 'Overdue')
+            ->get();
+
+        if ($overdueSchedules->isEmpty()) {
+            $this->info('No overdue schedules to update.');
+        } else {
+            foreach ($overdueSchedules as $schedule) {
+                $schedule->update(['status' => 'Overdue']);
+                $this->info("Schedule ID {$schedule->id} marked as Overdue");
+            }
         }
 
-        $this->info('All reminders have been sent successfully.');
+        $this->info('Maintenance reminders and overdue updates completed successfully.');
     }
 }
 
