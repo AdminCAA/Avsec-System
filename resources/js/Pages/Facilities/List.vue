@@ -287,7 +287,7 @@ const sortedFacilities = computed(() => {
                           @click="selectRow(facility.id)">
                           <td>{{ (facilities.current_page - 1) * facilities.per_page + index + 1 }}</td>
                           <td>
-                            <Link :href="route('facilities.edit', facility.id)">
+                            <Link :href="route('facilities.show', facility.id)">
                             {{ facility.name }}
                             </Link>
                           </td>
