@@ -112,7 +112,6 @@ const toggleMobileMenu = () => {
   min-height: 100vh;
   background-color: #000;
   color: #fff;
-  /* font-family: "Arial", sans-serif; */
   font-family: 'Poppins', 'Segoe UI', sans-serif;
   /* Updated font */
   display: flex;
