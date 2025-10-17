@@ -2,69 +2,78 @@
 /* @tailwind components; */
 /* @tailwind utilities; */
 
-
-
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 @import "@fortawesome/fontawesome-free/css/all.css";
 @import "./adminlteCss/adminlte.css";
 
+/* Global Font */
+html, body, #app {
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+* {
+    font-family: inherit;
+}
+
 /* Loader wrapper */
 #preloader {
-    position: fixed;      /* .position-fixed */
-    inset: 0;             /* top-0 start-0 w-100 h-100 */
+    position: fixed;
+    inset: 0;
     width: 100%;
-    height: 100vh;        /* full height */
-    background-color: #fff; /* .bg-white */
-    display: flex;        /* .d-flex */
-    justify-content: center; /* .justify-content-center */
-    align-items: center;     /* .align-items-center */
-    z-index: 1050;        /* Bootstrap modal z-index */
+    height: 100vh;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
     transition: opacity 1s ease;
     opacity: 1;
-  }
-  
-  /* Hidden state (used for fading out) */
-  #preloader.fade-out {
+}
+
+/* Hidden state (used for fading out) */
+#preloader.fade-out {
     opacity: 0;
-  }
-  
-  /* Logo image */
-  #preloader img {
+}
+
+/* Logo image */
+#preloader img {
     width: 100px;
     height: 100px;
     animation: spin 2s linear infinite;
-  }
-  
-  /* Spinner animation */
-  @keyframes spin {
+}
+
+/* Spinner animation */
+@keyframes spin {
     0% {
-      transform: rotate(0deg);
+        transform: rotate(0deg);
     }
     100% {
-      transform: rotate(360deg);
+        transform: rotate(360deg);
     }
-  }
-  
-  /* Custom utility for sliding text/image animation */
-  @keyframes slideLeftInfinite {
+}
+
+/* Custom utility for sliding text/image animation */
+@keyframes slideLeftInfinite {
     0% {
-      transform: translateX(-20px);
-      opacity: 0;
+        transform: translateX(-20px);
+        opacity: 0;
     }
     20% {
-      transform: translateX(0);
-      opacity: 1;
+        transform: translateX(0);
+        opacity: 1;
     }
     80% {
-      transform: translateX(0);
-      opacity: 1;
+        transform: translateX(0);
+        opacity: 1;
     }
     100% {
-      transform: translateX(-20px);
-      opacity: 0;
+        transform: translateX(-20px);
+        opacity: 0;
     }
-  }
-  
-  .animate-slide-left-infinite {
+}
+
+.animate-slide-left-infinite {
     animation: slideLeftInfinite 8s ease-in-out infinite;
-  }
-  
+}
