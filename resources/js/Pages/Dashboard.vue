@@ -27,7 +27,78 @@ const hasRoles = (roles) => {
     return requiredRoles.some(role => userRoles.includes(role))
 }
 
-
+const protocolQuesionPieOptions = computed(() => ({
+  accessibility: {
+    enabled: false
+  },
+  chart: {
+    type: 'pie',
+    backgroundColor: '#EEEEEE'
+  },
+  credits: {
+    enabled: false
+  },
+  exporting: {
+    enabled: true,
+    buttons: {
+      contextButton: {
+        menuItems: [
+          'printChart',
+          'separator',
+          'downloadPNG',
+          'downloadJPEG',
+          'downloadPDF',
+          'downloadSVG'
+        ],
+        symbolStroke: '#3498db',
+        theme: {
+          fill: '#fff',
+          stroke: '#ccc',
+          states: {
+            hover: { fill: '#f0f0f0' },
+            select: { fill: '#e0e0e0' }
+          }
+        }
+      }
+    }
+  },
+  title: {
+    text: 'PQs Status Summary',
+    style: { fontSize: '18px', fontWeight: 'bold', color: '#333' }
+  },
+  tooltip: {
+    pointFormat: '<b>{point.y}</b> ({point.percentage:.1f}%)'
+  },
+  plotOptions: {
+    pie: {
+      allowPointSelect: true,
+      cursor: 'pointer',
+      dataLabels: {
+        enabled: true,
+        format: '{point.name}: {point.y}',
+        style: { fontSize: '12px', fontWeight: 'bold', color: '#000' }
+      },
+      showInLegend: true
+    }
+  },
+  legend: {
+    align: 'center',
+    verticalAlign: 'bottom',
+    layout: 'horizontal',
+    itemStyle: { fontWeight: 'normal', color: '#333' }
+  },
+  series: [
+    {
+      name: 'Statuses',
+      colorByPoint: true,
+      data: [
+        { name: 'Open', y: props.stats.protocolQuestionsOpen, color: '#F08787' },
+        { name: 'In progress', y: props.stats.protocolQuestionsInProgress, color: '#FFE797  ' },
+        { name: 'Closed', y: props.stats.protocolQuestionsClosed, color: '#7ADAA5' }
+      ]
+    }
+  ]
+}));
 
 
 const pieOptions = computed(() => ({
@@ -36,7 +107,7 @@ const pieOptions = computed(() => ({
   },
   chart: {
     type: 'pie',
-    backgroundColor: '#ffffff'
+    backgroundColor: '#EEEEEE'
   },
   credits: {
     enabled: false
@@ -110,7 +181,7 @@ const operatorOptions = {
   },
   chart: {
     type: 'column',
-    backgroundColor: '#ffffff'
+    backgroundColor: '#EEEEEE'
   },
   credits: {
     enabled: false
@@ -239,7 +310,7 @@ const operatorStatisticOptions = computed(() => ({
   },
   chart: {
     type: 'column',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#EEEEEE',
     spacingTop: 20,
     spacingBottom: 20,
     style: {
@@ -714,7 +785,13 @@ const exportPdf = async () => {
                 <Chart :options="pieOptions" />
               </div>
             </div>
-            <div class="col-md-8 mb-4">
+            <div class="col-md-4 mb-4">
+              <div>
+                <Chart :options="protocolQuesionPieOptions" />
+              </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
               <Chart :options="operatorOptions" />
             </div>
             <div class="col-md-12 mb-4">

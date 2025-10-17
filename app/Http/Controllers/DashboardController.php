@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Facility;
+use App\Models\ProtocolQuestion;
 use App\Models\QualityControl;
 use App\Models\SelectedChecklistQuestion;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -155,6 +156,10 @@ class DashboardController extends Controller implements HasMiddleware
         $completedQualityControls = $qualityControls->where('status', 'Completed')->count();
         $overdueQualityControls = $qualityControls->where('status', 'Overdue')->count();
 
+        $protocolQuestionsInProgress = ProtocolQuestion::where('status', 'In Progress')->count();
+        $protocolQuestionsOpen = ProtocolQuestion::where('status', 'Open')->count();
+        $protocolQuestionsClosed = ProtocolQuestion::where('status', 'Closed')->count();
+
         return [                                                           
             'totalAudits' => $audits,
             'totalInspections' => $inspections,
@@ -171,6 +176,11 @@ class DashboardController extends Controller implements HasMiddleware
             'inProgressQualityControls' => $inProgressQualityControls,
             'completedQualityControls' => $completedQualityControls,
             'overdueQualityControls' => $overdueQualityControls,
+
+            // Protocol Questions stats
+            'protocolQuestionsInProgress' => $protocolQuestionsInProgress,
+            'protocolQuestionsOpen' => $protocolQuestionsOpen,
+            'protocolQuestionsClosed' => $protocolQuestionsClosed,
 
             'operatorStats'=> $result, // Quality control stats for each operator            
         ]; 
