@@ -188,13 +188,13 @@
                     <td>{{ $question->responsible_entity }}</td>
                     {{-- <td>{{ $question->status }}</td> --}}
                     <td style="
-                        @if($question->status === 'Open') background-color: #F08787; 
-                        @elseif($question->status === 'In Progress') background-color: #FFE797; 
-                        @elseif($question->status === 'Closed') background-color: #7ADAA5; 
-                        @endif
-                        text-align: center;
-                        font-weight: bold;
-                    ">
+                            @if($question->status === 'Open') background-color: #F08787; 
+                            @elseif($question->status === 'In Progress') background-color: #FFE797; 
+                            @elseif($question->status === 'Closed') background-color: #7ADAA5; 
+                            @endif
+                            text-align: center;
+                            font-weight: bold;
+                        ">
                         {{ $question->status }}
                     </td>
 
