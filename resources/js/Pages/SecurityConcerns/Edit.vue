@@ -374,7 +374,7 @@ const deleteFollowup = (id) => {
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item">
-                                    <button @click="generateCAR" class="btn  btn-primary">
+                                    <button @click="generateCAR" class="btn  btn-info">
                                         <i class="fas fa-file-pdf"></i> Generate CAR
                                     </button>
                                 </li>
