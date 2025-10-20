@@ -1,8 +1,9 @@
 <script setup>
-//import Swal from 'sweetalert2';
+import Swal from 'sweetalert2';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Pagination from '@/Components/Pagination.vue'; ``
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
+import axios from 'axios';
 import dayjs from 'dayjs';
 import { ref, computed, watch } from 'vue';
 
@@ -214,10 +215,72 @@ const downloadPDF = async () => {
   }
 };
 
-
 const trimText = (text, length = 50) => {
   if (!text) return '';
   return text.length > length ? text.substring(0, length) + '...' : text;
+};
+
+
+const showUploadModal = ref(false);
+const isUploading = ref(false);
+
+const uploadExcel = async () => {
+  const file = document.getElementById('file').files[0];
+  if (!file) {
+    Swal.fire('No File Selected', 'Please choose an Excel file to upload.', 'warning');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    isUploading.value = true;
+
+    await axios.post(route('protocolquestions.importProtocol'), formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Upload Successful',
+      text: 'Protocol Questions imported successfully!',
+      timer: 1500,
+      showConfirmButton: false,
+    });
+
+    showUploadModal.value = false;
+    router.visit(route('protocolquestions.index'), { preserveScroll: true, replace: true });
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Upload Failed',
+      text: 'Please check your Excel file format.',
+    });
+  } finally {
+    isUploading.value = false;
+  }
+};
+
+const downloadTemplate = async () => {
+  try {
+    isDownloading.value = true;
+    const response = await axios.get(route('protocolquestions.template'), {
+      responseType: 'blob',
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'protocol_questions_template.xlsx');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    Swal.fire('Download Failed', 'Unable to download template.', 'error');
+  } finally {
+    isDownloading.value = false;
+  }
 };
 
 
@@ -241,6 +304,13 @@ const trimText = (text, length = 50) => {
                   Create
                   </Link>
                 </li>
+
+                <li class="breadcrumb-item">
+                  <button class="btn btn-info" @click="showUploadModal = true">
+                    <i class="fas fa-upload"></i> Bulk Upload
+                  </button>
+                </li>
+
 
                 <li class="breadcrumb-item">
                   <Link class="btn btn-info" @click="downloadPDF" :disabled="isDownloading"
@@ -352,20 +422,12 @@ const trimText = (text, length = 50) => {
 
                           <td class="text-center">{{ question.pq_number }}</td>
 
-                          <!-- <td class="text-center">
-                            <Link :href="route('protocolquestions.edit', question.id)">
-                            {{ question.question }}
-                            </Link>
-                          </td> -->
-
                           <!-- Question details Column -->
                           <td class="text-center" :title="question.question">
                             <Link :href="route('protocolquestions.edit', question.id)">
                             {{ trimText(question.question, 50) }}
                             </Link>
                           </td>
-
-                          <!-- <td class="text-center">{{ question.answer_details }}</td> -->
 
                           <!-- Answer Details Column -->
                           <td class="text-center" :title="question.answer_details">
@@ -464,6 +526,53 @@ const trimText = (text, length = 50) => {
           </div>
         </div>
       </div>
+
+      <!-- Modal -->
+      <div v-if="showUploadModal" class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+          <div class="modal-content rounded-3 shadow">
+            <div class="modal-header bg-info text-white">
+              <h5 class="modal-title">
+                <i class="fas fa-upload"></i> Bulk Upload Protocol Questions
+              </h5>
+              <button type="button" class="btn-close" @click="showUploadModal = false"></button>
+            </div>
+
+            <div class="modal-body">
+              <form @submit.prevent="uploadExcel">
+                <div class="form-group mb-3">
+                  <label for="file">Choose Excel File (.xlsx, .xls)</label>
+                  <input type="file" id="file" ref="fileInput" class="form-control upload-input" accept=".xlsx,.xls"
+                    required />
+                </div>
+
+                <!-- Buttons row -->
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                  <!-- Left side -->
+                  <button type="button" class="btn btn-success" @click="downloadTemplate" :disabled="isDownloading">
+                    <i v-if="!isDownloading" class="fas fa-file-excel me-1"></i>
+                    <i v-else class="fas fa-spinner fa-spin me-1"></i>
+                    {{ isDownloading ? 'Downloading...' : 'Download Template' }}
+                  </button>
+
+                  <!-- Right side -->
+                  <div class="d-flex">
+                    <button type="button" class="btn btn-secondary mr-2" @click="showUploadModal = false">
+                      Cancel
+                    </button>
+                    <button type="submit" class="btn btn-info" :disabled="isUploading">
+                      <i v-if="!isUploading" class="fas fa-upload me-1"></i>
+                      <i v-else class="fas fa-spinner fa-spin me-1"></i>
+                      {{ isUploading ? 'Uploading...' : 'Upload' }}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </AuthenticatedLayout>
 </template>
@@ -541,5 +650,25 @@ td[title] {
   cursor: pointer;
 }
 
+/* Keep input height consistent but flexible for file input */
+.upload-input {
+  height: calc(2.25rem + 2px);
+  padding: 0.375rem 0.75rem;
+  line-height: 1.5;
+  font-size: 1rem;
+  border-radius: 0.25rem;
+  border: 1px solid #ced4da;
+}
+
+/* Prevent file input from breaking flex alignment */
+.upload-input::-webkit-file-upload-button {
+  height: 100%;
+  border: none;
+  background: #e9ecef;
+  color: #495057;
+  border-radius: 0.25rem 0 0 0.25rem;
+  padding: 0 0.75rem;
+  cursor: pointer;
+}
 
 </style>

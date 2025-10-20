@@ -56,6 +56,12 @@ Route::middleware(['auth','verified'])->group(function () {
         return Inertia::render('Training');
     })->name('training');
     
+
+    // Excel Download template and bulk save import
+    Route::post('/protocolquestions/importProtocol', [ProtocolQuestionsController::class, 'importProtocolQuestions'])->name('protocolquestions.importProtocol');
+    Route::get('/protocolquestions/template', [ProtocolQuestionsController::class, 'downloadTemplate'])->name('protocolquestions.template');
+
+
     //Permission Routes
     Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');
     Route::get('/permissions/create', [PermissionController::class, 'create'])->name('permissions.create');
@@ -150,12 +156,8 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::delete('/security-equipments/deleteMaintenanceSchedule/{id}', [SecurityEquipmentController::class, 'deleteMaintenanceSchedule'])->name('security-equipments.deleteMaintenanceSchedule');
     
 
-
-
-    
     Route::get('/security-equipments/{id}/editSchedule', [SecurityEquipmentController::class, 'editSchedule'])->name('security-equipments.editSchedule');
     Route::post('/security-equipments/schedule/{id}', [SecurityEquipmentController::class, 'updateSchedule'])->name('security-equipments.updateSchedule');
-
 
 
     //Training Routes
@@ -255,13 +257,7 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::delete('/specialisedtrainings/{id}', [SpecialisedTrainingController::class, 'destroy'])->name('specialisedtrainings.destroy');
     Route::get('/specialisedtrainings/{id}/edit', [SpecialisedTrainingController::class, 'edit'])->name('specialisedtrainings.edit');
     Route::post('/specialisedtrainings/{id}', [SpecialisedTrainingController::class, 'update'])->name('specialisedtrainings.update');
-  
-
-
     Route::get('/officers/{id}/download', [MandatoryCourseController::class, 'downloadStaffPDF'])->name('officers.download');
-
-
-
     Route::get('/quality-controls/{id}/export-pdf', [QualityControlController::class, 'exportPDF'])->name('quality-controls.exportPDF');
 
     //Protocol Questions Routes
@@ -284,11 +280,9 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/protocolquestions/{id}/editEvidence', [ProtocolQuestionsController::class, 'editEvidence'])->name('protocolquestions.editEvidence');
     Route::post('/protocolquestions/{id}/updateEvidence', [ProtocolQuestionsController::class, 'updateEvidence'])->name('protocolquestions.updateEvidence');
     Route::delete('/protocolquestions/{id}/destroyEvidenceDocument', [ProtocolQuestionsController::class, 'destroyEvidenceDocument'])->name('protocolquestions.destroyEvidenceDocument');
-
     Route::get('/quality-controls/{id}/export-pdf', [QualityControlController::class, 'exportPDF'])->name('quality-controls.exportPDF');
 
-    //Protocol Questions Routes
-    //Facility Routes
+
     Route::get('/protocolquestions', [ProtocolQuestionsController::class, 'index'])->name('protocolquestions.index');
     Route::get('/protocolquestions/create', [ProtocolQuestionsController::class, 'create'])->name('protocolquestions.create');
     Route::post('/protocolquestions', [ProtocolQuestionsController::class, 'store'])->name('protocolquestions.store');
@@ -307,12 +301,7 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/protocolquestions/{id}/editEvidence', [ProtocolQuestionsController::class, 'editEvidence'])->name('protocolquestions.editEvidence');
     Route::post('/protocolquestions/{id}/updateEvidence', [ProtocolQuestionsController::class, 'updateEvidence'])->name('protocolquestions.updateEvidence');
     Route::delete('/protocolquestions/{id}/destroyEvidenceDocument', [ProtocolQuestionsController::class, 'destroyEvidenceDocument'])->name('protocolquestions.destroyEvidenceDocument');
-
-
-
     Route::get('/protocolquestions/export/pdf', [ProtocolQuestionsController::class, 'exportPDF'])->name('protocolquestions.export.pdf');
-
-
 
 
 
@@ -323,20 +312,20 @@ Route::middleware(['auth','verified'])->group(function () {
 
 
 
-   //Interface routes
-   Route::get('about-us', function () {
-        return Inertia::render('Site/AboutUs');
-    })->name('aboutPage');
+    //Interface routes
+    Route::get('about-us', function () {
+            return Inertia::render('Site/AboutUs');
+        })->name('aboutPage');
 
-    Route::get('contact-us', function () {
-        return Inertia::render('Site/ContactUs');
-    })->name('contactPage');
+        Route::get('contact-us', function () {
+            return Inertia::render('Site/ContactUs');
+        })->name('contactPage');
 
-    Route::post('/contacts', [ContactController::class, 'store']);
-    Route::get('/contacts', [ContactController::class, 'fetchAllContacts']);
+        Route::post('/contacts', [ContactController::class, 'store']);
+        Route::get('/contacts', [ContactController::class, 'fetchAllContacts']);
 
 
-    
+        
 
 
 
