@@ -215,6 +215,11 @@ const downloadPDF = async () => {
 };
 
 
+const trimText = (text, length = 50) => {
+  if (!text) return '';
+  return text.length > length ? text.substring(0, length) + '...' : text;
+};
+
 
 </script>
 
@@ -347,12 +352,26 @@ const downloadPDF = async () => {
 
                           <td class="text-center">{{ question.pq_number }}</td>
 
-                          <td class="text-center">
+                          <!-- <td class="text-center">
                             <Link :href="route('protocolquestions.edit', question.id)">
                             {{ question.question }}
                             </Link>
+                          </td> -->
+
+                          <!-- Question details Column -->
+                          <td class="text-center" :title="question.question">
+                            <Link :href="route('protocolquestions.edit', question.id)">
+                            {{ trimText(question.question, 50) }}
+                            </Link>
                           </td>
-                          <td class="text-center">{{ question.answer_details }}</td>
+
+                          <!-- <td class="text-center">{{ question.answer_details }}</td> -->
+
+                          <!-- Answer Details Column -->
+                          <td class="text-center" :title="question.answer_details">
+                            {{ trimText(question.answer_details, 50) }}
+                          </td>
+
                           <td class="text-center">
                             <!-- List of reference documents in a table -->
                             <table class="table table-sm table-hover table-bordered mt-3 align-middle">
@@ -500,4 +519,27 @@ const downloadPDF = async () => {
   border: 1px solid #6c757d;
   color: #6c757d;
 }
+
+td[title] {
+  cursor: help;
+}
+
+.trimmed-text {
+  display: inline-block;
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #007bff;
+  font-weight: 500;
+  transition: color 0.2s ease-in-out;
+}
+
+.trimmed-text:hover {
+  color: #0056b3;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+
 </style>
