@@ -38,7 +38,7 @@ class ProtocolQuestionsController extends Controller implements HasMiddleware
         $searchQuery = ProtocolQuestion::search($request);
         $protocolQuestions = $searchQuery    
         ->with(['referenceDocuments','evidenceDocuments'])        
-        ->orderBy('created_at','ASC')
+        ->orderBy('created_at','DESC')
         //->where('status','Open')
         -> paginate(50);
         return inertia('ProtocolQuestions/List', [
