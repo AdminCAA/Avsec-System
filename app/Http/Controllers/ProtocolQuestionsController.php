@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\ReferenceDocument;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ProtocolQuestionsImport;
+use App\Exports\ProtocolQuestionsTemplateExport;
 
 class ProtocolQuestionsController extends Controller implements HasMiddleware
 {
@@ -378,6 +381,28 @@ class ProtocolQuestionsController extends Controller implements HasMiddleware
             ->setPaper('a4', 'landscape');
 
         return $pdf->download('protocol_questions.pdf');
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new ProtocolQuestionsTemplateExport, 'protocol_questions_template.xlsx');
+    }
+
+    public function importProtocolQuestions(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        try {
+            Excel::import(new ProtocolQuestionsImport, $request->file('file'));
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            return redirect()->back()->with('error', 'Import failed. Check your Excel format.');
+        }
+
+        return redirect()->route('protocolquestions.index')
+                        ->with('success', 'Protocol Questions imported successfully!');
     }
 
 
