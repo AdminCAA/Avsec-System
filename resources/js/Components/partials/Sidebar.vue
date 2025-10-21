@@ -268,6 +268,15 @@
                       <p>User Permissions</p>
                       </Link>
                   </li>
+
+                  <li class="nav-item">
+                      <Link :href="route('logs.index')" class="nav-link"
+                      :class="{ active: currentPath.startsWith('/logs') }"
+                      >
+                          <i class="fas fa-chevron-circle-right nav-icon"></i>
+                      <p>System Logs</p>
+                      </Link>
+                  </li>
                   </ul>
               </li>
                 

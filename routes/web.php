@@ -25,6 +25,8 @@ use App\Http\Controllers\DepartmentsController;
 use App\Http\Controllers\MandatoryCourseController;
 use App\Http\Controllers\SpecialisedTrainingController;
 use App\Http\Controllers\ProtocolQuestionsController;
+use App\Http\Controllers\LogsController;
+
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -303,26 +305,24 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::delete('/protocolquestions/{id}/destroyEvidenceDocument', [ProtocolQuestionsController::class, 'destroyEvidenceDocument'])->name('protocolquestions.destroyEvidenceDocument');
     Route::get('/protocolquestions/export/pdf', [ProtocolQuestionsController::class, 'exportPDF'])->name('protocolquestions.export.pdf');
 
-
-
-
+    //Logs Routes
+    Route::get('/logs', [LogsController::class, 'index'])->name('logs.index');
+    Route::delete('/logs/clear', [LogsController::class, 'clearLogs'])->name('logs.clear');
 });
-
-
 
 
 
     //Interface routes
     Route::get('about-us', function () {
             return Inertia::render('Site/AboutUs');
-        })->name('aboutPage');
+    })->name('aboutPage');
 
-        Route::get('contact-us', function () {
-            return Inertia::render('Site/ContactUs');
-        })->name('contactPage');
+    Route::get('contact-us', function () {
+        return Inertia::render('Site/ContactUs');
+    })->name('contactPage');
 
-        Route::post('/contacts', [ContactController::class, 'store']);
-        Route::get('/contacts', [ContactController::class, 'fetchAllContacts']);
+    Route::post('/contacts', [ContactController::class, 'store']);
+    Route::get('/contacts', [ContactController::class, 'fetchAllContacts']);
 
 
         

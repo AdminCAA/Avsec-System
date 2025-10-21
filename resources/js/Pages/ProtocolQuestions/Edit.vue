@@ -37,6 +37,15 @@ const gapIdentifiedOptions = [
   { label: 'No', value: 'No' },  
 ]
 
+const page = usePage()
+const roles = page.props.auth.user.roles;
+const hasRoles = (roles) => {
+  const userRoles = page.props.auth.user?.roles ?? []
+  // If a single role is passed as a string, wrap it in an array
+  const requiredRoles = Array.isArray(roles) ? roles : [roles]
+  return requiredRoles.some(role => userRoles.includes(role))
+}
+
 const form = useForm({
   question: protocolQuestion.question,  
   critical_element_type_id: protocolQuestion.critical_element_type_id || '',
@@ -545,7 +554,7 @@ const  openDocument = (doc) => {
                                                         <i class="fas fa-edit"></i>
                                                         <span>Edit</span>
                                                       </Link>
-                                                  <button
+                                                  <button  v-if="hasRoles(['Super Admin'])"
                                                     @click.prevent="deleteEvidence(doc.id)"
                                                     class="btn btn-outline-danger btn-sm"
                                                     title="Delete Document"
@@ -603,7 +612,7 @@ const  openDocument = (doc) => {
                                                         <i class="fas fa-edit"></i>
                                                         <span>Edit</span>
                                                       </Link>
-                                                  <button
+                                                  <button v-if="hasRoles(['Super Admin'])"
                                                     @click.prevent="deleteReference(doc.id)"
                                                     class="btn btn-outline-danger btn-sm"
                                                     title="Delete Reference"

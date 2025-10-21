@@ -8,6 +8,7 @@ use App\Models\Facility;
 use App\Models\ProtocolQuestion;
 use App\Models\QualityControl;
 use App\Models\SelectedChecklistQuestion;
+use App\Services\ActivityLogger;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -20,6 +21,13 @@ use Illuminate\Routing\Controllers\Middleware;
 
 class DashboardController extends Controller implements HasMiddleware
 {
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
+
     public static function middleware():array {
         return [
             new Middleware('permission:view admin dashboard', only: ['index']),
@@ -32,7 +40,14 @@ class DashboardController extends Controller implements HasMiddleware
      */
     public function index(Request $request)
     {
-        //
+
+        $this->activityLogger->info('Accessed Dashboard',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> $request->ip(),
+            'Time' => now(),
+        ]);
+        
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
         return Inertia::render('Dashboard', [
