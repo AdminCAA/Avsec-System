@@ -16,10 +16,16 @@ use App\Mail\notifyNewuser;
 
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use App\Services\ActivityLogger;
 
 class UserController extends Controller implements HasMiddleware
 {
-    
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
 
     public static function middleware():array {
         return [
@@ -94,6 +100,13 @@ class UserController extends Controller implements HasMiddleware
                 'department_id' => $department ? $department->id : null, 
                 'department_name' => $department ? $department->name : null,
                 'password' => bcrypt($request->password),
+            ]);
+
+            $this->activityLogger->info('Created User',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
             ]);
 
             // Handle portrait upload if provided
@@ -199,6 +212,13 @@ class UserController extends Controller implements HasMiddleware
                 $user->password = bcrypt($request->password);
             }
             $user->save();
+
+            $this->activityLogger->info('Updated User Information',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
+            ]);
             // Assign roles to the user
             if(!empty($request->roles)){
                 // Check if user has Guest Role, meaning the user is new 
@@ -235,6 +255,14 @@ class UserController extends Controller implements HasMiddleware
             return response()->json(['errors' => 'You cannot delete your own account'], 403);
         }
         $user->delete();
+
+        $this->activityLogger->warning('Deleted User Information',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         return response()->json([
             'success' => 'User deleted successfully',
             'status' => true
@@ -246,7 +274,13 @@ class UserController extends Controller implements HasMiddleware
         $user = User::findOrFail($request->id);
         $user->two_factor_recovery_codes = null;
         $user->two_factor_secret = null;
-        $user->save();      
+        $user->save();   
+        $this->activityLogger->info('Disabled 2 Factor Authentication',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);   
         return redirect()->route('users.index')->with('success', 'Two Factor Authentication disabled successfully');       
     }
 }

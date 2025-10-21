@@ -14,10 +14,24 @@ use Inertia\Inertia;
 use setasign\Fpdi\Fpdi;          // FPDI
 use setasign\Fpdi\PdfParser\StreamReader; // StreamReader helper (correct namespace)
 use setasign\Fpdi\Fpdi\Fpdi as FPDI_TTF; // If you want explicit tFPDF usage
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;  
+use App\Services\ActivityLogger;
 
 
-class MandatoryCourseController extends Controller
+class MandatoryCourseController extends Controller implements HasMiddleware
 {
+    protected ActivityLogger $activityLogger;
+    public static function middleware():array {
+        return [
+            new Middleware('permission:manage mandatory courses', only: ['index','create','store','edit','update','destroy']),
+        ];
+    }
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
+    
 
     public function create($id)
     {
@@ -47,6 +61,13 @@ class MandatoryCourseController extends Controller
 
         MandatoryCourse::create($validated);
 
+        $this->activityLogger->info('Created a mandatory Course',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         // Redirect to OFFICERS.show instead of personnels.show
         return redirect()
             ->route('officers.show', $request->user_id)
@@ -65,6 +86,12 @@ class MandatoryCourseController extends Controller
 
             // Delete record from the database
             $course->delete();
+            $this->activityLogger->warning('Deleted a mandatory Course',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
+            ]);
 
             return response()->json([
                 'message' => 'Mandatory course deleted successfully.'
@@ -133,6 +160,13 @@ class MandatoryCourseController extends Controller
         }
 
         $mandatoryCourse->save();
+        
+        $this->activityLogger->info('Updated a Mandatory Course',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
 
         return response()->json([
             'message' => 'Mandatory Course updated successfully',
@@ -143,6 +177,12 @@ class MandatoryCourseController extends Controller
     public function downloadStaffPDF($id)
     {
         $user = User::with(['qualifications', 'mandatorycourse', 'specialisedtraining'])->findOrFail($id);
+        $this->activityLogger->info('Downloaded a staff detail pdf file',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
 
         $pdf = Pdf::loadView('pdfTemplates.staffDetails', [
             'personnel' => $user, // passing User as personnel
@@ -154,9 +194,6 @@ class MandatoryCourseController extends Controller
 
         return $pdf->download("staff_{$user->name}.pdf");
     }
-
-
-
 
 
 }

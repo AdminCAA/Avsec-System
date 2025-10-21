@@ -9,10 +9,20 @@ use Illuminate\Support\Facades\Validator;
 
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use App\Services\ActivityLogger;
+use Illuminate\Support\Facades\Auth;
 
 
 class AuditAreaCategoryController extends Controller implements HasMiddleware
-{
+{   
+
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -21,6 +31,9 @@ class AuditAreaCategoryController extends Controller implements HasMiddleware
             new Middleware('permission:manage quality control areas', only: ['index','create','store','edit','update','show','destroy']),
         ];
     }
+        
+
+
     public function index(Request $request)
     {
         // Fetch all audit area categories from the database
@@ -37,7 +50,7 @@ class AuditAreaCategoryController extends Controller implements HasMiddleware
      */
     public function create()
     {
-        //
+        //        
         //Fetch all audit area categories
         $categories = AuditAreaCategory::CATEGORIES;
         return inertia('AuditCategories/Create', [
@@ -58,6 +71,13 @@ class AuditAreaCategoryController extends Controller implements HasMiddleware
         // Check if validation passes
         if ($validator->passes()) {
             // Create a new audit area category
+            $this->activityLogger->info('Created Area Category',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
+            ]);
+
             AuditAreaCategory::create([
                 'name' => trim($request->name) .' - '. trim($request->category_name),
                 'category_name' => trim($request->category_name),
@@ -107,6 +127,14 @@ class AuditAreaCategoryController extends Controller implements HasMiddleware
                 'name' => trim($request->name) .' - '.trim($request->category_name),
                 'category_name' => trim($request->category_name),
             ]);
+
+            $this->activityLogger->info('Updated Area Category',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
+            ]);
+
             return redirect()->route('audit-categories.index')->with('success', 'Audit Category updated successfully.');
         } else {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -126,6 +154,12 @@ class AuditAreaCategoryController extends Controller implements HasMiddleware
             );
         }
         $auditCategory->delete();
+        $this->activityLogger->warning('Deleted Area Category',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
         return response()->json(
             ['success' => 'Audit area deleted successfully.',
             'status' => true

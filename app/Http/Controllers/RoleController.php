@@ -10,9 +10,17 @@ use Illuminate\Http\Request;
 
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use App\Services\ActivityLogger;
+use Illuminate\Support\Facades\Auth;
 
 class RoleController extends Controller implements HasMiddleware
 {
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
     
     public static function middleware():array {
         return [
@@ -58,6 +66,12 @@ class RoleController extends Controller implements HasMiddleware
 
         if($validator->passes()){
             $role = Role::create(['name' => $request->name]);
+            $this->activityLogger->info('Created Role',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
+            ]);
             if(!empty($request->permissions)){
                 $role->syncPermissions($request->permissions);
             }
@@ -106,6 +120,14 @@ class RoleController extends Controller implements HasMiddleware
         if($validator->passes()){
             $role->name = $request->name;
             $role->save();
+
+            $this->activityLogger->info('Updated Role',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
+            ]);
+
             if(!empty($request->permissions)){
                 $role->syncPermissions($request->permissions);
             }else{
@@ -134,6 +156,14 @@ class RoleController extends Controller implements HasMiddleware
         }
         //Delete the role
         $role->delete();
+
+        $this->activityLogger->warning('Deleted Role',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         return response()->json([
             'success' => 'Role deleted successfully.'
             ], 200);

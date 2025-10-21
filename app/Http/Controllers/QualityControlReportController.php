@@ -10,9 +10,17 @@ use Inertia\Inertia;
 
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use App\Services\ActivityLogger;
+use Illuminate\Support\Facades\Auth;
 
 class QualityControlReportController extends Controller implements HasMiddleware
 {
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
     public static function middleware():array {
         return [
             new Middleware('permission:generate quality control reports', only: ['index','generateQualityControlReport']),
@@ -46,6 +54,13 @@ class QualityControlReportController extends Controller implements HasMiddleware
             ->get()
             ->groupBy('audit_area_name');
         $users = $qualityControl->users()->get();
+
+        $this->activityLogger->info('Exported Quality Control Report',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
         
         $pdf = PDF::loadView('pdfTemplates.qualityControlReport', [
             'qualityControl' => $qualityControl,

@@ -7,12 +7,20 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Department; 
-
+use App\Services\ActivityLogger;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
 class DepartmentsController extends Controller implements HasMiddleware
 {
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
+
     public static function middleware():array {
         return [
             new Middleware('permission:manage departments', only: ['index','create','store','edit','update','destroy']),
@@ -59,6 +67,13 @@ class DepartmentsController extends Controller implements HasMiddleware
         $department->name = trim($request->name);
         $department->description = trim($request->description);
         $department->save();
+
+        $this->activityLogger->info('Created Department',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
         return redirect()->route('departments.index')->with('success', 'Department created successfully.');
     }
 
@@ -101,6 +116,14 @@ class DepartmentsController extends Controller implements HasMiddleware
         $department->name = trim($request->name);
         $department->description = trim($request->description);
         $department->save();
+
+        $this->activityLogger->info('Updated Department',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         return redirect()->route('departments.index')->with('success', 'Department updated successfully.');
 
     }
@@ -119,6 +142,13 @@ class DepartmentsController extends Controller implements HasMiddleware
 
         // Delete the department
         $department->delete();
+
+        $this->activityLogger->warning('Deleted Department',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
         return response()->json(
             ['success' => 'Department deleted successfully.',
             'status' => true

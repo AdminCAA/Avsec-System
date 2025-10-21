@@ -13,9 +13,19 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
+use App\Services\ActivityLogger;
+
+
 
 class SecurityConcernsController extends Controller implements HasMiddleware
 {
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
+      
     public static function middleware():array {
         return [
             new Middleware('permission:manage security concerns', only: ['index','edit','update','destroy','generateCar','securityConcernsCount']),
@@ -151,6 +161,13 @@ class SecurityConcernsController extends Controller implements HasMiddleware
             'long_term_date' => $request->long_term_date,
             'cap_status'=> $request->cap_status,            
             'reason_for_rejection' => $request->cap_status === 'Rejected' ? $request->reason_for_rejection : null,
+        ]);
+
+        $this->activityLogger->info('Updated Security Concern',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
         ]);
 
         if ($request->hasFile('evidence_file')) {

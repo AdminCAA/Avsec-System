@@ -11,10 +11,19 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\Middleware;  
+use App\Services\ActivityLogger;
 
 class FollowupController extends Controller implements HasMiddleware
 {
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
+
+
     public static function middleware():array {
         return [
             new Middleware('permission:manage quality control followups', only: ['index','create','store','edit','update','destroy']),
@@ -63,6 +72,14 @@ class FollowupController extends Controller implements HasMiddleware
             'followup_comments' => trim($request->followup_comments),
             'followup_date' => $request->followup_date,
         ]);
+
+        $this->activityLogger->info('Created a followup',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         return redirect()->route('securityconcerns.edit', $id)->with('success', 'Followup created successfully.');
     }
 
@@ -109,6 +126,14 @@ class FollowupController extends Controller implements HasMiddleware
             'followup_comments' => $request->followup_comments,
             'followup_date' => $request->followup_date,
         ]);
+
+        $this->activityLogger->info('Update a followup',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         return redirect()->route('securityconcerns.edit', $followup->selected_checklist_question_id)->with('success', 'Followup created successfully.');
     }
 
@@ -125,6 +150,14 @@ class FollowupController extends Controller implements HasMiddleware
         }
         // Delete the quality control record
         $followup->delete();
+
+        $this->activityLogger->info('Deleted a followup',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         // Redirect to the quality controls list with a success message
         return response()->json(
             ['success' => 'Followup deleted successfully.',

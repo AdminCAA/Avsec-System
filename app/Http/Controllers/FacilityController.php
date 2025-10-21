@@ -13,10 +13,18 @@ use Inertia\Inertia;
 
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use App\Services\ActivityLogger;
 
 
 class FacilityController extends Controller implements HasMiddleware
 {
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
+
     public static function middleware():array {
         return [
             new Middleware('permission:manage operators', only: ['index','create','store','edit','update','show','destroy','downloadOperatorsPDF']),
@@ -104,6 +112,15 @@ class FacilityController extends Controller implements HasMiddleware
                 'email' => trim($request->email),
             ]);
             // Redirect to the facilities list with a success message
+
+            $this->activityLogger->info('Created Operator',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
+            ]);
+    
+
             return redirect()->route('facilities.index')->with('success', 'Operator created successfully.');
         }else{
             return response()->json(['errors' => $validator->errors()], 422);
@@ -217,8 +234,16 @@ class FacilityController extends Controller implements HasMiddleware
                 'email' => trim($request->email),
             ]);
             
+            $this->activityLogger->info('Updated Operator',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
+            ]);
             // Redirect to the facilities list with a success message
             return redirect()->route('facilities.index')->with('success', 'Operator updated successfully.');
+            
+
         }else{
             return response()->json(['errors' => $validator->errors()], 422);
         }
@@ -236,6 +261,13 @@ class FacilityController extends Controller implements HasMiddleware
         }
         // Delete the facility
         $facility->delete();
+        
+        $this->activityLogger->warning('Deleted Operator',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
         // Redirect to the facilities list with a success message
         return response()->json(
             ['success' => 'Operator deleted successfully.',

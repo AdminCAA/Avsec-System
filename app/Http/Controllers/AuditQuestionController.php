@@ -7,6 +7,8 @@ use App\Models\AuditAreaCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\AuditQuestion;
+use App\Services\ActivityLogger;
+use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -16,10 +18,17 @@ class AuditQuestionController extends Controller implements HasMiddleware
     /**
      * Define middleware for the controller.
      */
+    protected ActivityLogger $activityLogger;
+
     public static function middleware(): array {
         return [
             new Middleware('permission:manage checklist questions', only: ['index','create','store','edit','update','destroy']),
         ];
+    }
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
     }
 
     /**
@@ -77,6 +86,12 @@ class AuditQuestionController extends Controller implements HasMiddleware
             'reference' => trim($request->reference),
             'risk_description' => trim($request->risk_description),
         ]);
+        $this->activityLogger->info('Created Quality Control Question',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
         return redirect()->route('audit-questions.index')->with('success', 'Audit question created successfully.');
       
     }
@@ -129,6 +144,13 @@ class AuditQuestionController extends Controller implements HasMiddleware
             'reference' => trim($request->reference),
             'risk_description' => trim($request->risk_description),
         ]);
+
+        $this->activityLogger->info('Updated Quality Control Question',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
         return redirect()->route('audit-questions.index')->with('success', 'Audit question updated successfully.');
     }
 
@@ -145,6 +167,13 @@ class AuditQuestionController extends Controller implements HasMiddleware
         }
         // Delete the audit question
         $auditQuestion->delete();
+
+        $this->activityLogger->warning('Deleted Quality Control Question',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
         // Return a success response
         return response()->json(['message' => 'Audit question deleted successfully'], 200);
     }

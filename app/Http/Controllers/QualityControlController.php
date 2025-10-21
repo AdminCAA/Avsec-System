@@ -19,11 +19,18 @@ use setasign\Fpdf\Fpdf;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
+use App\Services\ActivityLogger;
 
 
 class QualityControlController extends Controller implements HasMiddleware
 {
-    
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
+
     public static function middleware():array {
         return [
             new Middleware('permission:manage quality controls', 
@@ -153,6 +160,13 @@ class QualityControlController extends Controller implements HasMiddleware
                 'scheduled_date' => $request->scheduled_date,  
                 'end_date' => $request->end_date, 
             ]);   
+            // Update the selected checklist questions for this quality control
+            $this->activityLogger->info('Updated Quality Control',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
+            ]);
 
             if (!empty($request->selectedCheckListQuestions)) {
                 foreach ($request->selectedCheckListQuestions as $questionId) {
@@ -241,6 +255,13 @@ class QualityControlController extends Controller implements HasMiddleware
         }
         // Delete the quality control record
         $qualityControl->delete();
+        $this->activityLogger->warning('Deleted Quality Control',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         // Redirect to the quality controls list with a success message
         return response()->json(
             ['success' => 'Quality Control deleted successfully.',
@@ -282,71 +303,7 @@ class QualityControlController extends Controller implements HasMiddleware
         }
         return response()->json(['errors' => $validator->errors()], 422);
     }
-
-    // public function saveQuestionResponse(Request $request,string $id){
-    //     $validator = Validator::make($request->all(),[
-    //         'question_id' => 'required|integer',
-    //         'quality_control_id' => 'required|integer',
-    //         'question_response' => 'required|string|in:Yes,No,Pass,Fail,Not Applicable,Not confirmed',
-    //         'finding_observation' => 'required|string',
-    //         'action_taken' => 'nullable|string',
-    //         'immediate_corrective_action' => 'nullable|string',
-    //         'recommendations' => 'nullable|string',
-    //         'reference' => 'nullable|string',
-    //         'status' => 'required|string|in:Open,Closed,Overdue',
-    //         'finding_category' => 'required|string|in:Compliant,Not Compliant(Minor),Not Compliant(Serious),Not Applicable,Not Confirmed,Not Applicable,Not Confirmed',
-    //         'date_quality_control' => 'required|date',
-    //         'problem_cause' => 'nullable|string',
-    //         'proposed_follow_up_action' => 'nullable|string|in:Onsite,Administrative,Onsite and Administrative,Not Applicable',
-    //         'short_term_action' => 'nullable|string',
-    //         'short_term_date' => 'nullable|date',
-    //         'long_term_action' => 'nullable|string',
-    //         'long_term_date' => 'nullable|date',
-    //         'completion_date' => 'nullable|date',
-    //         'date_of_closure' => 'nullable|date',
-    //         'follow_up_date' => 'nullable|date',
-    //         'evidence_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', 
-    //     ]);
-
-    //     if($validator->fails()){
-    //         return response()->json(['errors' => $validator->errors()], 422);
-    //     }
-
-    //     $selectedCheckliskQuestion = SelectedChecklistQuestion::findOrFail($request->question_id);
-    //     $selectedCheckliskQuestion->update([                    
-    //         'question_response' => $request->question_response,
-    //         'finding_observation' => $request->finding_observation,
-    //         'action_taken' => $request->action_taken,
-    //         'status' => $request->status,
-    //         'finding_category' => $request->finding_category,
-    //         'date_quality_control' => $request->date_quality_control,
-    //         'problem_cause' =>$request->problem_cause,
-    //         'proposed_follow_up_action' => $request->proposed_follow_up_action,
-    //         'short_term_action' => $request->short_term_action,
-    //         'long_term_action' => $request->long_term_action,
-    //         'completion_date' => $request->completion_date,
-    //         'date_of_closure' => $request->date_of_closure,
-    //         'follow_up_date' => $request->follow_up_date,
-    //         'immediate_corrective_action' => $request->immediate_corrective_action,
-    //         'recommendations' => $request->recommendations,
-    //         'reference' => $request->reference,
-    //         'short_term_date' => $request->short_term_date,
-    //         'long_term_date' => $request->long_term_date,
-
-    //     ]);
-
-    //     if ($request->hasFile('evidence_file')) {
-    //         // Delete old file if exists
-    //         if ($selectedCheckliskQuestion->evidence_file) {
-    //             Storage::disk('public')->delete($selectedCheckliskQuestion->evidence_file);
-    //         }
-    //         $selectedCheckliskQuestion->evidence_file = $request->file('evidence_file')->store('qc_evidences', 'public');
-    //     }
-        
-    //     $selectedCheckliskQuestion->save();
-    //     return redirect()->route('quality-controls.show',$request->quality_control_id)->with('success', 'Checklist updated successfully.');        
-    // }
-
+   
    
     public function saveQuestionResponse(Request $request, string $id)
     {
@@ -433,7 +390,7 @@ class QualityControlController extends Controller implements HasMiddleware
 
         // Update the question
         $question->update($data);
-
+        
         return redirect()
             ->route('quality-controls.show', $request->quality_control_id)
             ->with('success', 'Checklist updated successfully.');
@@ -537,7 +494,6 @@ class QualityControlController extends Controller implements HasMiddleware
                 //'proposed_follow_up_action' => $q->proposed_follow_up_action ?? 'N/A',
             ];
         });
-
         // 1️Generate main QC PDF
         $pdf = Pdf::loadView('pdfTemplates.selectedQualityControls', [
             'qualityControl' => $qualityControl,
@@ -550,7 +506,6 @@ class QualityControlController extends Controller implements HasMiddleware
 
         // 2 Merge PDFs with FPDI
         $fpdi = new Fpdi();
-
         // Add main PDF
         $pageCount = $fpdi->setSourceFile($mainPdfPath);
         for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
@@ -559,7 +514,6 @@ class QualityControlController extends Controller implements HasMiddleware
             $fpdi->AddPage($size['orientation'], [$size['width'], $size['height']]);
             $fpdi->useTemplate($tplId);
         }
-
         // Add evidence PDFs
         foreach ($qualityControl->selectedchecklistQuestions as $q) {
             if ($q->evidence_file && Storage::disk('public')->exists($q->evidence_file)) {
@@ -589,6 +543,14 @@ class QualityControlController extends Controller implements HasMiddleware
         $qualityControl->approved_by = $user->name;
         $qualityControl->approved_at = now();
         $qualityControl->save();
+
+        $this->activityLogger->info('Approved Quality Control',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         if (!empty($qualityControl->users)) {            
             //send email to the users assigned to this quality control      
             foreach($qualityControl->users as $user){             
@@ -602,7 +564,5 @@ class QualityControlController extends Controller implements HasMiddleware
         }   
         return redirect()->route('quality-controls.show', $id)->with('success', 'Quality Control checklist approved successfully.');
     }
-
-
 }
 

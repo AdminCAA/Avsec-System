@@ -10,12 +10,19 @@ use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
-
+use App\Services\ActivityLogger;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
 class CertificationsController extends Controller implements HasMiddleware
 {
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
     
     public static function middleware():array {
         return [
@@ -85,6 +92,14 @@ class CertificationsController extends Controller implements HasMiddleware
             $certification->certification_file = $request->file('certification_file')->store('certifications', 'public');
         }
         $certification->save();
+
+        $this->activityLogger->info('Created User Certification',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         return redirect()->route('personnels.show', $request->user_id)->with('success', 'Certification created successfully.');        
     }
 
@@ -152,6 +167,14 @@ class CertificationsController extends Controller implements HasMiddleware
             $certification->certification_file = $request->file('certification_file')->store('certifications', 'public');
         }
         $certification->save();
+
+        $this->activityLogger->info('Updated User Certification',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         return redirect()->route('personnels.show', $certification->user_id)->with('success', 'Certification updated successfully.');
 
     }
@@ -172,7 +195,15 @@ class CertificationsController extends Controller implements HasMiddleware
             Storage::disk('public')->delete($certification->certification_file);
         }
         // Delete the facility
-        $certification->delete();        
+        $certification->delete();  
+
+        $this->activityLogger->warning('Deleted User Certification',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+      
         // Redirect to the personnel list with a success message
         return response()->json(
             ['success' => 'Certification deleted successfully.',

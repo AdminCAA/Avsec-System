@@ -9,13 +9,21 @@ use App\Models\SecurityEquipment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use App\Services\ActivityLogger;
 
 
 class SecurityEquipmentController extends Controller implements HasMiddleware
 {
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
+      
 
     public static function middleware():array {
         return [
@@ -80,6 +88,12 @@ class SecurityEquipmentController extends Controller implements HasMiddleware
             'status'        => $request->status,              
         ]);
 
+        $this->activityLogger->info('Created Security Equipment',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
         return redirect()->route('security-equipments.index')
                         ->with('success', 'Security Equipment created successfully.');
     }
@@ -132,6 +146,13 @@ class SecurityEquipmentController extends Controller implements HasMiddleware
                 'description' => $request->description,
                 'status' => $request->status,              
             ]);
+
+            $this->activityLogger->info('Updated Security Equipment',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
+            ]);
             // Redirect to the facilities list with a success message
             return redirect()->route('security-equipments.index')->with('success', 'Security Equipment updated successfully.');
         }else{
@@ -149,27 +170,6 @@ class SecurityEquipmentController extends Controller implements HasMiddleware
         );
     }
 
-//    public function editSchedule(string $id){
-//         $securityEquipment = SecurityEquipment::findOrFail($id);
-//         return Inertia::render('SecurityEquipments/EditSchedule',
-//             [
-//                 'securityEquipment' => $securityEquipment,
-//             ]
-//         );
-//     }
-
-    // public function editSchedule(string $id)
-    // {
-    //     $securityEquipment = SecurityEquipment::findOrFail($id);
-
-    //     // Fetch the latest or specific maintenance schedule for this equipment
-    //     $maintainanceSchedule = $securityEquipment->maintainanceSchedules()->latest()->first();
-
-    //     return Inertia::render('SecurityEquipments/EditSchedule', [
-    //         'securityEquipment' => $securityEquipment,
-    //         'maintainanceSchedules' => $maintainanceSchedule,
-    //     ]);
-    // }
 
     public function editSchedule(string $id)
 {

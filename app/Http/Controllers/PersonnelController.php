@@ -9,7 +9,6 @@ use App\Models\Qualification;
 use App\Models\Training;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Validator;
@@ -20,10 +19,19 @@ use Illuminate\Support\Facades\DB;
 
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use App\Services\ActivityLogger;
+use Illuminate\Support\Facades\Auth; 
+
 
 class PersonnelController extends Controller implements HasMiddleware
 {
-    
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
+
     public static function middleware():array {
         return [
             new Middleware('permission:manage personnel records', only: ['index','create','store','edit','update','destroy']),
@@ -111,6 +119,13 @@ class PersonnelController extends Controller implements HasMiddleware
             //     $user->trainings()->sync($request->selectedTrainings);
             // }
 
+            $this->activityLogger->info('Created a Personnel Record',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
+            ]);
+            
             return redirect()->route('personnels.index')->with('success', 'Personnel created successfully.');
         } else {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -208,6 +223,14 @@ class PersonnelController extends Controller implements HasMiddleware
             }
 
             DB::commit();
+
+            $this->activityLogger->info('Edited a Personnel Record',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
+            ]);
+
             return redirect()->route('personnels.index')->with('success', 'Personnel updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -227,6 +250,14 @@ class PersonnelController extends Controller implements HasMiddleware
             Storage::disk('public')->delete($user->portrait);
         }
         $user->delete();
+
+        $this->activityLogger->warning('Deleted a Personnel Record',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         return response()->json(
             [
                 'success' => 'Personnel account deleted successfully.',
@@ -236,6 +267,13 @@ class PersonnelController extends Controller implements HasMiddleware
 
     public function downloadPersonnelPDF($id)
     {
+        $this->activityLogger->info('Downloaded a personel Indormation PDF',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         $user = User::with(['qualifications', 'certifications'])->findOrFail($id);
 
         $pdf = Pdf::loadView('pdfTemplates.personnelDetails', [
@@ -246,7 +284,4 @@ class PersonnelController extends Controller implements HasMiddleware
 
         return $pdf->download("personnel_{$user->name}.pdf");
     }
-
-
-
 }

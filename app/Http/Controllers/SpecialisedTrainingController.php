@@ -8,9 +8,25 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+use App\Services\ActivityLogger;
+use Illuminate\Support\Facades\Auth;
 
-class SpecialisedTrainingController extends Controller
+class SpecialisedTrainingController extends Controller implements HasMiddleware
 {
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
+
+    public static function middleware():array {
+        return [
+            new Middleware('permission:manage specialised trainings', only: ['index','create','store','edit','update','destroy']),
+        ];
+    }
 
     public function create($id)
     {
@@ -38,6 +54,12 @@ class SpecialisedTrainingController extends Controller
         }
 
         SpecialisedTraining::create($validated);
+        $this->activityLogger->info('Created Specialised Training',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
 
         //return redirect()->back()->with('success', 'Specialised training added successfully!');
         return redirect()
@@ -57,6 +79,12 @@ class SpecialisedTrainingController extends Controller
 
             // Delete record from the database
             $course->delete();
+            $this->activityLogger->warning('Deleted Specialised Training',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
+            ]);
 
             return response()->json([
                 'message' => 'Specialised training deleted successfully.'
@@ -125,6 +153,12 @@ class SpecialisedTrainingController extends Controller
 
         $training->save();
 
+        $this->activityLogger->info('Updated Specialised Training',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
         return response()->json([
             'message' => 'Specialised Training updated successfully',
             'specialisedtraining' => $training

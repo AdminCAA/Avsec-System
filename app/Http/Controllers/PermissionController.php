@@ -9,9 +9,19 @@ use Spatie\Permission\Models\Permission;
 
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use App\Services\ActivityLogger;
+use Illuminate\Support\Facades\Auth;
 
 class PermissionController extends Controller implements HasMiddleware
 {
+
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
+
     public static function middleware():array {
         return [
             new Middleware('permission:manage permissions', only: ['create','store','edit','update','destroy']),
@@ -54,6 +64,12 @@ class PermissionController extends Controller implements HasMiddleware
         }
     
         Permission::create(['name' => $request->name]);    
+        $this->activityLogger->info('Created a Permission',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
         return redirect()->route('permissions.index')->with('success', 'Permission created successfully.');
     }        
 
@@ -90,6 +106,14 @@ class PermissionController extends Controller implements HasMiddleware
         }
         $permission->name = $request->name;
         $permission->save();
+
+        $this->activityLogger->info('Updated a Permission',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         return redirect()->route('permissions.index')->with('success', 'Permission updated successfully.');
 
     }
@@ -107,6 +131,14 @@ class PermissionController extends Controller implements HasMiddleware
             );
         }
         $permission->delete();
+        
+        $this->activityLogger->warning('Deleted Permission',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         return response()->json(
             ['success' => 'Permission deleted successfully.',
             'status' => true

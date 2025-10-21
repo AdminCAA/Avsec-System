@@ -12,10 +12,26 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use App\Services\ActivityLogger;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class AvsecOfficersController extends Controller
+class AvsecOfficersController extends Controller implements HasMiddleware
 { 
+    protected ActivityLogger $activityLogger;
 
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
+
+    public static function middleware():array {
+        return [
+            new Middleware('permission:manage avsec officers', only: ['index','create','store','edit','update','show','destroy']),
+        ];
+    }
+    
     public function index(Request $request) 
     {        
         $searchQuery = User::search($request);
@@ -94,10 +110,12 @@ class AvsecOfficersController extends Controller
                 $user->save();
             }
 
-            // Attach trainings if any
-            // if ($request->has('selectedTrainings')) {
-            //     $user->trainings()->sync($request->selectedTrainings);
-            // }
+            $this->activityLogger->info('Created User Information',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
+            ]);
 
             return redirect()->route('officers.index')->with('success', 'Avsec Officer created successfully.');
         } else {
@@ -106,15 +124,13 @@ class AvsecOfficersController extends Controller
     }
 
     public function show(string $id)
-    {
-        
-        
+    {                
         $personnel = User::findOrFail($id);        
         $qualifications = $personnel->qualifications()->orderBy('created_at', 'desc')->get();
         $certifications = $personnel->certifications()->orderBy('created_at', 'desc')->get();
         $mandatorycourse = $personnel->mandatorycourse()->orderBy('created_at', 'desc')->get();
         $specialisedtraining = $personnel->specialisedtraining()->orderBy('created_at', 'desc')->get();
-        
+
         return Inertia::render('Officers/Show', [
             'personnel' => $personnel,
             'qualifications' => $qualifications,
@@ -201,6 +217,13 @@ class AvsecOfficersController extends Controller
             }
 
             DB::commit();
+
+            $this->activityLogger->info('Updated User Information',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
+            ]);
             return redirect()->route('officers.index')->with('success', 'Avsec Officer updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -220,14 +243,16 @@ class AvsecOfficersController extends Controller
             Storage::disk('public')->delete($user->portrait);
         }
         $user->delete();
+        $this->activityLogger->warning('Deleted User Information',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
         return response()->json(
             [
                 'success' => 'Avsec User account deleted successfully.',
                 'status' => true
             ], 200);    
     }
-
-
-
-
 }

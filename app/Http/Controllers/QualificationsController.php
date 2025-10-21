@@ -11,12 +11,20 @@ use Inertia\Inertia;
 
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use App\Services\ActivityLogger;
+use Illuminate\Support\Facades\Auth;
 
 
 
 class QualificationsController extends Controller implements HasMiddleware
 {
-    
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
+
     public static function middleware():array {
         return [
             new Middleware('permission:manage qualifications', only: ['index','create','store','edit','update','destroy']),
@@ -74,6 +82,14 @@ class QualificationsController extends Controller implements HasMiddleware
             $qualification->qualification_file = $request->file('qualification_file')->store('qualifications', 'public');
         }
         $qualification->save();
+        
+        $this->activityLogger->info('Created Qualifications',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         return redirect()->route('personnels.show', $request->user_id)->with('success', 'Qualification created successfully.');        
     }
 
@@ -127,6 +143,14 @@ class QualificationsController extends Controller implements HasMiddleware
             $qualification->qualification_file = $request->file('qualification_file')->store('qualifications', 'public');
         }
         $qualification->save();
+
+        $this->activityLogger->info('Updated Qualifications',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         return redirect()->route('personnels.show', $qualification->user_id)->with('success', 'Qualification updated successfully.');
     }
 
@@ -144,7 +168,14 @@ class QualificationsController extends Controller implements HasMiddleware
             Storage::disk('public')->delete($qualification->qualification_file);
         }
         // Delete the facility
-        $qualification->delete();        
+        $qualification->delete();   
+        
+        $this->activityLogger->warning('Deleted Qualifications',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
         // Redirect to the personnel list with a success message
         return response()->json(
             ['success' => 'Qualification deleted successfully.',

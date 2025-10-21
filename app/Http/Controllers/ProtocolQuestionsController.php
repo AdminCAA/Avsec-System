@@ -17,9 +17,17 @@ use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ProtocolQuestionsImport;
 use App\Exports\ProtocolQuestionsTemplateExport;
+use App\Services\ActivityLogger;
 
 class ProtocolQuestionsController extends Controller implements HasMiddleware
-{
+{    
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
+
     public static function middleware(): array {
         return [
             new Middleware('permission:manage protocol questions', only: [
@@ -27,7 +35,7 @@ class ProtocolQuestionsController extends Controller implements HasMiddleware
                 'createReference','storeReference','editReference',
                 'updateReference','destroyReferenceDocument',
                 'createEvidence','storeEvidence','editEvidence',
-                'updateEvidence','destroyEvidenceDocument'
+                'updateEvidence','destroyEvidenceDocument'                
             ] ),
         ];
     }
@@ -125,6 +133,14 @@ class ProtocolQuestionsController extends Controller implements HasMiddleware
                 null,
             'uploaded_by' => Auth::user()->name,
         ]);
+
+        $this->activityLogger->info('Created Protocol Evidence',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         return redirect()->route('protocolquestions.edit',$protocolQuestion->id)->with('success', 'Reference document added successfully.');                
     }
 
@@ -154,6 +170,14 @@ class ProtocolQuestionsController extends Controller implements HasMiddleware
                 null,
             'uploaded_by' => Auth::user()->name,
         ]);
+
+        $this->activityLogger->info('Created Protocol Reference',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         return redirect()->route('protocolquestions.edit',$protocolQuestion->id)->with('success', 'Reference document added successfully.');                
     }
 
@@ -186,6 +210,13 @@ class ProtocolQuestionsController extends Controller implements HasMiddleware
             $referenceDocument->update(['attachment' => $attachmentPath]);
         }    
 
+        $this->activityLogger->info('Updated Protocol Reference',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         return redirect()->route('protocolquestions.edit',$referenceDocument->protocol_question_id)->with('success', 'Reference document added successfully.');                
     }
 
@@ -216,7 +247,15 @@ class ProtocolQuestionsController extends Controller implements HasMiddleware
             }
             $attachmentPath = $request->file('attachment')->store('attachment', 'public');
             $evidenceDocument->update(['attachment' => $attachmentPath]);
-        }    
+        } 
+        
+        $this->activityLogger->info('Updated Protocol Evidence',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         return redirect()->route('protocolquestions.edit',$evidenceDocument->protocol_question_id)->with('success', 'Evidence document added successfully.');                
     }
 
@@ -242,6 +281,14 @@ class ProtocolQuestionsController extends Controller implements HasMiddleware
             'ce_category' => $request->ce_category,            
             'icao_reference' => $request->icao_reference,
         ]);
+
+        $this->activityLogger->info('Created Protocol Question',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         return redirect()->route('protocolquestions.index')->with('success', 'Protocol Question created successfully.');
     }
 
@@ -303,6 +350,13 @@ class ProtocolQuestionsController extends Controller implements HasMiddleware
             'actual_completion_date'=> $request->actual_completion_date,
             'remarks'=> $request->remarks,
         ]);
+
+        $this->activityLogger->info('Edited Protocol Question',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
     }
 
     /**
@@ -328,6 +382,13 @@ class ProtocolQuestionsController extends Controller implements HasMiddleware
         }
 
         $protocolQuestion->delete();
+
+        $this->activityLogger->warning('Deleted Protocol Question',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
         // Redirect to the protocol question list with a success message
         return response()->json(
             ['success' => 'Protocol Question deleted successfully.',
@@ -346,6 +407,14 @@ class ProtocolQuestionsController extends Controller implements HasMiddleware
         }
         // Delete the protocol question record
         $referenceDocument->delete();
+
+        $this->activityLogger->warning('Deleted Protocol Reference',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+        
         // Redirect to the protocol question list with a success message
         return response()->json(
             ['success' => 'Reference Document deleted successfully.',
@@ -364,6 +433,14 @@ class ProtocolQuestionsController extends Controller implements HasMiddleware
         }
         // Delete the protocol question record
         $evidenceDocument->delete();
+
+        $this->activityLogger->warning('Deleted Protocol Evidence',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+
         // Redirect to the protocol question list with a success message
         return response()->json(
             ['success' => 'Evidence Document deleted successfully.',
@@ -380,6 +457,14 @@ class ProtocolQuestionsController extends Controller implements HasMiddleware
         $pdf = Pdf::loadView('pdfTemplates.protocolQuestions', compact('protocolQuestions'))
             ->setPaper('a4', 'landscape');
 
+
+        $this->activityLogger->info('Downloaded Protocol Question PDF',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
+            
         return $pdf->download('protocol_questions.pdf');
     }
 

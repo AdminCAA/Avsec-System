@@ -7,12 +7,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use App\Models\Training;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use App\Services\ActivityLogger;
 
 class TrainingController extends Controller implements HasMiddleware
 {
+    protected ActivityLogger $activityLogger;
+
+    public function __construct(ActivityLogger $activityLogger)
+    {
+        $this->activityLogger = $activityLogger;
+    }
     public static function middleware():array {
         return [
             new Middleware('permission:manage trainings', only: ['index','create','store','edit','update','destroy']),
@@ -57,6 +64,12 @@ class TrainingController extends Controller implements HasMiddleware
             Training::create([
                 'title' => $request->name,
                 'description' => $request->description,
+            ]);
+            $this->activityLogger->info('Created Training',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
             ]);
             return redirect()->route('trainings.index')->with('success', 'Training created successfully.');
         }else{
@@ -105,6 +118,13 @@ class TrainingController extends Controller implements HasMiddleware
                 'title' => $request->name,
                 'description' => $request->description,
             ]);
+
+            $this->activityLogger->info('Updated Training',[
+                'User Name' => Auth::user()->name,
+                'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+                'IP'=> request()->ip(),
+                'Time' => now(),
+            ]);
             return redirect()->route('trainings.index')->with('success', 'Training updated successfully.');
         } else {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -120,6 +140,12 @@ class TrainingController extends Controller implements HasMiddleware
         $training = Training::findOrFail($id);
         // Delete the training record
         $training->delete();
+        $this->activityLogger->warning('Deleted Training',[
+            'User Name' => Auth::user()->name,
+            'User Role'=> Auth::user()->roles->pluck('name')->join(', '),
+            'IP'=> request()->ip(),
+            'Time' => now(),
+        ]);
 
         return response()->json(
             ['success' => 'Training record deleted successfully.',
