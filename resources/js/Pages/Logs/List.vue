@@ -75,7 +75,8 @@ const clearAllLogs = () => {
     confirmButtonText: 'Yes, delete it!'
   })
     .then((result) => {
-      if (result.isConfirmed) {        
+      if (result.isConfirmed) {    
+          isLoading.value = true;  
         axios.delete(route('logs.clear'), { data: {} })
           .then(response => {
             Swal.fire({
@@ -88,6 +89,7 @@ const clearAllLogs = () => {
               timerProgressBar: true,
             });
             //redirect to the permissions index page
+            isLoading.value = false;
             setTimeout(() => {
               router.visit(route('logs.index'), {
                 preserveScroll: true,
@@ -157,7 +159,7 @@ const sortedLogs = computed(() => {
   return sorted;
 });
 
-
+const isLoading = ref(false);
 </script>
 
 <template>
@@ -175,7 +177,9 @@ const sortedLogs = computed(() => {
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item">
-                  <button v-if="hasRoles(['Super Admin'])" class="btn btn-danger"  @click="clearAllLogs"><i class="fas fa-trash"></i> Clear All
+                  <button  :disabled="isLoading" v-if="hasRoles(['Super Admin'])" class="btn btn-danger btn-sm"  @click="clearAllLogs">
+                    <span v-if="isLoading"><i class="fas fa-spinner fa-spin"></i> Clearing Logs..</span>
+                    <span v-else><i class="fas fa-trash"></i> Clear All Logs</span>
                   </button>
                 </li>
               </ol>
@@ -256,15 +260,16 @@ const sortedLogs = computed(() => {
 .table td,
 .table th {
   vertical-align: middle;
+  text-align: center;
 }
 
 .table th {
-  text-align: left;
+  text-align: center;
   background-color: #B2C6D5;
 }
 
 .table th {
-  text-align: left;
+  text-align: center;
   background-color: #B2C6D5;
   cursor: pointer;
   user-select: none;

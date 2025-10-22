@@ -10,87 +10,9 @@
 
                 <!-- Right navbar links -->
                 <ul class="navbar-nav ml-auto">
-                <!-- Navbar Search -->
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-                    <i class="fas fa-search"></i>
-                    </a>
-                    <div class="navbar-search-block">
-                    <form class="form-inline">
-                        <div class="input-group input-group-sm">
-                        <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
-                        <div class="input-group-append">
-                            <button class="btn btn-navbar" type="submit">
-                            <i class="fas fa-search"></i>
-                            </button>
-                            <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-                            <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        </div>
-                    </form>
-                    </div>
-                </li>
 
-                <!-- Messages Dropdown Menu -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="#">
-                    <i class="far fa-comments"></i>
-                    <span class="badge badge-danger navbar-badge">3</span>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                    <a href="#" class="dropdown-item">
-                        <!-- Message Start -->
-                        <div class="media">
-                        <img :src="user2" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-                        <div class="media-body">
-                            <h3 class="dropdown-item-title">
-                            Brad Diesel
-                            <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                            </h3>
-                            <p class="text-sm">Call me whenever you can...</p>
-                            <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                        </div>
-                        </div>
-                        <!-- Message End -->
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item">
-                        <!-- Message Start -->
-                        <div class="media">
-                        <img :src="user3" alt="User Avatar" class="img-size-50 img-circle mr-3">
-                        <div class="media-body">
-                            <h3 class="dropdown-item-title">
-                            John Pierce
-                            <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
-                            </h3>
-                            <p class="text-sm">I got your message bro</p>
-                            <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                        </div>
-                        </div>
-                        <!-- Message End -->
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item">
-                        <!-- Message Start -->
-                        <div class="media">
-                        <img :src="user4" alt="User Avatar" class="img-size-50 img-circle mr-3">
-                        <div class="media-body">
-                            <h3 class="dropdown-item-title">
-                            Nora Silvester
-                            <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
-                            </h3>
-                            <p class="text-sm">The subject goes here</p>
-                            <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                        </div>
-                        </div>
-                        <!-- Message End -->
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
-                    </div>
-                </li>
-                <!-- Notifications Dropdown Menu -->
+               
+                
                 <li class="nav-item dropdown">
                     <a class="nav-link" data-toggle="dropdown" href="#">
                     <i class="far fa-bell"></i>
@@ -123,11 +45,54 @@
                     <i class="fas fa-expand-arrows-alt"></i>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
-                    <i class="fas fa-th-large"></i>
+                
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <div class="user-panel  d-flex">       
+                            <img :src="user.portrait ?`/storage/${user.portrait}`
+                                                    : '/storage/portraits/avatar.png'" class="img-circle elevation-2" alt="User Image">         
+                            <div class="info">
+                                <span  class="d-block">{{ user.name }}</span>
+                            </div>
+                        </div>                    
                     </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                    <a href="#" class="dropdown-item">                        
+                        <div class="media">                        
+                        <div class="media-body">
+                            <Link
+                                :href="route('profile.edit')"
+                                class="dropdown-item d-flex align-items-center"
+                                >
+                                <i class="fas fa-user me-2 text-primary"></i>
+                                <span class="fw-semibold ml-2">Profile</span>
+                            </Link>                        
+                        </div>
+                        </div>                        
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item">
+                        
+                        <div class="media">
+                        
+                        <div class="media-body">
+                        <Link
+                            :href="route('logout')"
+                            method="post"
+                            as="button"
+                            class="dropdown-item d-flex align-items-center text-danger"
+                            >
+                        <i class="fas fa-power-off me-1 poweroff-color"></i>
+                        <span class="fw-semibold ml-2">Logout</span>
+                        </Link>  
+                        </div>
+                        </div>                        
+                    </a>                                                            
+                    </div>
                 </li>
+
+                
+
                 </ul>
             </nav>
 
@@ -139,11 +104,8 @@ import { useRoute } from 'vue-router';
 import axios from 'axios';
 import { onMounted} from 'vue';
 
-
-
-const user2 = '/assets/user2.jpg';
-    const user3 = '/assets/user3.jpg';
-    const user4 = '/assets/user4.jpg';
+    const page = usePage()
+    const user = page.props.auth.user;    
     const logoImage = '/assets/caa-logo.png';
     const avatar = '/assets/avatar.png';
 
@@ -161,6 +123,13 @@ const user2 = '/assets/user2.jpg';
     });
     
 </script>
-<style lang="">
-    
+<style scoped>
+    .dropdown-menu-lg {
+        max-width: 300px;
+        min-width: 160px !important;
+        padding: 0;
+    }
+    .dropdown-menu-lg .dropdown-item {
+        padding: .3rem 1rem !important;
+    }
 </style>
