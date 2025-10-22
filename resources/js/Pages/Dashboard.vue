@@ -535,13 +535,13 @@ const exportPdf = async () => {
         <div class="container-fluid">
           <div class="row mb-2">
             <div v-if="hasRoles(['Administrator','Super Admin','AVSEC Administrator'])" class="col-sm-6">
-            <h3 class="m-0">Admin Dashboard</h3>
+            <h3 class="m-0"><strong>Admin Dashboard</strong></h3>
           </div>
           <div v-if="hasRoles(['AVSEC Inspector'])" class="col-sm-6">
-            <h3 class="m-0">Inspector Dashboard</h3>
+            <h3 class="m-0"><strong>Inspector Dashboard</strong></h3>
           </div>
           <div v-if="hasRoles(['Guest User'])" class="col-sm-6">
-            <h3 class="m-0">Guest Dashboard</h3>
+            <h3 class="m-0"><strong>Guest Dashboard</strong></h3>
           </div>
           </div>
         </div>

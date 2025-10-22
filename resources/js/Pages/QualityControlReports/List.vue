@@ -31,7 +31,7 @@ let qualityControlsUrl = computed(() => {
   if (search.value) {
     url.searchParams.append('search', search.value);
   }
- 
+
   if (startDate.value) {
     url.searchParams.append('start_date', startDate.value);
   }
@@ -95,11 +95,11 @@ const getUserColor = (name) => {
   return `hsl(${hue}, 70%, 80%)`; // pastel-like background
 }
 
-const isLoading = ref(false);
+const loadingId = ref(null);
 
 const generateQualityControlReport = async (id) => {
   try {
-    isLoading.value = true;
+    loadingId.value = id; // mark only this record as loading
 
     const response = await axios.get(
       `/api/quality-control-reports/${id}/generateQualityControlReport`,
@@ -137,7 +137,7 @@ const generateQualityControlReport = async (id) => {
       timerProgressBar: true,
     });
   } finally {
-    isLoading.value = false;
+    loadingId.value = null; // reset after completion
   }
 };
 
@@ -187,7 +187,7 @@ const sortedqualityControls = computed(() => {
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h3 class="m-0">Quality Control Reports</h3>
+              <h3 class="m-0"><strong>Quality Control Reports</strong></h3>
             </div>
           </div>
         </div>
@@ -325,19 +325,15 @@ const sortedqualityControls = computed(() => {
                           </td>
                           <td>
                             <div class="d-flex justify-content-center">
-                              <!-- <button class="btn btn-success btn-sm mr-2" @click="generateQualityControlReport(item.id)">
-                            <i class="fas fa-chart-bar"></i> <span>Report</span>
-                        </button> -->
 
-                              <button class="btn btn-success btn-sm mr-2" :disabled="isLoading"
+                              <button class="btn btn-success btn-sm mr-2" :disabled="loadingId === item.id"
                                 @click="generateQualityControlReport(item.id)">
-                                <i v-if="!isLoading" class="fas fa-chart-bar"></i>
+                                <i v-if="loadingId !== item.id" class="fas fa-chart-bar"></i>
                                 <i v-else class="fas fa-spinner fa-spin"></i>
                                 <span>
-                                  {{ isLoading ? 'Generating...' : 'Report' }}
+                                  {{ loadingId === item.id ? 'Generating...' : 'Report' }}
                                 </span>
                               </button>
-
 
                               <Link class="btn btn-info btn-sm" :href="route('quality-controls.edit', item.id)">
                               <i class="fas fa-clipboard-list"></i><span> Details</span>
