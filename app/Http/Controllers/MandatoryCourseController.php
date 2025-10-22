@@ -17,6 +17,7 @@ use setasign\Fpdi\Fpdi\Fpdi as FPDI_TTF; // If you want explicit tFPDF usage
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;  
 use App\Services\ActivityLogger;
+use Illuminate\Support\Facades\Auth;
 
 
 class MandatoryCourseController extends Controller implements HasMiddleware

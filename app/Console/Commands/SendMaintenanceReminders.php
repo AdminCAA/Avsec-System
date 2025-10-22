@@ -10,12 +10,12 @@ use Carbon\Carbon;
 
 class SendMaintenanceReminders extends Command
 {
-    protected $signature = 'maintenance:send-reminders';
-
+    protected $signature = 'maintenance:send-reminders';    
     protected $description = 'Send maintenance reminders 14 days before next due date and mark overdue schedules';
 
     public function handle()
     {
+        $avsec_email = env('AVSEC_EMAIL');
         $today = Carbon::now()->toDateString();
         $reminderDate = Carbon::now()->addDays(14)->toDateString();
 
@@ -26,7 +26,7 @@ class SendMaintenanceReminders extends Command
             $this->info('No maintenance reminders to send today.');
         } else {
             foreach ($upcomingSchedules as $schedule) {
-                Mail::to('umoyoprintex@gmail.com')->send(new MaintenanceReminderMail($schedule));
+                Mail::to($avsec_email)->send(new MaintenanceReminderMail($schedule));
                 $this->info("Reminder sent for equipment ID: {$schedule->securityEquipment->id}");
             }
         }

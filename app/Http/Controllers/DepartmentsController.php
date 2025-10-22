@@ -135,12 +135,6 @@ class DepartmentsController extends Controller implements HasMiddleware
     {
         //
         $department = Department::findOrFail($id);
-        // Check if the department has any associated users
-        // if ($department->users()->count() > 0) {
-        //     return redirect()->route('departments.index')->with('error', 'Cannot delete department with associated users.');
-        // }
-
-        // Delete the department
         $department->delete();
 
         $this->activityLogger->warning('Deleted Department',[
