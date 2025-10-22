@@ -13,6 +13,7 @@ const submit = () => {
 </script>
 
 <template>
+
   <Head title="Confirm Password" />
 
   <div class="login-wrapper">
@@ -30,24 +31,13 @@ const submit = () => {
 
         <form @submit.prevent="submit" class="login-form">
           <div class="form-group mb-3">
-            <input
-              id="password"
-              type="password"
-              class="input-field"
-              placeholder="Enter your password"
-              v-model="form.password"
-              autocomplete="current-password"
-              autofocus
-            />
+            <input id="password" type="password" class="input-field" placeholder="Enter your password"
+              v-model="form.password" autocomplete="current-password" autofocus />
             <div v-if="form.errors.password" class="error">{{ form.errors.password }}</div>
           </div>
 
           <div class="button-group">
-            <button
-              type="submit"
-              class="btn-primary"
-              :disabled="form.processing"
-            >
+            <button type="submit" class="btn-primary" :disabled="form.processing">
               <span v-if="form.processing">
                 <i class="fas fa-spinner fa-spin"></i> Confirming...
               </span>
@@ -61,7 +51,6 @@ const submit = () => {
 
       <!-- RIGHT PANEL -->
       <div class="right-panel">
-        <h2>Aviation <br />Security Information Management System (ASIMS)</h2>
         <img src="/assets/register-3.png" class="illustration" alt="Confirm Password" />
 
         <div class="register-info">
@@ -70,7 +59,7 @@ const submit = () => {
             If you’ve forgotten your password, you can reset it using the link below.
           </p>
           <Link :href="route('password.request')" class="btn-register">
-            Forgot Password?
+          Forgot Password?
           </Link>
         </div>
       </div>
@@ -79,7 +68,6 @@ const submit = () => {
 </template>
 
 <style scoped>
-/* Reused from verifyEmail.vue for consistency */
 body,
 html {
   height: 100%;

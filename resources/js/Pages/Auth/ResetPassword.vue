@@ -101,7 +101,7 @@ const submit = () => {
 
       <!-- RIGHT PANEL -->
       <div class="right-panel">
-        <h2>Welcome to <br />Aviation Security Information Management System (ASIMS)</h2>
+        <!-- <h2>Welcome to <br />Aviation Security Information Management System (ASIMS)</h2> -->
         <img src="/assets/register-3.png" class="illustration" alt="Reset Password" />
 
         <div class="register-info">
@@ -117,8 +117,6 @@ const submit = () => {
 </template>
 
 <style scoped>
-/* Reuse styles from verifyEmail.vue */
-
 body,
 html {
   height: 100%;

@@ -53,16 +53,17 @@ watch(() => form.password_confirmation, (value) => {
 </script>
 
 <template>
+
   <Head title="Register" />
   <div class="login-wrapper">
     <div class="login-container">
+
       <!-- LEFT PANEL -->
       <div class="left-panel">
         <div class="header-section">
           <img src="/assets/caa-logo.png" alt="CAA Logo" class="caa-logo" />
           <h2 class="welcome-title">Welcome to</h2>
-          <h2 class="welcome-title">Aviation Security Information System</h2>
-          <p class="subtitle">Fill the form below to create your account</p>
+          <h2 class="welcome-title">Aviation Security Information <br /> Management System </h2>
         </div>
 
         <form @submit.prevent="submit" class="login-form">
@@ -75,7 +76,8 @@ watch(() => form.password_confirmation, (value) => {
           <input v-model="form.password" type="password" placeholder="Password" class="input-field" />
           <div v-if="passwordError" class="error">{{ passwordError }}</div>
 
-          <input v-model="form.password_confirmation" type="password" placeholder="Confirm Password" class="input-field" />
+          <input v-model="form.password_confirmation" type="password" placeholder="Confirm Password"
+            class="input-field" />
           <div v-if="confirmPasswordError" class="error">{{ confirmPasswordError }}</div>
 
           <button type="submit" class="btn-primary" :disabled="form.processing">
@@ -88,28 +90,16 @@ watch(() => form.password_confirmation, (value) => {
           Already have an account?
           <Link :href="route('login')">Login</Link>
         </p>
-
-        <!-- <div class="bottom-row">
-          <div class="avatars">
-            <img src="/assets/user1.jpg" alt="user1" />
-            <img src="/assets/user2.jpg" alt="user2" />
-            <img src="/assets/user3.jpg" alt="user3" />
-            <span>Join with 20k+ Users!</span>
-          </div>
-           <button class="arrow-btn">➜</button>
-        </div> -->
       </div>
 
       <!-- RIGHT PANEL -->
       <div class="right-panel">
-        <h2>Aviation <br/> Security Information Management System (ASIMS).</h2>
-        <!-- <img src="/assets/register-2.jpg" class="illustration" alt="Register" /> -->
-         <img src="/assets/register-3.png" class="illustration" alt="Register" />
-        
+        <img src="/assets/register-3.png" class="illustration" alt="Register" />
+
         <div class="register-info">
           <h3>New Here?</h3>
           <p>
-            Register an account to access ASIMS. Once registered, you can securely log in, 
+            Register an account to access ASIMS. Once registered, you can securely log in,
             manage your profile, and gain access to Aviation Security Information.
           </p>
           <Link :href="route('login')" class="btn-register">Back to Login</Link>
@@ -119,7 +109,6 @@ watch(() => form.password_confirmation, (value) => {
   </div>
 </template>
 <style scoped>
-/* Wrapper */
 body,
 html {
   height: 100%;
@@ -271,7 +260,8 @@ html {
   top: 40px;
   font-size: 28px;
   margin-bottom: 20px;
-  width: 80%;          /* takes 80% of right panel width */
+  width: 80%;
+  /* takes 80% of right panel width */
   margin-left: auto;
   margin-right: auto;
   line-height: 1.4;
@@ -294,12 +284,13 @@ html {
 .register-info {
   position: absolute;
   bottom: 40px;
-  background: rgba(255, 255, 255, 0.5); /* reduced opacity */
+  background: rgba(255, 255, 255, 0.5);
+  /* reduced opacity */
   padding: 20px;
   border-radius: 12px;
   text-align: center;
   max-width: 80%;
-  backdrop-filter: blur(2px); 
+  backdrop-filter: blur(2px);
 }
 
 

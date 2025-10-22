@@ -1,4 +1,4 @@
-<script setup> 
+<script setup>
 import { ref, watch } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
@@ -19,7 +19,6 @@ const submit = () => {
   });
 };
 
-// Errors
 const emailError = ref('');
 const passwordError = ref('');
 
@@ -37,17 +36,17 @@ watch(() => form.password, (value) => {
 </script>
 
 <template>
+
   <Head title="Login" />
   <div class="login-wrapper">
     <div class="login-container">
+
       <!-- LEFT SIDE -->
       <div class="left-panel">
-        <!-- Centered Header Section -->
         <div class="header-section">
           <img src="/assets/caa-logo.png" alt="CAA Logo" class="caa-logo" />
           <h2 class="welcome-title">Welcome to</h2>
-          <h2 class="welcome-title">Aviation Security Information System</h2>
-          <p class="subtitle">Enter email & password to login</p>
+          <h2 class="welcome-title">Aviation Security Information <br /> Management System </h2>
         </div>
 
         <form @submit.prevent="submit" class="login-form">
@@ -60,20 +59,12 @@ watch(() => form.password, (value) => {
           <!-- Remember Me + Forgot Password Row -->
           <div class="remember-forgot-row">
             <label class="remember-label">
-              <input
-                type="checkbox"
-                v-model="form.remember"
-                class="remember-checkbox"
-              />
+              <input type="checkbox" v-model="form.remember" class="remember-checkbox" />
               Remember Me
             </label>
 
-            <Link
-              v-if="canResetPassword"
-              :href="route('password.request')"
-              class="forgot-link"
-            >
-              Forgot your password?
+            <Link v-if="canResetPassword" :href="route('password.request')" class="forgot-link">
+            Forgot your password?
             </Link>
           </div>
 
@@ -87,25 +78,12 @@ watch(() => form.password, (value) => {
           Not yet registered?
           <Link :href="route('register')">Register</Link>
         </p>
-
-        <!-- <div class="bottom-row">
-          <div class="avatars">
-            <img src="/assets/user1.jpg" alt="user1" />
-            <img src="/assets/user2.jpg" alt="user2" />
-            <img src="/assets/user3.jpg" alt="user3" />
-            <span>Join with 20k+ Users!</span>
-          </div>
-          <button class="arrow-btn">➜</button>
-        </div> -->
       </div>
 
       <!-- RIGHT SIDE -->
       <div class="right-panel">
-        <h2>Aviation <br/> Security Information Management System (ASIMS).</h2>
-        <!-- <img src="/assets/register-2.jpg" class="illustration" alt="Aviation Security" /> -->
-         <img src="/assets/register-3.png" class="illustration" alt="Aviation Security" />
+        <img src="/assets/register-3.png" class="illustration" alt="Aviation Security" />
 
-        <!-- Register Info -->
         <div class="register-info">
           <h3>New Here?</h3>
           <p>
@@ -120,7 +98,6 @@ watch(() => form.password, (value) => {
 </template>
 
 <style scoped>
-/* Wrapper */
 body,
 html {
   height: 100%;
@@ -315,12 +292,13 @@ html {
 .register-info {
   position: absolute;
   bottom: 40px;
-  background: rgba(255, 255, 255, 0.5); /* reduced opacity */
+  background: rgba(255, 255, 255, 0.5);
+  /* reduced opacity */
   padding: 20px;
   border-radius: 12px;
   text-align: center;
   max-width: 80%;
-  backdrop-filter: blur(2px); 
+  backdrop-filter: blur(2px);
 }
 
 
