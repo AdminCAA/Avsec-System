@@ -322,7 +322,7 @@ const downloadTemplate = async () => {
 
 
                 <li class="breadcrumb-item">
-                  <Link class="btn btn-info" @click="downloadPDF" :disabled="isDownloading"
+                  <Link href="#" class="btn btn-info" @click.prevent="downloadPDF" :disabled="isDownloading"
                     style="display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
                   <i v-if="!isDownloading" class="fas fa-file-pdf" style="margin-right: 6px; font-size: 14px;"></i>
                   <i v-else class="fas fa-spinner fa-spin" style="margin-right: 6px; font-size: 14px;"></i>
