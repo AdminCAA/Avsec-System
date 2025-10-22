@@ -130,7 +130,7 @@ const sortedRoles = computed(() => {
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h3 class="m-0">Roles</h3>
+              <h3 class="m-0"><strong>Roles</strong></h3>
             </div><!-- /.col -->
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
