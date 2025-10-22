@@ -14,7 +14,6 @@ const submit = () => {
     form.post(route('password.email'));
 };
 
-// Error
 const emailError = ref('');
 
 watch(() => form.email, (value) => {
@@ -22,6 +21,7 @@ watch(() => form.email, (value) => {
     if (!value) emailError.value = 'Email is required.';
     else if (!/^\S+@\S+\.\S+$/.test(value)) emailError.value = 'Enter a valid email address.';
 });
+
 </script>
 
 <template>
@@ -29,6 +29,7 @@ watch(() => form.email, (value) => {
     <Head title="Forgot Password" />
     <div class="login-wrapper">
         <div class="login-container">
+
             <!-- LEFT SIDE -->
             <div class="left-panel">
                 <div class="header-section">
@@ -57,9 +58,7 @@ watch(() => form.email, (value) => {
 
             <!-- RIGHT SIDE -->
             <div class="right-panel">
-                <h2>Password Recovery</h2>
-                <!-- <img src="/assets/register-2.jpg" class="illustration" alt="Password Reset" /> -->
-                 <img src="/assets/register-3.png" class="illustration" alt="Password Reset" />
+                <img src="/assets/register-3.png" class="illustration" alt="Password Reset" />
 
                 <div class="register-info">
                     <h3>Forgot Your Password?</h3>
@@ -76,7 +75,6 @@ watch(() => form.email, (value) => {
 </template>
 
 <style scoped>
-/* Reuse same styles as login.vue */
 .login-wrapper {
     display: flex;
     align-items: center;
@@ -170,7 +168,7 @@ watch(() => form.email, (value) => {
 }
 
 .btn-primary:hover {
-  background-color: #005fa3;
+    background-color: #005fa3;
 }
 
 .right-panel {
@@ -203,14 +201,14 @@ watch(() => form.email, (value) => {
 }
 
 .register-info {
-  position: absolute;
-  bottom: 40px;
-  background: rgba(255, 255, 255, 0.5); /* reduced opacity */
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
-  max-width: 80%;
-  backdrop-filter: blur(2px); 
+    position: absolute;
+    bottom: 40px;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 80%;
+    backdrop-filter: blur(2px);
 }
 
 
