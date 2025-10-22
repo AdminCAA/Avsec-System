@@ -101,7 +101,8 @@ const submit = () => {
       <!-- RIGHT PANEL -->
       <div class="right-panel">
         <h2>Aviation <br />Security Information Management System (ASIMS).</h2>
-        <img src="/assets/register-2.jpg" class="illustration" alt="2FA Verification" />
+        <!-- <img src="/assets/register-2.jpg" class="illustration" alt="2FA Verification" /> -->
+         <img src="/assets/register-3.png" class="illustration" alt="2FA Verification" />
 
         <div class="register-info">
           <h3>Having Trouble?</h3>

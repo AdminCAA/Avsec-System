@@ -102,7 +102,8 @@ watch(() => form.password, (value) => {
       <!-- RIGHT SIDE -->
       <div class="right-panel">
         <h2>Aviation <br/> Security Information Management System (ASIMS).</h2>
-        <img src="/assets/register-2.jpg" class="illustration" alt="Aviation Security" />
+        <!-- <img src="/assets/register-2.jpg" class="illustration" alt="Aviation Security" /> -->
+         <img src="/assets/register-3.png" class="illustration" alt="Aviation Security" />
 
         <!-- Register Info -->
         <div class="register-info">

@@ -103,7 +103,8 @@ watch(() => form.password_confirmation, (value) => {
       <!-- RIGHT PANEL -->
       <div class="right-panel">
         <h2>Aviation <br/> Security Information Management System (ASIMS).</h2>
-        <img src="/assets/register-2.jpg" class="illustration" alt="Register" />
+        <!-- <img src="/assets/register-2.jpg" class="illustration" alt="Register" /> -->
+         <img src="/assets/register-3.png" class="illustration" alt="Register" />
         
         <div class="register-info">
           <h3>New Here?</h3>
