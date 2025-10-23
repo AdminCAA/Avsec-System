@@ -42,8 +42,9 @@ class CreateNewUser implements CreatesNewUsers
         $user->assignRole('Guest User'); 
 
         if($user){
+            $avsec_email = env('AVSEC_EMAIL');
             //Send email to the user
-            Mail::to("felix.mantini@caa.co.zm")->send(new \App\Mail\notifyAdminAboutNewuser($user));
+            Mail::to($avsec_email)->send(new \App\Mail\notifyAdminAboutNewuser($user));
         }
 
         return $user;
