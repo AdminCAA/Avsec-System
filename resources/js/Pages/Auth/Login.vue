@@ -13,11 +13,45 @@ const form = useForm({
   remember: false,
 });
 
+// const submit = () => {
+//   form.post(route('login'), {
+//     onFinish: () => form.reset('password'),
+//   });
+// };
+
 const submit = () => {
+  // Reset errors first
+  emailError.value = '';
+  passwordError.value = '';
+
+  // Frontend validation
+  let valid = true;
+
+  if (!form.email) {
+    emailError.value = 'Email is required.';
+    valid = false;
+  } else if (!/^\S+@\S+\.\S+$/.test(form.email)) {
+    emailError.value = 'Enter a valid email address.';
+    valid = false;
+  }
+
+  if (!form.password) {
+    passwordError.value = 'Password is required.';
+    valid = false;
+  } else if (form.password.length < 6) {
+    passwordError.value = 'Password must be at least 6 characters.';
+    valid = false;
+  }
+
+  // Stop if validation failed
+  if (!valid) return;
+
+  // Proceed with login
   form.post(route('login'), {
     onFinish: () => form.reset('password'),
   });
 };
+
 
 const emailError = ref('');
 const passwordError = ref('');

@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
 import { ref, watch } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
@@ -43,6 +43,122 @@ watch(() => form.password, (value) => {
   else if (!/[0-9]/.test(value)) passwordError.value = 'Add at least one number.';
   else if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) passwordError.value = 'Add at least one special character.';
   else if (value !== form.password_confirmation) passwordError.value = 'Passwords do not match.';
+});
+
+watch(() => form.password_confirmation, (value) => {
+  confirmPasswordError.value = '';
+  if (!value) confirmPasswordError.value = 'Password confirmation is required.';
+  else if (value !== form.password) confirmPasswordError.value = 'Passwords do not match.';
+});
+</script> -->
+
+<script setup>
+import { ref, watch } from 'vue';
+import { Head, Link, useForm } from '@inertiajs/vue3';
+
+const form = useForm({
+  name: '',
+  email: '',
+  password: '',
+  password_confirmation: '',
+});
+
+const nameError = ref('');
+const emailError = ref('');
+const passwordError = ref('');
+const confirmPasswordError = ref('');
+
+const submit = () => {
+  // Reset previous errors
+  nameError.value = '';
+  emailError.value = '';
+  passwordError.value = '';
+  confirmPasswordError.value = '';
+
+  let valid = true;
+
+  // Name validation
+  if (!form.name) {
+    nameError.value = 'Name is required.';
+    valid = false;
+  } else if (form.name.length < 3) {
+    nameError.value = 'Name must be at least 3 characters.';
+    valid = false;
+  } else if (form.name.length > 50) {
+    nameError.value = 'Name must be less than 50 characters.';
+    valid = false;
+  }
+
+  // Email validation
+  if (!form.email) {
+    emailError.value = 'Email is required.';
+    valid = false;
+  } else if (!/^\S+@\S+\.\S+$/.test(form.email)) {
+    emailError.value = 'Enter a valid email address.';
+    valid = false;
+  }
+
+  // Password validation
+  if (!form.password) {
+    passwordError.value = 'Password is required.';
+    valid = false;
+  } else if (form.password.length < 8) {
+    passwordError.value = 'Password must be at least 8 characters.';
+    valid = false;
+  } else if (!/[A-Z]/.test(form.password)) {
+    passwordError.value = 'Add at least one uppercase letter.';
+    valid = false;
+  } else if (!/[a-z]/.test(form.password)) {
+    passwordError.value = 'Add at least one lowercase letter.';
+    valid = false;
+  } else if (!/[0-9]/.test(form.password)) {
+    passwordError.value = 'Add at least one number.';
+    valid = false;
+  } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(form.password)) {
+    passwordError.value = 'Add at least one special character.';
+    valid = false;
+  }
+
+  // Confirm password validation
+  if (!form.password_confirmation) {
+    confirmPasswordError.value = 'Password confirmation is required.';
+    valid = false;
+  } else if (form.password_confirmation !== form.password) {
+    confirmPasswordError.value = 'Passwords do not match.';
+    valid = false;
+  }
+
+  // Stop if validation failed
+  if (!valid) return;
+
+  // Proceed to submit if valid
+  form.post(route('register'), {
+    onFinish: () => form.reset('password', 'password_confirmation'),
+  });
+};
+
+// Watchers for live validation while typing
+watch(() => form.name, (value) => {
+  nameError.value = '';
+  if (!value) nameError.value = 'Name is required.';
+  else if (value.length < 3) nameError.value = 'Name must be at least 3 characters.';
+  else if (value.length > 50) nameError.value = 'Name must be less than 50 characters.';
+});
+
+watch(() => form.email, (value) => {
+  emailError.value = '';
+  if (!value) emailError.value = 'Email is required.';
+  else if (!/^\S+@\S+\.\S+$/.test(value)) emailError.value = 'Enter a valid email address.';
+});
+
+watch(() => form.password, (value) => {
+  passwordError.value = '';
+  if (!value) passwordError.value = 'Password is required.';
+  else if (value.length < 8) passwordError.value = 'Password must be at least 8 characters.';
+  else if (!/[A-Z]/.test(value)) passwordError.value = 'Add at least one uppercase letter.';
+  else if (!/[a-z]/.test(value)) passwordError.value = 'Add at least one lowercase letter.';
+  else if (!/[0-9]/.test(value)) passwordError.value = 'Add at least one number.';
+  else if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) passwordError.value = 'Add at least one special character.';
 });
 
 watch(() => form.password_confirmation, (value) => {
